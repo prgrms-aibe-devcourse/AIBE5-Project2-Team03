@@ -28,7 +28,7 @@ public class Quest {
     @Column(name="form_data")
     private String form_data;
 
-    @Column(name="reward_amount")
+    @Column(name=reward_amount)
     private BigDecimal reward_amount;
 
 }

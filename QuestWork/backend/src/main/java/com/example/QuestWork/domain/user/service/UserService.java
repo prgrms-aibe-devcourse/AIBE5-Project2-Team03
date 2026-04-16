@@ -5,7 +5,7 @@ import com.example.QuestWork.domain.user.constant.UserStatus;
 import com.example.QuestWork.domain.user.dto.UserLoginRequestDto;
 import com.example.QuestWork.domain.user.dto.UserSignupRequesetDto;
 import com.example.QuestWork.domain.user.entity.User;
-import com.example.QuestWork.domain.user.repository.UserRepository;;
+import com.example.QuestWork.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
