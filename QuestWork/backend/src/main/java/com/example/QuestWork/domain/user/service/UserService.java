@@ -36,35 +36,45 @@ public class UserService {
     }
     @Transactional
     public void signUp(UserRequestDto dto) {
-        // 1. 비밀번호 암호화 및 유저 저장
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
         User user = userRepository.save(dto.toUserEntity(encodedPassword));
 
-        // 2. 권한 및 프로필 생성
         String roleType = dto.getRoleType();
+        System.out.println("전달된 roleType: [" + roleType + "]");
 
-        if ("MANAGER".equals(roleType)) {
+        // 1. [공통] 어떤 역할이든 '기본 멤버 프로필'은 생성합니다.
+        // (매니저도 활동을 하려면 기본 프로필 정보가 필요하니까요!)
+        MemberProfileEntity memberProfile = MemberProfileEntity.builder()
+                .user(user)
+                .level(MemberLevel.BRONZE)
+                .badgeCount(0)
+                .totalReward(BigDecimal.ZERO)
+                .build();
+        memberProfileRepository.save(memberProfile);
+
+        // 2. 역할에 따른 권한 부여 및 추가 프로필 생성
+        if (roleType != null && roleType.trim().equalsIgnoreCase("MANAGER")) {
+            // 매니저 권한 부여
             userRepository.insertUserRoleNative(user.getId(), "MANAGER");
 
+            // 매니저 추가 프로필 생성
             ManagerProfileEntity managerProfile = ManagerProfileEntity.builder()
                     .user(user)
                     .managerType(dto.getManagerType())
                     .companyName(dto.getCompanyName())
+                    .managerType(dto.getManagerType() != null ? dto.getManagerType() : "COMPANY")
                     .businessNumber(dto.getBusinessNumber())
+                    .managerName(dto.getManagerName())     // 👈 DTO에서 꺼내서 주입
+                    .contact_phone(dto.getContactPhone()) // 👈 DTO에서 꺼내서 주입
                     .approved(false)
                     .build();
             managerProfileRepository.save(managerProfile);
 
+            System.out.println("매니저 및 기본 멤버 프로필 생성 완료");
         } else {
+            // 일반 멤버 권한 부여
             userRepository.insertUserRoleNative(user.getId(), "MEMBER");
-
-            MemberProfileEntity memberProfile = MemberProfileEntity.builder()
-                    .user(user)
-                    .level(MemberLevel.BRONZE)
-                    .badgeCount(0)
-                    .totalReward(BigDecimal.ZERO)
-                    .build();
-            memberProfileRepository.save(memberProfile);
+            System.out.println("일반 멤버 프로필 생성 완료");
         }
     }
     }

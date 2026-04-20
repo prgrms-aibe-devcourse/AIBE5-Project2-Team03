@@ -14,7 +14,7 @@ export default function SignupPage() {
     nickname: '',
     email: '',
     password: '',
-    role: '',
+    roleType: '',
   })
 
   // const [emailCodeSent, setEmailCodeSent] = useState(false)
@@ -31,14 +31,10 @@ export default function SignupPage() {
     // }
   }
 
-  const handleRoleChange = (value: string) => {
-    setFormData(prev => ({ ...prev, role: value }))
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.role) {
+    if (!formData.roleType) {
       alert('역할을 선택해주세요.')
       return
     }
@@ -88,7 +84,7 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="name">이름</Label>
             <Input
@@ -101,18 +97,30 @@ export default function SignupPage() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>역할 선택</Label>
-            <RadioGroup value={formData.role} onValueChange={handleRoleChange}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="individual" id="individual" />
-                <Label htmlFor="individual">개인</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="manager" id="manager" />
-                <Label htmlFor="manager">매니저</Label>
-              </div>
-            </RadioGroup>
+          <div className="grid grid-cols-2 gap-3">
+            <label className={`cursor-pointer rounded-2xl border px-4 py-3 text-center transition ${formData.roleType === 'MEMBER' ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-surface text-foreground'}`}>
+              <input
+                  type="radio"
+                  name="roleType" // name도 변경
+                  value="MEMBER"  // individual -> MEMBER로 변경
+                  checked={formData.roleType === 'MEMBER'}
+                  onChange={handleChange}
+                  className="sr-only"
+              />
+              개인
+            </label>
+
+            <label className={`cursor-pointer rounded-2xl border px-4 py-3 text-center transition ${formData.roleType === 'MANAGER' ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-surface text-foreground'}`}>
+              <input
+                  type="radio"
+                  name="roleType" // name도 변경
+                  value="MANAGER" // manager -> MANAGER로 변경
+                  checked={formData.roleType === 'MANAGER'}
+                  onChange={handleChange}
+                  className="sr-only"
+              />
+              매니저
+            </label>
           </div>
 
           <div className="space-y-2">

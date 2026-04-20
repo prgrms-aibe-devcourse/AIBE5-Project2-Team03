@@ -15,10 +15,12 @@ public class UserRequestDto {
     private String nickname;
     private String roleType; // "MEMBER" or "MANAGER"
 
-    // 매니저 전용
+    // 💡 매니저 추가 정보 필드 삽입
     private String managerType;
     private String companyName;
     private String businessNumber;
+    private String managerName;   // 👈 추가
+    private String contactPhone;  // 👈 추가 (DB 컬럼명 contact_phone과 매핑)
 
     public User toUserEntity(String encodedPassword) {
         return User.builder()

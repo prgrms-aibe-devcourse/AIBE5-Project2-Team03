@@ -69,9 +69,10 @@ export function MemberTable({
 
   // UI 스타일 헬퍼 함수들
   const getRoleBadgeStyle = (role: Role) => {
-    switch (role.toLowerCase()) {
-      case "admin": return "bg-primary/10 text-primary border-primary/20"
-      case "member": return "bg-amber-50 text-amber-700 border-amber-200"
+    switch (role.toUpperCase()) {
+      case "ADMIN": return "bg-purple-50 text-purple-700 border-purple-200"
+      case "MANAGER": return "bg-amber-50 text-amber-700 border-amber-200"
+      case "MEMBER": return "bg-blue-50 text-blue-700 border-blue-200"
       default: return "bg-slate-50 text-slate-700 border-slate-200"
     }
   }
@@ -86,10 +87,11 @@ export function MemberTable({
   }
 
   const getRoleLabel = (role: Role) => {
-    switch (role.toLowerCase()) {
-      case "admin": return "관리자"
-      case "member": return "매니저"
-      default: return "회원"
+    switch (role.toUpperCase()) {
+      case "ADMIN": return "관리자"
+      case "MANAGER": return "매니저"   // ✅ MANAGER가 매니저로 나오게 수정
+      case "MEMBER": return "회원"     // ✅ MEMBER가 회원으로 나오게 수정
+      default: return role
     }
   }
 
@@ -162,9 +164,9 @@ export function MemberTable({
                             </DropdownMenuSubTrigger>
                             <DropdownMenuPortal>
                               <DropdownMenuSubContent>
-                                <DropdownMenuItem onClick={() => onRoleChange(member.id, "admin")}>관리자</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onRoleChange(member.id, "member")}>매니저</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onRoleChange(member.id, "user")}>일반 회원</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => onRoleChange(member.id, "ADMIN")}>관리자</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => onRoleChange(member.id, "MANAGER")}>매니저</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => onRoleChange(member.id, "MEMBER")}>일반 회원</DropdownMenuItem>
                               </DropdownMenuSubContent>
                             </DropdownMenuPortal>
                           </DropdownMenuSub>

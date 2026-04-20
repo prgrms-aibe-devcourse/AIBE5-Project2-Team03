@@ -6,7 +6,7 @@ import { MemberTable } from "@/components/admin/member-table"
 import { MemberStats } from "@/components/admin/member-stats"
 import { SearchFilter } from "@/components/admin/search-filter"
 
-export type Role = "admin" | "user" | "member"
+export type Role = "ADMIN" | "MEMBER" | "MANAGER" // 💡 대문자로 변경
 export type Status = "ACTIVE" | "INACTIVE" | "DELETED"
 
 export interface Member {
@@ -43,7 +43,8 @@ export default function AdminPage() {
         id: user.id.toString(),
         name: user.nickname,
         email: user.email,
-        role: "user", // Role 엔티티가 구현되면 user.role 등으로 변경 필요
+        // ✅ 서버 DTO의 roleName을 사용합니다.
+        role: user.roleName || "MEMBER",
         status: user.status || "ACTIVE",
         joinDate: user.createdAt ? user.createdAt.split("T")[0] : "-",
         lastLogin: "-",
@@ -90,13 +91,12 @@ export default function AdminPage() {
 
   // 3. 권한 변경 백엔드 연동
   const handleRoleChange = async (memberId: string, newRole: Role) => {
+    // 💡 토글 방식이 아니라, 드롭다운에서 선택한 newRole을 그대로 사용해야 합니다.
     try {
       const response = await fetch(`http://localhost:8000/api/admin/users/${memberId}/role`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newRole),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roleName: newRole }), // 선택된 권한 그대로 전달
       });
 
       if (response.ok) {
@@ -105,16 +105,13 @@ export default function AdminPage() {
                 member.id === memberId ? { ...member, role: newRole } : member
             )
         );
-        console.log(`유저 ${memberId}의 권한이 ${newRole}로 변경되었습니다.`);
       } else {
-        alert("권한 변경에 실패했습니다. 서버 로그를 확인하세요.");
+        alert("권한 변경 실패");
       }
     } catch (error) {
       console.error("통신 에러:", error);
-      alert("서버와 연결할 수 없습니다.");
     }
   }
-
   // 4. 회원 소프트 삭제 (DELETED 상태로 변경)
   const handleDeleteMember = async (memberId: string) => {
     if(confirm("정말로 이 회원을 삭제하시겠습니까?")) {
@@ -131,14 +128,17 @@ export default function AdminPage() {
     return matchesSearch && matchesRole && matchesStatus
   })
 
+  // AdminPage.tsx 내부의 stats 부분 수정
   const stats = {
     total: members.length,
     active: members.filter((m) => m.status === "ACTIVE").length,
     inactive: members.filter((m) => m.status === "INACTIVE").length,
     deleted: members.filter((m) => m.status === "DELETED").length,
-    admins: members.filter((m) => m.role === "admin").length,
-    managers: members.filter((m) => m.role === "member").length,
-    users: members.filter((m) => m.role === "user").length,
+
+    // 💡 아래 필드명과 비교 값을 수정합니다.
+    admins: members.filter((m) => m.role === "ADMIN").length,
+    managers: members.filter((m) => m.role === "MANAGER").length,
+    users: members.filter((m) => m.role === "MEMBER").length,
   }
 
   return (
