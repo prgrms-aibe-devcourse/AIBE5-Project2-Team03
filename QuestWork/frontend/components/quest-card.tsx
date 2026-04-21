@@ -21,23 +21,19 @@ interface QuestCardProps {
 
 export function QuestCard({ quest }: QuestCardProps) {
   return (
-    <Link href={`/quests/${quest.id}`}>
+    <Link href={`/quests/${quest.id}`} className="block">
       <Card className="group flex h-full flex-col overflow-hidden rounded-lg border border-border shadow transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
-        {/* Top - Quest Title */}
-        <div className="border-b border-border p-4">
+        <div className="border-b border-border px-4 py-3.5">
           <h3 className="line-clamp-2 text-lg font-semibold text-foreground transition-colors group-hover:text-primary">
             {quest.title}
           </h3>
         </div>
 
-        {/* Middle - Description & Tech Stack */}
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          {/* Description */}
+        <div className="flex flex-1 flex-col gap-3 px-4 py-3.5">
           <p className="line-clamp-2 text-sm text-foreground-muted">
             {quest.description}
           </p>
 
-          {/* Tech Stack Tags */}
           <div className="flex flex-wrap gap-2">
             {quest.techStack.map((tech) => (
               <Badge
@@ -50,9 +46,7 @@ export function QuestCard({ quest }: QuestCardProps) {
           </div>
         </div>
 
-        {/* Bottom - Reward, Deadline, Participants & CTA */}
-        <div className="space-y-4 border-t border-border p-4">
-          {/* Stats Row */}
+        <div className="space-y-3 border-t border-border px-4 py-3.5">
           <div className="flex items-center justify-between text-sm">
             <div className="flex flex-col gap-1">
               <span className="text-xs text-foreground-muted">보상</span>
@@ -68,8 +62,7 @@ export function QuestCard({ quest }: QuestCardProps) {
             </div>
           </div>
 
-          {/* CTA Button */}
-          <Button className="w-full bg-primary text-primary-foreground transition-colors hover:bg-primary-hover">
+          <Button className="h-9 w-full bg-primary text-primary-foreground transition-colors hover:bg-primary-hover">
             퀘스트 보기
           </Button>
         </div>

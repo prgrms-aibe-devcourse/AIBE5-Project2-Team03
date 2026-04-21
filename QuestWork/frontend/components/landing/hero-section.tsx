@@ -1,8 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
+import {
+  QUEST_CATEGORIES,
+  type QuestCategorySlug,
+} from "@/lib/mock-quests-data";
 
 const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1600&h=900&fit=crop",
@@ -11,19 +16,16 @@ const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1522202176988-4ea95f317b13?w=1600&h=900&fit=crop",
 ];
 
-const CATEGORY_CHIPS = [
-  "Web Development",
-  "Mobile Development",
-  "Software Development",
-  "WordPress Development",
-];
-
 type Audience = "freelancer" | "manager";
 
 export function HeroSection() {
+  const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [audience, setAudience] = useState<Audience>("freelancer");
+  const [selectedCategory, setSelectedCategory] =
+    useState<QuestCategorySlug>("web-development");
+  const [searchQuery, setSearchQuery] = useState("");
   const autoSlideRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -48,8 +50,19 @@ export function HeroSection() {
     );
   const nextSlide = () =>
     setCurrentSlide((prev) => (prev + 1) % HERO_IMAGES.length);
+
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const category =
+      QUEST_CATEGORIES.find((item) => item.slug === selectedCategory) ??
+      QUEST_CATEGORIES[0];
+    const trimmedQuery = searchQuery.trim();
+    const destination = trimmedQuery
+      ? `${category.route}?q=${encodeURIComponent(trimmedQuery)}`
+      : category.route;
+
+    router.push(destination);
   };
 
   return (
@@ -79,22 +92,22 @@ export function HeroSection() {
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent" />
         </div>
 
-        <div className="relative z-10 flex h-full items-center px-6 py-12 sm:px-10 lg:px-16">
+        <div className="relative z-10 flex h-full items-center px-6 py-12 sm:px-10 md:pl-20 md:pr-14 lg:px-16 lg:pl-24">
           <div className="flex w-full max-w-3xl flex-col gap-7">
             <div className="inline-flex w-fit items-center rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-sm backdrop-blur-md">
-              개발자 퀘스트를 가장 빠르게 만나는 곳
+              개발자와 퀘스트를 가장 빠르게 연결해보세요
             </div>
 
             <div className="space-y-5">
               <h1 className="text-balance text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
-                검증된 개발자와
+                검증된 개발자를
                 <br />
-                명확한 퀘스트로 일하세요
+                명확한 퀘스트로 찾아보세요
               </h1>
               <p className="max-w-2xl text-pretty text-base leading-7 text-white/80 sm:text-lg">
                 QuestWork는 개발자 중심의 프리랜서 플랫폼입니다. 프리랜서는
                 실력에 맞는 퀘스트를 찾고, 기업과 매니저는 필요한 기술을 가진
-                전문가와 더 빠르게 연결됩니다.
+                전문가를 더 빠르게 연결할 수 있습니다.
               </p>
             </div>
 
@@ -144,6 +157,8 @@ export function HeroSection() {
                   <input
                     id="quest-search"
                     type="search"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
                     placeholder="어떤 퀘스트를 찾고 있나요?"
                     className="min-h-12 flex-1 rounded-full bg-transparent px-5 text-sm font-medium text-gray-950 outline-none placeholder:text-gray-500 sm:text-base"
                   />
@@ -165,22 +180,32 @@ export function HeroSection() {
             </div>
 
             <div className="flex flex-wrap gap-2.5 pt-1">
-              {CATEGORY_CHIPS.map((category) => (
-                <Link
-                  key={category}
-                  href="/quests/web-development"
-                  className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white/90 backdrop-blur-md transition hover:border-[#A78BFA]/80 hover:bg-[#6D28D9]/30 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#A78BFA]"
-                >
-                  {category}
-                </Link>
-              ))}
+              {QUEST_CATEGORIES.map((category) => {
+                const isActive = selectedCategory === category.slug;
+
+                return (
+                  <button
+                    key={category.slug}
+                    type="button"
+                    onClick={() => setSelectedCategory(category.slug)}
+                    className={`rounded-full border px-4 py-2 text-sm font-semibold backdrop-blur-md transition ${
+                      isActive
+                        ? "border-[#A78BFA] bg-[#6D28D9]/45 text-white shadow-lg shadow-[#6D28D9]/20"
+                        : "border-white/20 bg-white/10 text-white/90 hover:border-[#A78BFA]/80 hover:bg-[#6D28D9]/30 hover:text-white"
+                    }`}
+                    aria-pressed={isActive}
+                  >
+                    {category.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
 
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-white/20 bg-black/25 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] md:inline-flex"
+          className="absolute left-5 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-white/20 bg-black/25 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A78BFA] md:inline-flex lg:left-6"
           aria-label="Previous slide"
         >
           <svg
@@ -200,7 +225,7 @@ export function HeroSection() {
 
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-white/20 bg-black/25 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] md:inline-flex"
+          className="absolute right-4 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-white/20 bg-black/25 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A78BFA] md:inline-flex"
           aria-label="Next slide"
         >
           <svg

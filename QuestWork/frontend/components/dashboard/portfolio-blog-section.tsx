@@ -3,29 +3,20 @@
 import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-
-interface BlogPost {
-  id: string
-  title: string
-  excerpt: string
-  date: string
-  readTime: string
-}
+import type { getBlogPostSummariesByUsername } from '@/lib/mock-blog-data'
 
 interface PortfolioBlogSectionProps {
-  posts: BlogPost[]
+  posts: ReturnType<typeof getBlogPostSummariesByUsername>
 }
 
 export function PortfolioBlogSection({ posts }: PortfolioBlogSectionProps) {
   return (
     <Card className="border border-border">
       <div className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">
-            기술 블로그
-          </h2>
-          <Button variant="outline" size="sm">
-            글 작성
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground">기술 블로그</h2>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/dashboard/blog-management">글 관리</Link>
           </Button>
         </div>
 
@@ -38,10 +29,10 @@ export function PortfolioBlogSection({ posts }: PortfolioBlogSectionProps) {
             {posts.map((post) => (
               <Link key={post.id} href={`/blog/${post.id}`}>
                 <div className="group rounded-lg border border-border p-4 transition-colors hover:bg-surface">
-                  <h3 className="font-semibold text-foreground group-hover:text-primary line-clamp-2">
+                  <h3 className="line-clamp-2 font-semibold text-foreground group-hover:text-primary">
                     {post.title}
                   </h3>
-                  <p className="mt-2 text-sm text-foreground-muted line-clamp-2">
+                  <p className="mt-2 line-clamp-2 text-sm text-foreground-muted">
                     {post.excerpt}
                   </p>
                   <div className="mt-3 flex items-center justify-between text-xs text-foreground-subtle">

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef, useEffect, type MutableRefObject } from "react";
+import { useEffect, useRef, useState, type MutableRefObject } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
@@ -14,12 +14,12 @@ const QUEST_CATEGORIES = [
   },
   {
     title: "Mobile Development",
-    description: "iOS, Android, React Native 기반 모바일 앱 퀘스트",
+    description: "iOS, Android, React Native 기반 모바일 개발 퀘스트",
     route: "/quests/mobile-development",
   },
   {
     title: "Software Development",
-    description: "데스크톱 및 시스템 소프트웨어 개발 퀘스트",
+    description: "데스크톱 앱 및 시스템 소프트웨어 개발 퀘스트",
     route: "/quests/software-development",
   },
   {
@@ -97,7 +97,6 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background">
       <nav className="mx-auto flex max-w-content items-center justify-between px-4 py-4 sm:px-6">
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded bg-primary font-bold text-primary-foreground">
             Q
@@ -107,16 +106,14 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
           </span>
         </Link>
 
-        {/* Center nav links */}
         <div className="flex items-center gap-6">
-          {/* Quests dropdown */}
           <div
             className="relative"
             onMouseEnter={makeEnter(setIsQuestsOpen, questsCloseRef)}
             onMouseLeave={makeLeave(setIsQuestsOpen, questsCloseRef)}
           >
             <button
-              onClick={() => setIsQuestsOpen((o) => !o)}
+              onClick={() => setIsQuestsOpen((open) => !open)}
               className="text-sm font-medium text-foreground transition-colors hover:text-primary"
             >
               Quests
@@ -124,20 +121,17 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 
             {isQuestsOpen && (
               <div className="absolute left-0 top-full w-90 rounded-lg border border-border bg-background shadow-lg">
-                <div className="p-4 ">
+                <div className="p-4">
                   {QUEST_CATEGORIES.map((category) => (
                     <Link
                       key={category.route}
                       href={category.route}
                       onClick={() => setIsQuestsOpen(false)}
-                      className="group block rounded-lg p-3 transition-colors hover:bg-surface "
+                      className="group block rounded-lg p-3 transition-colors hover:bg-surface"
                     >
-                      <div
-                        className={`text-sm font-semibold text-foreground group-hover:text-primary `}
-                      >
+                      <div className="text-sm font-semibold text-foreground group-hover:text-primary">
                         {category.title}
                       </div>
-
                       <div className="mt-1 max-h-0 overflow-hidden text-xs text-foreground-muted opacity-0 transition-all duration-200 group-hover:max-h-20 group-hover:opacity-100">
                         {category.description}
                       </div>
@@ -155,7 +149,13 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
             Dashboard
           </Link>
 
-          {/* My Page dropdown — logged-in only */}
+          <Link
+            href="/blog"
+            className="text-sm font-medium text-foreground transition-colors hover:text-primary"
+          >
+            Blog
+          </Link>
+
           {isLoggedIn && (
             <div
               className="relative"
@@ -163,7 +163,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
               onMouseLeave={makeLeave(setIsMyPageOpen, myPageCloseRef)}
             >
               <button
-                onClick={() => setIsMyPageOpen((o) => !o)}
+                onClick={() => setIsMyPageOpen((open) => !open)}
                 className="text-sm font-medium text-foreground transition-colors hover:text-primary"
               >
                 My Page
@@ -189,7 +189,6 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
           )}
         </div>
 
-        {/* Right side actions */}
         <div className="flex items-center gap-2">
           {nickname ? (
             <div
@@ -229,7 +228,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                     </Avatar>
 
                     <p className="mt-3 text-base font-semibold text-foreground">
-                      안녕하세요, {nickname}님!
+                      안녕하세요, {nickname}님
                     </p>
 
                     <div className="mt-4 space-y-2">
@@ -257,18 +256,13 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
               )}
             </div>
           ) : (
-            <>
-              <Button
-                variant="outline"
-                className="text-xs sm:text-sm border-border transition-all duration-200 hover:border-primary hover:text-primary hover:shadow-[0_0_0_2px_var(--primary-light)]"
-                asChild
-              >
-                <Link href="/login">Sign In</Link>
-              </Button>
-              {/* <Button className="bg-primary text-xs text-primary-foreground hover:bg-primary-hover sm:text-sm">
-                Post Quest
-              </Button> */}
-            </>
+            <Button
+              variant="outline"
+              className="border-border text-xs transition-all duration-200 hover:border-primary hover:text-primary hover:shadow-[0_0_0_2px_var(--primary-light)] sm:text-sm"
+              asChild
+            >
+              <Link href="/login">Sign In</Link>
+            </Button>
           )}
         </div>
       </nav>

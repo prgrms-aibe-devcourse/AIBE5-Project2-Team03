@@ -1,4 +1,20 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
+  "/blog/[slug]/page": "app/blog/[slug]/page.js",
+  "/blog/page": "app/blog/page.js",
+  "/dashboard/blog-management/page": "app/dashboard/blog-management/page.js",
+  "/dashboard/earnings/page": "app/dashboard/earnings/page.js",
+  "/dashboard/my-quests/page": "app/dashboard/my-quests/page.js",
+  "/dashboard/my-submissions/page": "app/dashboard/my-submissions/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
   "/login/page": "app/login/page.js",
-  "/page": "app/page.js"
+  "/manager/create-quest/page": "app/manager/create-quest/page.js",
+  "/manager/page": "app/manager/page.js",
+  "/page": "app/page.js",
+  "/profile/[username]/page": "app/profile/[username]/page.js",
+  "/quests/[id]/page": "app/quests/[id]/page.js",
+  "/quests/mobile-development/page": "app/quests/mobile-development/page.js",
+  "/quests/software-development/page": "app/quests/software-development/page.js",
+  "/quests/web-development/page": "app/quests/web-development/page.js",
+  "/quests/wordpress-development/page": "app/quests/wordpress-development/page.js"
 }

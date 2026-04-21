@@ -1,12 +1,15 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist_Mono } from 'next/font/google'
+import { Geist_Mono, Noto_Sans_KR } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-/**
- * Pretendard is loaded via CDN — best Korean + Latin coverage.
- * Geist Mono is used for code / monospace contexts.
- */
+const notoSansKr = Noto_Sans_KR({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-noto-sans-kr',
+})
+
 const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-geist-mono',
@@ -14,12 +17,19 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'QuestWork — 퀘스트 기반 프리랜서 마켓플레이스',
+    default: 'QuestWork | 퀘스트 기반 개발자 협업 플랫폼',
     template: '%s | QuestWork',
   },
   description:
-    '기업이 문제를 퀘스트로 등록하면 프리랜서가 솔루션을 제출하고 보상을 받는 경쟁형 프리랜서 플랫폼입니다.',
-  keywords: ['프리랜서', '퀘스트', '마켓플레이스', '개발', '외주', 'QuestWork'],
+    'QuestWork는 기업의 문제를 퀘스트로 등록하고, 개발자가 해결 과정과 결과를 제안하는 협업형 개발 플랫폼입니다.',
+  keywords: [
+    'QuestWork',
+    '개발자 플랫폼',
+    '프리랜서',
+    '퀘스트',
+    '협업',
+    '포트폴리오',
+  ],
   authors: [{ name: 'QuestWork' }],
   creator: 'QuestWork',
   metadataBase: new URL('https://questwork.io'),
@@ -27,14 +37,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ko_KR',
     siteName: 'QuestWork',
-    title: 'QuestWork — 퀘스트 기반 프리랜서 마켓플레이스',
+    title: 'QuestWork | 퀘스트 기반 개발자 협업 플랫폼',
     description:
-      '기업이 문제를 퀘스트로 등록하면 프리랜서가 솔루션을 제출하고 보상을 받는 경쟁형 프리랜서 플랫폼입니다.',
+      '기업의 문제를 퀘스트로 등록하고, 개발자가 해결 과정과 결과를 제안하는 협업형 개발 플랫폼입니다.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'QuestWork',
-    description: '퀘스트 기반 경쟁형 프리랜서 플랫폼',
+    description: '퀘스트 기반 개발자 협업 플랫폼',
   },
   robots: {
     index: true,
@@ -56,15 +66,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className="bg-background">
-      {/* Pretendard CDN — supports Korean + Latin */}
-      <head>
-        <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-        />
-      </head>
-      <body className={`${geistMono.variable} font-sans antialiased`}>
+      <body
+        className={`${notoSansKr.variable} ${geistMono.variable} font-sans antialiased`}
+      >
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

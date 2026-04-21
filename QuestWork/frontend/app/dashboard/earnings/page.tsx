@@ -1,7 +1,7 @@
 'use client'
 
 import { GlobalNav } from '@/components/global-nav'
-import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar'
+import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { StatCard } from '@/components/dashboard/stat-card'
 import { Card } from '@/components/ui/card'
 
@@ -43,10 +43,7 @@ export default function EarningsPage() {
     <div className="min-h-screen bg-background">
       <GlobalNav />
 
-      <div className="flex">
-        <DashboardSidebar />
-
-        <main className="flex-1 p-6 lg:p-8">
+      <DashboardShell>
           <div className="mb-8">
             <p className="text-sm font-semibold text-primary">Earnings</p>
             <h1 className="mt-1 text-3xl font-bold text-foreground">
@@ -131,10 +128,9 @@ export default function EarningsPage() {
                   ))}
                 </div>
               </div>
-            </Card>
-          </div>
-        </main>
-      </div>
+              </Card>
+            </div>
+      </DashboardShell>
     </div>
   )
 }
