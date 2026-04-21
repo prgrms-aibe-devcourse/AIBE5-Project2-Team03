@@ -1,0 +1,31 @@
+### 1. 프로필 수정 테스트 (이미 성공하신 것)
+PUT http://localhost:8000/api/member/kim-dev
+Content-Type: application/json
+
+{
+  "intro": "인텔리제이에서 수정함",
+  "portfolioUrl": "https://naver.com",
+  "level": "SILVER",
+  "totalCareerYears": 10
+}
+
+### 2. 수정된 결과 확인 (GET)
+GET http://localhost:8000/api/member/kim-dev
+Accept: application/json
+
+### 유저 상태를 INACTIVE(정지)로 변경
+PATCH http://localhost:8000/api/admin/users/4/status
+Content-Type: application/json
+
+"INACTIVE"
+
+### 다시 유저 상태를 ACTIVE(활성)로 변경
+PATCH http://localhost:8000/api/admin/users/4/status
+Content-Type: application/json
+
+"ACTIVE"
+
+### 전체 회원 조회 테스트
+GET http://localhost:8000/api/admin/users?page=0&size=10
+Accept: application/json
+

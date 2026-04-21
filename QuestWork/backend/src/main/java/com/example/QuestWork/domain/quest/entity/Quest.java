@@ -29,7 +29,7 @@ public class Quest {
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name= "manager_id", nullable = false)
-    private User manager;
+    private User managerId;
 
     @Column(nullable = false, length = 200)
     private String title;
@@ -55,5 +55,23 @@ public class Quest {
     @LastModifiedDate
     @Column(name="updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    public void update(
+            String title,
+            String formData,
+            BigDecimal rewardAmount,
+            LocalDateTime deadline,
+            QuestStatus status
+    )    {
+        if (title != null) this.title = title;
+        if (formData != null) this.formData = formData;
+        if (rewardAmount != null) this.rewardAmount = rewardAmount;
+        if (deadline != null) this.deadline = deadline;
+        if (status != null) this.status = status;
+    }
+
+    public void updateStatus(QuestStatus status) {
+        this.status = status;
+    }
 
 }

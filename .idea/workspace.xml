@@ -5,99 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a8527835-04ab-47f7-a15c-d584422902af" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/domain/auth/entity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/domain/quest/constant/QuestStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/domain/quest/entity/Quest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/domain/user/constant/AuthProvider.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/domain/user/constant/UserStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/domain/user/controller/AuthController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/domain/user/dto/UserLoginRequestDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/domain/user/dto/UserSignupRequesetDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/domain/user/entity/User.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/domain/user/repository/UserRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/domain/user/service/UserService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/global/SecurityConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/resources/application.properties.example" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/build-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/cache/.rscinfo" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/cache/next-devtools-config.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/cache/turbopack/0ca967b8/00000003.sst" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/cache/turbopack/0ca967b8/00000004.sst" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/cache/turbopack/0ca967b8/00000005.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/cache/turbopack/0ca967b8/00000006.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/cache/turbopack/0ca967b8/CURRENT" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/cache/turbopack/0ca967b8/LOG" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/fallback-build-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/prerender-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/routes-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app-paths-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app/page.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app/page.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app/page/app-paths-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app/page/build-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app/page/next-font-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app/page/react-loadable-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app/page/server-reference-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app/page_client-reference-manifest.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/[externals]__0lxblph._.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/[externals]__0lxblph._.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/[externals]_next_dist_0x~8e2m._.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/[externals]_next_dist_0x~8e2m._.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/[root-of-the-server]__02p3q7o._.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/[root-of-the-server]__02p3q7o._.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/[turbopack]_runtime.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/[turbopack]_runtime.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/_0qy_fvn._.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/_0qy_fvn._.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/_next-internal_server_app_page_actions_09-gtaw.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/_next-internal_server_app_page_actions_09-gtaw.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/interception-route-rewrite-manifest.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/middleware-build-manifest.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/middleware-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/next-font-manifest.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/next-font-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/pages-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/server-reference-manifest.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/server-reference-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/[next]_internal_font_google_geist_mono_d6617093_module_css_0w3-wzy._.single.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/[next]_internal_font_google_geist_mono_d6617093_module_css_0w3-wzy._.single.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/[root-of-the-server]__007a.a5._.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/[root-of-the-server]__007a.a5._.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_0yjw1oe._.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_0yjw1oe._.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/_08w4d8l._.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/_08w4d8l._.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/_0rqeker._.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/app_globals_css_0w3-wzy._.single.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/app_globals_css_0w3-wzy._.single.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/development/_buildManifest.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/development/_clientMiddlewareManifest.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/development/_ssgManifest.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/media/4fa387ec64143e14-s.0q3udbd2bu5yp.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/media/bbc41e54d2fcbd21-s.0gw~uztddq1df.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/trace" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/types/cache-life.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/types/routes.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/types/validator.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/app/admin/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/app/login/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/app/signup/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/components/admin/admin-header.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/components/admin/member-stats.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/components/admin/member-table.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/components/admin/search-filter.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/components/login-form.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/components/signup-modal.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/QuestWork/frontend/pnpm-workspace.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/QuestWork/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/8d1bcf42-d19f-48cf-916a-aed06cb70e57.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/8d1bcf42-d19f-48cf-916a-aed06cb70e57.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/QuestWork/backend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/backend/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/QuestWork/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/backend/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/QuestWork/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/components/global-nav.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/components/global-nav.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/global/test.http" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/global/test.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/cache/turbopack/0ca967b8/CURRENT" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/cache/turbopack/0ca967b8/CURRENT" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/cache/turbopack/0ca967b8/LOG" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/cache/turbopack/0ca967b8/LOG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/prerender-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/prerender-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app-paths-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app-paths-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app/page_client-reference-manifest.js" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/app/page_client-reference-manifest.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/[root-of-the-server]__02p3q7o._.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/chunks/ssr/[root-of-the-server]__02p3q7o._.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/next-font-manifest.js" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/next-font-manifest.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/next-font-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/server/next-font-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/[root-of-the-server]__007a.a5._.css" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/[root-of-the-server]__007a.a5._.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/[root-of-the-server]__007a.a5._.css.map" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/[root-of-the-server]__007a.a5._.css.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/app_globals_css_0w3-wzy._.single.css" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/app_globals_css_0w3-wzy._.single.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/app_globals_css_0w3-wzy._.single.css.map" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/static/chunks/app_globals_css_0w3-wzy._.single.css.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/trace" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/trace" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/types/routes.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/types/routes.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/types/validator.ts" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/.next/dev/types/validator.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestWork/frontend/components/admin/member-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/QuestWork/frontend/components/admin/member-table.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,10 +48,13 @@
     &quot;accountId&quot;: &quot;6d94e6a4-9635-4ddc-a656-b87945606c2d&quot;
   }
 }</component>
-  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
-  <component name="KubernetesApiProvider"><![CDATA[{
-  "isMigrated": true
+  <component name="HttpClientOnboardingState"><![CDATA[{
+  "isOnboardingCommentShown": true
 }]]></component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -135,18 +67,27 @@
   &quot;fromUser&quot;: false
 }</component>
   <component name="ProjectId" id="3CIPEcd7h4pBIY0R1AxFkulZF96" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "HTTP 요청.test | 1. 프로필 수정 테스트 (이미 성공하신 것).executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.QuestWorkApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "Merging merge-login",
+    "git-widget-placeholder": "seokmin에 #2개",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/dev/Team3-QuestWork/QuestWork",
     "nodejs_package_manager_path": "npm",
@@ -167,7 +108,23 @@
       <recent name="C:\dev\Team3-QuestWork\QuestWork" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunDashboard">
+    <option name="configurationStatuses">
+      <map>
+        <entry key="HttpClient.HttpRequestRunConfigurationType">
+          <value>
+            <map>
+              <entry key="test | 1. 프로필 수정 테스트 (이미 성공하신 것)" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.QuestWorkApplication">
+    <configuration name="test | 1. 프로필 수정 테스트 (이미 성공하신 것)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/QuestWork/backend/src/main/java/com/example/QuestWork/global/test.http" executionIdentifier="1. 프로필 수정 테스트 (이미 성공하신 것)" runType="단일 요청 실행">
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <module name="Team3-QuestWork" />
       <method v="2">
@@ -187,6 +144,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="HTTP 요청.test | 1. 프로필 수정 테스트 (이미 성공하신 것)" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
