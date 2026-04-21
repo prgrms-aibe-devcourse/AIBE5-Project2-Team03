@@ -62,7 +62,7 @@ public class Quest {
             BigDecimal rewardAmount,
             LocalDateTime deadline,
             QuestStatus status
-    ) {
+    )    {
         if (title != null) this.title = title;
         if (formData != null) this.formData = formData;
         if (rewardAmount != null) this.rewardAmount = rewardAmount;
