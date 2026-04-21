@@ -69,12 +69,7 @@ export function QuestCard({ quest }: QuestCardProps) {
           </div>
 
           {/* CTA Button */}
-          <Button
-            className="w-full bg-primary text-primary-foreground transition-colors hover:bg-primary-hover"
-            onClick={(e) => {
-              e.preventDefault()
-            }}
-          >
+          <Button className="w-full bg-primary text-primary-foreground transition-colors hover:bg-primary-hover">
             퀘스트 보기
           </Button>
         </div>

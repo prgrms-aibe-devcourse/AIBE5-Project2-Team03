@@ -2,15 +2,13 @@
 
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
-import { toast } from '@/hooks/use-toast'
-import { addStoredSubmission } from '@/lib/quest-submissions'
 import { GlobalNav } from '@/components/global-nav'
 import { QuestHeader } from '@/components/quest-detail/quest-header'
 import { QuestDescription } from '@/components/quest-detail/quest-description'
-import {
-  SubmissionForm,
-  type SubmissionData,
-} from '@/components/quest-detail/submission-form'
+import { CompanyInfo } from '@/components/quest-detail/company-info'
+import { ActivityInfo } from '@/components/quest-detail/activity-info'
+import { RelatedQuests } from '@/components/quest-detail/related-quests'
+import { SubmissionForm } from '@/components/quest-detail/submission-form'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
@@ -24,6 +22,30 @@ interface QuestDetailData {
   deadline: string
   participants: number
   submissionFormat: string
+  postedDate: string
+  experienceLevel: 'beginner' | 'intermediate' | 'advanced'
+  projectType: 'short' | 'long'
+  collaborationType: 'remote' | 'offline' | 'hybrid'
+  company: {
+    name: string
+    joinDate: string
+    questCount: number
+    totalPayout: string
+    description?: string
+  }
+  activity: {
+    participantCount: number
+    submissionCount: number
+    reviewingCount: number
+    selectedCount: number
+  }
+  relatedQuests?: Array<{
+    id: string
+    title: string
+    reward: string
+    techStack: string[]
+    deadline: string
+  }>
 }
 
 // Mock quest data
@@ -52,6 +74,46 @@ const MOCK_QUESTS: Record<string, QuestDetailData> = {
 2. 성능 개선 리포트 (PDF 또는 마크다운)
 3. 성능 측정 결과 (스크린샷 또는 CSV)
 4. 개선 사항 설명 (README 파일)`,
+    postedDate: '2일 전',
+    experienceLevel: 'intermediate',
+    projectType: 'short',
+    collaborationType: 'remote',
+    company: {
+      name: 'QuestLabs',
+      joinDate: '2025.10',
+      questCount: 12,
+      totalPayout: '₩8,500,000',
+      description: 'React 기반 서비스와 SaaS 제품을 운영하는 스타트업입니다.',
+    },
+    activity: {
+      participantCount: 15,
+      submissionCount: 6,
+      reviewingCount: 3,
+      selectedCount: 0,
+    },
+    relatedQuests: [
+      {
+        id: '4',
+        title: 'Next.js E-commerce 성능 개선',
+        reward: '₩1,200,000',
+        techStack: ['Next.js', 'React', 'TypeScript'],
+        deadline: '7일 남음',
+      },
+      {
+        id: '5',
+        title: 'SaaS 관리자 페이지 UX 개선',
+        reward: '₩900,000',
+        techStack: ['React', 'Figma', 'UX'],
+        deadline: '4일 남음',
+      },
+      {
+        id: '6',
+        title: 'API 응답 속도 최적화',
+        reward: '₩1,500,000',
+        techStack: ['Node.js', 'Express', 'Performance'],
+        deadline: '6일 남음',
+      },
+    ],
   },
   '2': {
     id: '2',
@@ -85,6 +147,22 @@ const MOCK_QUESTS: Record<string, QuestDetailData> = {
 4. 스크린샷 (최소 5개)
 5. 테스트 케이스
 6. README 파일`,
+    postedDate: '3일 전',
+    experienceLevel: 'intermediate',
+    projectType: 'long',
+    collaborationType: 'remote',
+    company: {
+      name: 'TaskFlow Inc',
+      joinDate: '2025.08',
+      questCount: 8,
+      totalPayout: '₩5,200,000',
+    },
+    activity: {
+      participantCount: 12,
+      submissionCount: 4,
+      reviewingCount: 2,
+      selectedCount: 1,
+    },
   },
   '3': {
     id: '3',
@@ -117,6 +195,22 @@ const MOCK_QUESTS: Record<string, QuestDetailData> = {
 4. 테스트 코드 및 결과
 5. 성능 테스트 결과
 6. 배포 가이드`,
+    postedDate: '1일 전',
+    experienceLevel: 'advanced',
+    projectType: 'long',
+    collaborationType: 'remote',
+    company: {
+      name: 'CloudSync Systems',
+      joinDate: '2025.06',
+      questCount: 18,
+      totalPayout: '₩12,300,000',
+    },
+    activity: {
+      participantCount: 22,
+      submissionCount: 8,
+      reviewingCount: 4,
+      selectedCount: 2,
+    },
   },
 }
 
@@ -127,13 +221,12 @@ export default function QuestDetailPage() {
   const [participationStatus, setParticipationStatus] = useState<
     'idle' | 'participating' | 'submitted'
   >('idle')
-  const [lastSubmissionTitle, setLastSubmissionTitle] = useState('')
 
   if (!quest) {
     return (
       <div className="min-h-screen bg-background">
         <GlobalNav />
-        <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 xl:px-12">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-foreground">
               퀘스트를 찾을 수 없습니다
@@ -154,30 +247,10 @@ export default function QuestDetailPage() {
     setParticipationStatus('participating')
   }
 
-  const handleSubmission = (data: SubmissionData) => {
+  const handleSubmission = (data: any) => {
     console.log('[v0] Submission data:', data)
-
-    addStoredSubmission({
-      id: `${quest.id}-${Date.now()}`,
-      questId: quest.id,
-      questTitle: quest.title,
-      reward: quest.reward,
-      title: data.title,
-      summary: data.summary,
-      submissionType: data.submissionType,
-      githubUrl: data.githubUrl,
-      fileName: data.file?.name,
-      submittedAt: new Date().toISOString().slice(0, 10),
-      freelancerName: '새 지원자',
-    })
-
-    setLastSubmissionTitle(data.title)
     setParticipationStatus('submitted')
-
-    toast({
-      title: '제출이 완료되었습니다',
-      description: '대시보드에서 제출 현황을 바로 확인할 수 있습니다.',
-    })
+    // In a real app, this would send data to backend
   }
 
   return (
@@ -190,28 +263,43 @@ export default function QuestDetailPage() {
         reward={quest.reward}
         deadline={quest.deadline}
         participants={quest.participants}
+        postedDate={quest.postedDate}
+        experienceLevel={quest.experienceLevel}
+        projectType={quest.projectType}
+        collaborationType={quest.collaborationType}
         onParticipate={handleParticipate}
       />
 
       {/* Main Content */}
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-3">
-          {/* Left Column - Description */}
-          <div className="lg:col-span-2">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 xl:px-12">
+        <div className="grid gap-8 lg:grid-cols-[1fr_380px] lg:gap-16">
+          {/* Left Column - Description (wider) */}
+          <div className="min-w-0 space-y-8">
             <QuestDescription
               description={quest.fullDescription}
               techStack={quest.techStack}
               submissionFormat={quest.submissionFormat}
             />
+
+            {/* Company Info Section */}
+            <CompanyInfo company={quest.company} />
+
+            {/* Activity Info Section */}
+            <ActivityInfo activity={quest.activity} />
+
+            {/* Related Quests Section */}
+            {quest.relatedQuests && (
+              <RelatedQuests quests={quest.relatedQuests} />
+            )}
           </div>
 
-          {/* Right Column - Submission Form */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-20 space-y-6 rounded-lg border border-border bg-surface p-6">
+          {/* Right Column - Submission Form (fixed width sidebar) */}
+          <div className="lg:w-[380px]">
+            <div className="sticky top-24 space-y-6 rounded-xl border border-border bg-surface p-6 shadow-sm">
               {participationStatus === 'idle' && (
                 <div className="space-y-3 text-center">
                   <h3 className="font-semibold text-foreground">
-                    이 퀘스트에 참여하시겠어요?
+                    이 퀨스트에 참여하시겠어요?
                   </h3>
                   <Button
                     className="w-full bg-primary text-primary-foreground hover:bg-primary-hover"
@@ -222,38 +310,19 @@ export default function QuestDetailPage() {
                 </div>
               )}
 
-              {participationStatus === 'participating' && (
-                <SubmissionForm
-                  questId={questId}
-                  questTitle={quest.title}
-                  submissionGuide={quest.submissionFormat}
-                  onSubmit={handleSubmission}
-                />
+              {(participationStatus === 'participating' ||
+                participationStatus === 'submitted') && (
+                <SubmissionForm questId={questId} onSubmit={handleSubmission} />
               )}
 
               {participationStatus === 'submitted' && (
-                <div className="space-y-4 rounded-lg border border-border bg-primary-light p-4 text-center">
-                  <div>
-                    <p className="text-sm font-medium text-primary">
-                      ✓ 제출되었습니다!
-                    </p>
-                    <p className="mt-1 text-xs text-foreground-muted">
-                      {lastSubmissionTitle} 항목이 리뷰 대기 상태로 등록되었습니다.
-                    </p>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Link href="/dashboard">
-                      <Button className="w-full bg-primary text-primary-foreground hover:bg-primary-hover">
-                        내 제출 현황 보기
-                      </Button>
-                    </Link>
-                    <Link href="/quests">
-                      <Button variant="outline" className="w-full">
-                        다른 퀘스트 더 보기
-                      </Button>
-                    </Link>
-                  </div>
+                <div className="rounded-lg border border-border bg-primary-light p-4 text-center">
+                  <p className="text-sm font-medium text-primary">
+                    ✓ 제출되었습니다!
+                  </p>
+                  <p className="mt-1 text-xs text-foreground-muted">
+                    리뷰 진행 중입니다. 곧 연���드리겠습니다.
+                  </p>
                 </div>
               )}
             </div>

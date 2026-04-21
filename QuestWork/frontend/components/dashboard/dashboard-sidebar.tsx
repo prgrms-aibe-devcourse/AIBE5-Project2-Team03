@@ -2,38 +2,50 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 interface NavItem {
   label: string
   href: string
-  icon: React.ReactNode
+  icon: ReactNode
 }
 
 const NAV_ITEMS: NavItem[] = [
   {
-    label: '개요',
+    label: 'Overview',
     href: '/dashboard',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
-        <rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
-        <rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
-        <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="1.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="9.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="1.5" y="9.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="9.5" y="9.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
       </svg>
     ),
   },
   {
-    label: '나의 제출',
-    href: '/dashboard/submissions',
+    label: 'My Quests',
+    href: '/dashboard/my-quests',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M2 3h12M2 8h8M2 13h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M8 1.75L2.5 4.5v3.75c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V4.5L8 1.75z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        <path d="M5.75 8.25L7.25 9.75L10.5 6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
   {
-    label: '수익 내역',
+    label: 'My Submissions',
+    href: '/dashboard/my-submissions',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 2.5h7l3 3V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        <path d="M10 2.5V5a1 1 0 0 0 1 1h2M4.75 8.5h6.5M4.75 11h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Earnings',
     href: '/dashboard/earnings',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -43,21 +55,12 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: '즐겨찾기',
-    href: '/dashboard/saved',
+    label: 'Blog Management',
+    href: '/dashboard/blog-management',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M8 2l1.76 3.57L14 6.27l-3 2.92.71 4.13L8 11.27l-3.71 2.05L5 9.19 2 6.27l4.24-.7L8 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-      </svg>
-    ),
-  },
-  {
-    label: '프로필 설정',
-    href: '/dashboard/settings',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M8 1v2M8 13v2M1 8h2M13 8h2M2.93 2.93l1.41 1.41M11.66 11.66l1.41 1.41M2.93 13.07l1.41-1.41M11.66 4.34l1.41-1.41" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M3 2.5h10a1 1 0 0 1 1 1V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1z" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M4.75 5.5h6.5M4.75 8h6.5M4.75 10.5h3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -68,24 +71,23 @@ export function DashboardSidebar() {
 
   return (
     <aside className="hidden w-56 flex-shrink-0 border-r border-border bg-surface lg:flex lg:flex-col">
-      {/* User Profile */}
       <div className="border-b border-border p-5">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-            김
+            Q
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">김민준</p>
-            <p className="truncate text-xs text-foreground-muted">풀스택 개발자</p>
+            <p className="truncate text-sm font-semibold text-foreground">QuestWork</p>
+            <p className="truncate text-xs text-foreground-muted">Dashboard</p>
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-3" aria-label="대시보드 내비게이션">
+      <nav className="flex-1 p-3" aria-label="Dashboard navigation">
         <ul className="space-y-0.5">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href
+
             return (
               <li key={item.href}>
                 <Link
@@ -94,14 +96,14 @@ export function DashboardSidebar() {
                     'flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                     isActive
                       ? 'bg-primary-light text-primary'
-                      : 'text-foreground-muted hover:bg-surface-raised hover:text-foreground'
+                      : 'text-foreground-muted hover:bg-surface-raised hover:text-foreground',
                   )}
                   aria-current={isActive ? 'page' : undefined}
                 >
                   <span
                     className={cn(
                       'flex-shrink-0',
-                      isActive ? 'text-primary' : 'text-foreground-muted'
+                      isActive ? 'text-primary' : 'text-foreground-muted',
                     )}
                   >
                     {item.icon}
@@ -114,16 +116,15 @@ export function DashboardSidebar() {
         </ul>
       </nav>
 
-      {/* Bottom — Quests Link */}
       <div className="border-t border-border p-3">
         <Link
-          href="/quests"
+          href="/quests/web-development"
           className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium text-foreground-muted transition-colors hover:bg-surface-raised hover:text-foreground"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 1L2 4v4c0 3.31 2.69 6 6 6s6-2.69 6-6V4L8 1z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+            <path d="M3 8h10M8 3v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          퀘스트 탐색하기
+          Find Quests
         </Link>
       </div>
     </aside>

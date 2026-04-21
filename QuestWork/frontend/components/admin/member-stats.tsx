@@ -8,6 +8,7 @@ interface StatsProps {
     total: number
     active: number
     inactive: number
+    deleted: number
     admins: number
     managers: number
     users: number
@@ -38,6 +39,13 @@ export function MemberStats({ stats }: StatsProps) {
       bgColor: "bg-rose-50",
     },
     {
+      label: "삭제됨",
+      value: stats.deleted,
+      icon: UserX,
+      color: "text-slate-600",
+      bgColor: "bg-slate-50",
+    },
+    {
       label: "관리자",
       value: stats.admins,
       icon: Shield,
@@ -52,7 +60,7 @@ export function MemberStats({ stats }: StatsProps) {
       bgColor: "bg-amber-50",
     },
     {
-      label: "일반 회원",
+      label: "일반 사용자",
       value: stats.users,
       icon: User,
       color: "text-slate-600",

@@ -7,10 +7,11 @@ import com.example.QuestWork.domain.user.dto.UserSignupRequesetDto;
 import com.example.QuestWork.domain.user.entity.User;
 import com.example.QuestWork.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 
 @Service
@@ -46,7 +47,24 @@ public class UserService {
 //                .updatedAt(LocalDateTime.now())
                 .build();
 
-        return userRepository.save(user).getId();
+            // 매니저 추가 프로필 생성
+            ManagerProfileEntity managerProfile = ManagerProfileEntity.builder()
+                    .user(user)
+                    .managerType(dto.getManagerType())
+                    .companyName(dto.getCompanyName())
+                    .managerType(dto.getManagerType() != null ? dto.getManagerType() : "COMPANY")
+                    .businessNumber(dto.getBusinessNumber())
+                    .managerName(dto.getManagerName())     // 👈 DTO에서 꺼내서 주입
+                    .contact_phone(dto.getContactPhone()) // 👈 DTO에서 꺼내서 주입
+                    .approved(false)
+                    .build();
+            managerProfileRepository.save(managerProfile);
+
+            System.out.println("매니저 및 기본 멤버 프로필 생성 완료");
+        } else {
+            // 일반 멤버 권한 부여
+            userRepository.insertUserRoleNative(user.getId(), "MEMBER");
+            System.out.println("일반 멤버 프로필 생성 완료");
         }
 
     }

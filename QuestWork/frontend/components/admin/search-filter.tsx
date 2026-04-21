@@ -49,9 +49,9 @@ export function SearchFilter({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="전체">전체 권한</SelectItem>
-            <SelectItem value="회원">회원</SelectItem>
-            <SelectItem value="매니저">매니저</SelectItem>
-            <SelectItem value="관리자">관리자</SelectItem>
+            <SelectItem value="ADMIN">관리자</SelectItem>
+            <SelectItem value="MANAGER">매니저</SelectItem>
+            <SelectItem value="MEMBER">일반 사용자</SelectItem>
           </SelectContent>
         </Select>
         <Select
@@ -63,8 +63,9 @@ export function SearchFilter({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="전체">전체 상태</SelectItem>
-            <SelectItem value="활성화">활성화</SelectItem>
-            <SelectItem value="비활성화">비활성화</SelectItem>
+            <SelectItem value="ACTIVE">활성화</SelectItem>
+            <SelectItem value="INACTIVE">비활성화</SelectItem>
+            <SelectItem value="DELETED">삭제됨</SelectItem>
           </SelectContent>
         </Select>
       </div>
