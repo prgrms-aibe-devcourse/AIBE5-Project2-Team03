@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useMemo, useState } from 'react'
+import { getStoredSubmissions } from '@/lib/quest-submissions'
 import { GlobalNav } from '@/components/global-nav'
 import { ManagerSidebar } from '@/components/manager/manager-sidebar'
 import { PostedQuestsSection } from '@/components/manager/posted-quests-section'
@@ -8,6 +10,32 @@ import { RewardSection } from '@/components/manager/reward-section'
 import { Card } from '@/components/ui/card'
 
 export default function ManagerDashboardPage() {
+  const [savedSubmissions, setSavedSubmissions] = useState<
+    {
+      id: string
+      freelancerName: string
+      questTitle: string
+      questId: string
+      submittedAt: string
+      status: 'reviewing' | 'winner' | 'rejected'
+      githubUrl: string
+    }[]
+  >([])
+
+  useEffect(() => {
+    const stored = getStoredSubmissions().map((submission) => ({
+      id: submission.id,
+      freelancerName: submission.freelancerName,
+      questTitle: submission.questTitle,
+      questId: submission.questId,
+      submittedAt: submission.submittedAt,
+      status: 'reviewing' as const,
+      githubUrl: submission.githubUrl ?? `파일 제출: ${submission.fileName ?? '첨부파일'}`,
+    }))
+
+    setSavedSubmissions(stored)
+  }, [])
+
   // Mock posted quests data
   const postedQuests = [
     {
@@ -76,6 +104,11 @@ export default function ManagerDashboardPage() {
     },
   ]
 
+  const allSubmissions = useMemo(
+    () => [...savedSubmissions, ...submissions],
+    [savedSubmissions, submissions]
+  )
+
   return (
     <div className="min-h-screen bg-background">
       <GlobalNav />
@@ -108,7 +141,7 @@ export default function ManagerDashboardPage() {
               <Card className="border border-border p-5">
                 <p className="text-sm text-foreground-muted">총 제출</p>
                 <p className="mt-2 text-3xl font-bold text-foreground">
-                  {submissions.length}
+                  {allSubmissions.length}
                 </p>
               </Card>
               <Card className="border border-border p-5 bg-primary">
@@ -133,7 +166,7 @@ export default function ManagerDashboardPage() {
             </div>
 
             {/* Submissions Review Section */}
-            <SubmissionsReviewSection submissions={submissions} />
+            <SubmissionsReviewSection submissions={allSubmissions} />
           </div>
         </main>
       </div>

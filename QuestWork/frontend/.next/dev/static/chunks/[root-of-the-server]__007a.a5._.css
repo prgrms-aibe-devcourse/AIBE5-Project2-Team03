@@ -2057,6 +2057,16 @@
     background-color: var(--primary-light);
   }
 
+  .bg-primary-light\/40 {
+    background-color: var(--primary-light);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .bg-primary-light\/40 {
+      background-color: color-mix(in oklab, var(--primary-light) 40%, transparent);
+    }
+  }
+
   .bg-primary\/10 {
     background-color: var(--primary);
   }

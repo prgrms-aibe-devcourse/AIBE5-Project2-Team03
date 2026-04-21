@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useMemo, useState } from 'react'
+import { getStoredSubmissions } from '@/lib/quest-submissions'
 import { GlobalNav } from '@/components/global-nav'
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar'
 import { ActiveQuestsSection } from '@/components/dashboard/active-quests-section'
@@ -8,6 +10,30 @@ import { EarningsSection } from '@/components/dashboard/earnings-section'
 import { PortfolioBlogSection } from '@/components/dashboard/portfolio-blog-section'
 
 export default function DashboardPage() {
+  const [savedSubmissions, setSavedSubmissions] = useState<
+    {
+      id: string
+      questTitle: string
+      questId: string
+      status: 'submitted' | 'selected' | 'rejected'
+      submittedAt: string
+      reward: string
+    }[]
+  >([])
+
+  useEffect(() => {
+    const stored = getStoredSubmissions().map((submission) => ({
+      id: submission.id,
+      questTitle: submission.questTitle,
+      questId: submission.questId,
+      status: 'submitted' as const,
+      submittedAt: submission.submittedAt,
+      reward: submission.reward,
+    }))
+
+    setSavedSubmissions(stored)
+  }, [])
+
   // Mock active quests data
   const activeQuests = [
     {
@@ -70,6 +96,11 @@ export default function DashboardPage() {
     },
   ]
 
+  const allSubmissions = useMemo(
+    () => [...savedSubmissions, ...submissions],
+    [savedSubmissions, submissions]
+  )
+
   // Mock blog posts data
   const blogPosts = [
     {
@@ -124,7 +155,7 @@ export default function DashboardPage() {
               {/* Left Column */}
               <div className="space-y-6">
                 <ActiveQuestsSection quests={activeQuests} />
-                <SubmissionsSection submissions={submissions} />
+                <SubmissionsSection submissions={allSubmissions} />
               </div>
 
               {/* Right Column */}

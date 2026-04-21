@@ -8,7 +8,77 @@ import {
 import { cn } from '@/lib/utils'
 import { Button, buttonVariants } from '@/components/ui/button'
 
-function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
+interface PaginationProps extends React.ComponentProps<'nav'> {
+  currentPage?: number
+  totalPages?: number
+  onPageChange?: (page: number) => void
+}
+
+function Pagination({
+  className,
+  currentPage,
+  totalPages,
+  onPageChange,
+  children,
+  ...props
+}: PaginationProps) {
+  if (typeof currentPage === 'number' && typeof totalPages === 'number' && onPageChange) {
+    const pages = Array.from({ length: totalPages }, (_, index) => index + 1)
+
+    return (
+      <nav
+        role="navigation"
+        aria-label="pagination"
+        data-slot="pagination"
+        className={cn('mx-auto flex w-full justify-center', className)}
+        {...props}
+      >
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                if (currentPage > 1) {
+                  onPageChange(currentPage - 1)
+                }
+              }}
+              className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
+            />
+          </PaginationItem>
+
+          {pages.map((page) => (
+            <PaginationItem key={page}>
+              <PaginationLink
+                href="#"
+                isActive={page === currentPage}
+                onClick={(e) => {
+                  e.preventDefault()
+                  onPageChange(page)
+                }}
+              >
+                {page}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+
+          <PaginationItem>
+            <PaginationNext
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                if (currentPage < totalPages) {
+                  onPageChange(currentPage + 1)
+                }
+              }}
+              className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </nav>
+    )
+  }
+
   return (
     <nav
       role="navigation"
@@ -16,7 +86,9 @@ function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
       data-slot="pagination"
       className={cn('mx-auto flex w-full justify-center', className)}
       {...props}
-    />
+    >
+      {children}
+    </nav>
   )
 }
 

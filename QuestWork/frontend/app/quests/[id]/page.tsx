@@ -2,10 +2,15 @@
 
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
+import { toast } from '@/hooks/use-toast'
+import { addStoredSubmission } from '@/lib/quest-submissions'
 import { GlobalNav } from '@/components/global-nav'
 import { QuestHeader } from '@/components/quest-detail/quest-header'
 import { QuestDescription } from '@/components/quest-detail/quest-description'
-import { SubmissionForm } from '@/components/quest-detail/submission-form'
+import {
+  SubmissionForm,
+  type SubmissionData,
+} from '@/components/quest-detail/submission-form'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
@@ -122,6 +127,7 @@ export default function QuestDetailPage() {
   const [participationStatus, setParticipationStatus] = useState<
     'idle' | 'participating' | 'submitted'
   >('idle')
+  const [lastSubmissionTitle, setLastSubmissionTitle] = useState('')
 
   if (!quest) {
     return (
@@ -148,10 +154,30 @@ export default function QuestDetailPage() {
     setParticipationStatus('participating')
   }
 
-  const handleSubmission = (data: any) => {
+  const handleSubmission = (data: SubmissionData) => {
     console.log('[v0] Submission data:', data)
+
+    addStoredSubmission({
+      id: `${quest.id}-${Date.now()}`,
+      questId: quest.id,
+      questTitle: quest.title,
+      reward: quest.reward,
+      title: data.title,
+      summary: data.summary,
+      submissionType: data.submissionType,
+      githubUrl: data.githubUrl,
+      fileName: data.file?.name,
+      submittedAt: new Date().toISOString().slice(0, 10),
+      freelancerName: '새 지원자',
+    })
+
+    setLastSubmissionTitle(data.title)
     setParticipationStatus('submitted')
-    // In a real app, this would send data to backend
+
+    toast({
+      title: '제출이 완료되었습니다',
+      description: '대시보드에서 제출 현황을 바로 확인할 수 있습니다.',
+    })
   }
 
   return (
@@ -185,7 +211,7 @@ export default function QuestDetailPage() {
               {participationStatus === 'idle' && (
                 <div className="space-y-3 text-center">
                   <h3 className="font-semibold text-foreground">
-                    이 퀨스트에 참여하시겠어요?
+                    이 퀘스트에 참여하시겠어요?
                   </h3>
                   <Button
                     className="w-full bg-primary text-primary-foreground hover:bg-primary-hover"
@@ -196,19 +222,38 @@ export default function QuestDetailPage() {
                 </div>
               )}
 
-              {(participationStatus === 'participating' ||
-                participationStatus === 'submitted') && (
-                <SubmissionForm questId={questId} onSubmit={handleSubmission} />
+              {participationStatus === 'participating' && (
+                <SubmissionForm
+                  questId={questId}
+                  questTitle={quest.title}
+                  submissionGuide={quest.submissionFormat}
+                  onSubmit={handleSubmission}
+                />
               )}
 
               {participationStatus === 'submitted' && (
-                <div className="rounded-lg border border-border bg-primary-light p-4 text-center">
-                  <p className="text-sm font-medium text-primary">
-                    ✓ 제출되었습니다!
-                  </p>
-                  <p className="mt-1 text-xs text-foreground-muted">
-                    리뷰 진행 중입니다. 곧 연락드리겠습니다.
-                  </p>
+                <div className="space-y-4 rounded-lg border border-border bg-primary-light p-4 text-center">
+                  <div>
+                    <p className="text-sm font-medium text-primary">
+                      ✓ 제출되었습니다!
+                    </p>
+                    <p className="mt-1 text-xs text-foreground-muted">
+                      {lastSubmissionTitle} 항목이 리뷰 대기 상태로 등록되었습니다.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Link href="/dashboard">
+                      <Button className="w-full bg-primary text-primary-foreground hover:bg-primary-hover">
+                        내 제출 현황 보기
+                      </Button>
+                    </Link>
+                    <Link href="/quests">
+                      <Button variant="outline" className="w-full">
+                        다른 퀘스트 더 보기
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
