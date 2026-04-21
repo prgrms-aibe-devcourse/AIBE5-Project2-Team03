@@ -8,7 +8,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { SignupModal } from '@/components/signup-modal'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { API_BASE_URL, setStoredUser, type UserResponse } from '@/lib/api'
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
@@ -20,19 +19,18 @@ export function LoginForm() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch('http://localhost:8000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: userId, password }),
       })
 
       if (response.ok) {
-        const user = (await response.json()) as UserResponse
-        setStoredUser(user)
-        localStorage.setItem('nickname', user.nickname)
+        const nickname = await response.text()
+        localStorage.setItem('nickname', nickname)
         window.location.href = '/'
       } else {
-        const errorData = await response.json().catch(() => ({}))
+        const errorData = await response.json()
         alert(`로그인 실패: ${errorData.message || '아이디 또는 비밀번호를 확인해주세요'}`)
       }
     } catch (error) {

@@ -70,17 +70,14 @@ export function DashboardSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="hidden w-56 flex-shrink-0 border-r border-border bg-surface lg:flex lg:flex-col">
-      <div className="border-b border-border p-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-            Q
-          </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">QuestWork</p>
-            <p className="truncate text-xs text-foreground-muted">Dashboard</p>
-          </div>
-        </div>
+    <aside className="sticky top-[73px] hidden h-[calc(100vh-73px)] w-56 flex-shrink-0 self-start overflow-y-auto border-r border-border bg-surface lg:flex lg:flex-col">
+      <div className="border-b border-border px-5 py-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-foreground-subtle">
+          Dashboard
+        </p>
+        <p className="mt-1 text-sm text-foreground-muted">
+          Work summary and workspace menu
+        </p>
       </div>
 
       <nav className="flex-1 p-3" aria-label="Dashboard navigation">

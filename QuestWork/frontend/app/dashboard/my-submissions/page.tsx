@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { GlobalNav } from '@/components/global-nav'
-import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar'
+import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -48,10 +48,7 @@ export default function MySubmissionsPage() {
     <div className="min-h-screen bg-background">
       <GlobalNav />
 
-      <div className="flex">
-        <DashboardSidebar />
-
-        <main className="flex-1 p-6 lg:p-8">
+      <DashboardShell>
           <div className="mb-8">
             <p className="text-sm font-semibold text-primary">My Submissions</p>
             <h1 className="mt-1 text-3xl font-bold text-foreground">
@@ -122,8 +119,7 @@ export default function MySubmissionsPage() {
               </table>
             </div>
           </Card>
-        </main>
-      </div>
+      </DashboardShell>
     </div>
   )
 }

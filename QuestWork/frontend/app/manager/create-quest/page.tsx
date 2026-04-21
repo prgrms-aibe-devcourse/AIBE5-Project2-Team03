@@ -2,13 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { GlobalNav } from '@/components/global-nav'
 import { ManagerSidebar } from '@/components/manager/manager-sidebar'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { createQuest, toLocalDateTime, getStoredUser } from '@/lib/api'
 
 const TECH_STACK_OPTIONS = [
   'React',
@@ -27,7 +25,6 @@ const SUBMISSION_FORMAT_OPTIONS = [
 ]
 
 export default function CreateQuestPage() {
-  const router = useRouter()
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -39,7 +36,6 @@ export default function CreateQuestPage() {
   })
 
   const [submitted, setSubmitted] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -70,40 +66,11 @@ export default function CreateQuestPage() {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setError(null)
-
-    const user = getStoredUser()
-    if (!user) {
-      setError('로그인이 필요합니다.')
-      return
-    }
-
-    const rewardNumber = parseFloat(formData.reward)
-    if (isNaN(rewardNumber) || rewardNumber <= 0) {
-      setError('올바른 보상액을 입력해주세요.')
-      return
-    }
-
-    try {
-      await createQuest({
-        managerId: user.id,
-        title: formData.title,
-        formData: {
-          description: formData.description,
-          techStack: formData.techStack,
-          difficulty: formData.difficulty,
-          submissionFormats: formData.submissionFormats,
-        },
-        rewardAmount: rewardNumber,
-        deadline: toLocalDateTime(formData.deadline),
-      })
-      setSubmitted(true)
-      setTimeout(() => router.push('/manager'), 1500)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '퀘스트 생성에 실패했습니다.')
-    }
+    console.log('[v0] Quest creation form submitted:', formData)
+    setSubmitted(true)
+    setTimeout(() => setSubmitted(false), 3000)
   }
 
   return (
@@ -287,13 +254,6 @@ export default function CreateQuestPage() {
                   ))}
                 </div>
               </Card>
-
-              {/* Error Message */}
-              {error && (
-                <div className="rounded-md border border-red-200 bg-red-50 p-4">
-                  <p className="text-sm font-medium text-red-800">{error}</p>
-                </div>
-              )}
 
               {/* Success Message */}
               {submitted && (

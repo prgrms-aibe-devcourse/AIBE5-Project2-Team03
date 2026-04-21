@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { GlobalNav } from '@/components/global-nav'
-import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar'
+import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { StatCard } from '@/components/dashboard/stat-card'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -88,11 +88,8 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background">
       <GlobalNav />
 
-      <div className="flex">
-        <DashboardSidebar />
-
-        <main className="flex-1">
-          <div className="space-y-8 p-6 lg:p-8">
+      <DashboardShell>
+        <div className="space-y-8">
             <div>
               <p className="text-sm font-semibold text-primary">Overview</p>
               <h1 className="mt-1 text-3xl font-bold text-foreground">
@@ -223,9 +220,8 @@ export default function DashboardPage() {
                 </div>
               </Card>
             </section>
-          </div>
-        </main>
-      </div>
+        </div>
+      </DashboardShell>
     </div>
   )
 }

@@ -3,7 +3,6 @@ node_modules/
 
 # Next.js 빌드 캐시 및 결과물 - 빌드 시 다시 생성됨
 .next/
-node_modules/
 
 # 환경 변수 - API 키 등 민감 정보 포함 가능
 .env*.local
