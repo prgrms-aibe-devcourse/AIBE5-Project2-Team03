@@ -1,5 +1,7 @@
 package com.example.QuestWork.domain.member.repository;
 
+
+
 import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

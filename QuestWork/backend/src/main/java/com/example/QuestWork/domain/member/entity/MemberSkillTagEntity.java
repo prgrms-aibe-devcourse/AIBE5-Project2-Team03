@@ -2,8 +2,6 @@ package com.example.QuestWork.domain.member.entity;
 
 
 import com.example.QuestWork.domain.skill.SkillTagEntity;
-
-
 import jakarta.persistence.*;
 
 import lombok.Getter;

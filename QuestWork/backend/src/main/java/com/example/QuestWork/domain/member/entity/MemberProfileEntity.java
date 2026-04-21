@@ -1,8 +1,8 @@
 package com.example.QuestWork.domain.member.entity;
 
 import com.example.QuestWork.domain.member.constant.MemberLevel;
-
 import com.example.QuestWork.domain.user.entity.User;
+
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
@@ -43,7 +43,7 @@ public class MemberProfileEntity {
 
     // 기술 스택 목록과의 연결 (1:N)
     @OneToMany(mappedBy = "memberProfile")
-    private List<MemberSkillTagEntity> skillTags;
+    private List<com.example.QuestWork.domain.member.entity.MemberSkillTagEntity> skillTags;
 
 //프로필 업데이트 석민이꺼
     public void updateProfile(String intro, MemberLevel level, String portfolioUrl, int totalCareerYears) {
