@@ -68,7 +68,7 @@ export function HeroSection() {
   return (
     <section className="flex justify-center bg-background px-4 py-10 sm:px-6 lg:px-8">
       <div
-        className="relative aspect-[1280/628] min-h-[560px] w-full max-w-[1280px] overflow-hidden rounded-3xl shadow-2xl shadow-black/20 lg:min-h-0"
+        className="relative aspect-[1280/628] min-h-[616px] w-full max-w-[1408px] overflow-hidden rounded-3xl shadow-2xl shadow-black/20 lg:min-h-0"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

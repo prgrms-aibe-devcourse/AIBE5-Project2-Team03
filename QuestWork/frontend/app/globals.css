@@ -210,3 +210,29 @@
     background: var(--foreground-subtle);
   }
 }
+
+@keyframes trusted-marquee-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.trusted-marquee__track {
+  animation: trusted-marquee-scroll 36s linear infinite;
+  will-change: transform;
+}
+
+.trusted-marquee:hover .trusted-marquee__track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trusted-marquee__track {
+    animation: none;
+    transform: none;
+  }
+}

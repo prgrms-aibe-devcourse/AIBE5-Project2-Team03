@@ -26,53 +26,46 @@ export function LoginForm() {
       });
 
       if (response.ok) {
-<<<<<<< HEAD
         const data = await response.json();
-        localStorage.setItem("nickname", data.nickname);
-        localStorage.setItem("userId", String(data.id));
-        window.location.href = "/";
-=======
-        const data = await response.json()
-        console.log("로그인 응답 데이터:", data)
+        console.log("로그인 응답 데이터:", data);
 
         // 1. 유저 기본 정보 저장
-        localStorage.setItem('userId', data.id.toString())
-        localStorage.setItem('nickname', data.nickname)
+        localStorage.setItem("userId", data.id.toString());
+        localStorage.setItem("nickname", data.nickname);
 
         // 2. 권한(Role) 판별 및 교정 로직
         // DB 기준: 7=ADMIN, 8=MEMBER, 9=MANAGER
-        let userRole = "MEMBER" // 기본값
+        let userRole = "MEMBER"; // 기본값
 
         // 백엔드에서 올 수 있는 모든 권한 필드 체크
-        const rawRole = (data.roleName || data.role || "").toString().toUpperCase()
-        const roleId = Number(data.roleId || (data.role && data.role.id))
+        const rawRole = (data.roleName || data.role || "")
+          .toString()
+          .toUpperCase();
+        const roleId = Number(data.roleId || (data.role && data.role.id));
 
         if (roleId === 7 || rawRole === "ADMIN") {
-          userRole = "ADMIN"
+          userRole = "ADMIN";
         }
         // 34번 유저이거나 roleId가 9이거나 "MANAGER" 문자열이 포함된 경우
         else if (roleId === 9 || rawRole === "MANAGER" || data.id === 34) {
-          userRole = "MANAGER"
-        }
-        else if (roleId === 8 || rawRole === "MEMBER" || rawRole === "USER") {
-          userRole = "MEMBER"
+          userRole = "MANAGER";
+        } else if (roleId === 8 || rawRole === "MEMBER" || rawRole === "USER") {
+          userRole = "MEMBER";
         }
 
         // 3. 로컬스토리지에 표준화된 Role 저장 (대시보드 경고 해결용)
-        localStorage.setItem('role', userRole)
+        localStorage.setItem("role", userRole);
 
         // 4. 역할별 이동 경로 설정
-        let targetPath = "/"
-        if (userRole === "ADMIN") targetPath = "/admin"
-        else if (userRole === "MANAGER") targetPath = "/manager"
-        else if (userRole === "MEMBER") targetPath = "/" // 일반 유저는 메인으로
+        let targetPath = "/";
+        if (userRole === "ADMIN") targetPath = "/admin";
+        else if (userRole === "MANAGER") targetPath = "/manager";
+        else if (userRole === "MEMBER") targetPath = "/"; // 일반 유저는 메인으로
 
-        console.log(`✅ 확정 권한: ${userRole} | 이동 경로: ${targetPath}`)
+        console.log(`✅ 확정 권한: ${userRole} | 이동 경로: ${targetPath}`);
 
         // 5. 페이지 이동
-        window.location.href = targetPath
-
->>>>>>> 645c541d75f07450c0fd26b4688add162eb629b8
+        window.location.href = targetPath;
       } else {
         const errorData = await response.json();
         alert(
@@ -83,11 +76,7 @@ export function LoginForm() {
       console.error("로그인 중 오류:", error);
       alert("서버 연결에 실패했습니다.");
     }
-<<<<<<< HEAD
   };
-=======
-  }
->>>>>>> 645c541d75f07450c0fd26b4688add162eb629b8
 
   return (
     <div className="w-full max-w-md mx-auto">

@@ -1,10 +1,22 @@
 {
   "app": {
+    "[project]/app/blog/page": [
+      "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
+      "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
+    ],
     "[project]/app/login/page": [
       "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
       "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
     ],
     "[project]/app/page": [
+      "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
+      "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
+    ],
+    "[project]/app/profile/[username]/page": [
+      "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
+      "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
+    ],
+    "[project]/app/signup/page": [
       "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
       "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
     ]
