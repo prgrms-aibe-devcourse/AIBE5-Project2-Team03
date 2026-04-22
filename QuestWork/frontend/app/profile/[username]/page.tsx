@@ -166,11 +166,19 @@ export default function ProfilePage({
         const data: FreelancerProfile = await response.json();
         setProfile(data);
         setDraft({
+<<<<<<< HEAD
           nickname: data.nickname || "",
           profileImageUrl: data.profileImageUrl || "",
           intro: data.intro || "",
           portfolioUrl: data.portfolioUrl || "",
           level: data.level || "BRONZE",
+=======
+          nickname: data.nickname || '', // username을 nickname으로 변경!
+          profileImageUrl: data.profileImageUrl || '',
+          intro: data.intro || '',
+          portfolioUrl: data.portfolioUrl || '',
+          level: data.level || 'BRONZE',
+>>>>>>> origin/seokmin
           totalCareerYears: data.totalCareerYears || 0,
           techStack: data.techStack || [],
         });

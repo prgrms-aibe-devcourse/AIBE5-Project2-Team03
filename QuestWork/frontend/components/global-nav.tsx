@@ -43,6 +43,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   const [nickname, setNickname] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [role, setRole] = useState<"USER" | "MANAGER">("USER");
+  const [username, setUsername] = useState<string | null>(null);  
 
   const questsCloseRef = useRef<NodeJS.Timeout | null>(null);
   const myPageCloseRef = useRef<NodeJS.Timeout | null>(null);
@@ -71,9 +72,10 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
     };
 
   useEffect(() => {
+    setUsername(localStorage.getItem("username")); // 💡 추가
     setNickname(localStorage.getItem("nickname"));
     setProfileImage(
-      localStorage.getItem("profileImage") || localStorage.getItem("avatar"),
+        localStorage.getItem("profileImage") || localStorage.getItem("avatar"),
     );
     const storedRole = localStorage.getItem("role") as
       | "USER"
@@ -84,14 +86,17 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 
   const isAuthenticated = isLoggedIn || Boolean(nickname);
   const userProfileImage =
-    profileImage ||
-    `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
-      nickname || "questwork-user",
-    )}`;
-  const profileHref = `/profile/${encodeURIComponent(nickname || "")}`;
+      profileImage ||
+      `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
+          nickname || "questwork-user",
+      )}`;
+
+  // 💡 주소창에 들어가는 값은 nickname이 아닌 username(아이디)으로 설정!
+  const profileHref = `/profile/${encodeURIComponent(username || "")}`;
   const avatarFallback = nickname?.trim().slice(0, 1).toUpperCase() || "Q";
 
   const handleLogout = () => {
+    localStorage.removeItem("username"); // 💡 추가
     localStorage.removeItem("nickname");
     localStorage.removeItem("profileImage");
     localStorage.removeItem("avatar");
@@ -164,10 +169,8 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                       </Link>
                     ))}
                   </div>
-                </div>
-              )}
             </div>
-
+  )}
             <Link
               href="/dashboard"
               className="rounded-full px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
@@ -259,7 +262,8 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                     {nickname}
                   </span>
                 </div>
-              </button>
+            ) : null}
+          </div>
 
               {isUserMenuOpen && (
                 <div className="absolute right-0 top-full z-30 w-72 pt-3">
@@ -269,7 +273,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                   >
                     <Avatar className="mx-auto size-20 border-2 border-primary/15 bg-primary-light shadow-md shadow-primary/10">
                       <AvatarImage src={userProfileImage} alt={nickname} />
-                      <AvatarFallback className="bg-primary-light text-2xl font-bold text-primary">
+                      <AvatarFallback className="bg-primary-light text-xs font-semibold text-primary">
                         {avatarFallback}
                       </AvatarFallback>
                     </Avatar>
@@ -307,7 +311,71 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                         Log Out
                       </Button>
                     </div>
-                  </div>
+                  </button>
+
+                  {isUserMenuOpen && (
+                      <div className="absolute right-0 top-full w-72 pt-3">
+                        <div
+                            className="rounded-lg border border-border bg-background p-4 text-center shadow-xl shadow-primary/10"
+                            role="menu"
+                        >
+                          <Avatar className="mx-auto size-20 border-2 border-primary bg-primary-light shadow-md shadow-primary/10">
+                            <AvatarImage src={userProfileImage} alt={nickname} />
+                            <AvatarFallback className="bg-primary-light text-2xl font-bold text-primary">
+                              {avatarFallback}
+                            </AvatarFallback>
+                          </Avatar>
+
+                          <p className="mt-3 text-base font-semibold text-foreground">
+                            안녕하세요, {nickname}님
+                          </p>
+
+                          <div className="mt-4 space-y-2">
+                            <Button
+                                asChild
+                                className="w-full bg-primary text-primary-foreground hover:bg-primary-hover"
+                            >
+                              {role === 'MANAGER' ? (
+                                  <Link
+                                      href="/manager"
+                                      onClick={() => setIsUserMenuOpen(false)}
+                                  >
+                                    매니저 대시보드
+                                  </Link>
+                              ) : (
+                                  <Link
+                                      href={profileHref}
+                                      onClick={() => setIsUserMenuOpen(false)}
+                                  >
+                                    프로필 보기
+                                  </Link>
+                              )}
+                            </Button>
+                            {role === 'MANAGER' && (
+                                <Button
+                                    asChild
+                                    variant="outline"
+                                    className="w-full border-blue-200 text-blue-600 hover:border-blue-400 hover:bg-blue-50"
+                                >
+                                  <Link
+                                      href="/manager"
+                                      onClick={() => setIsUserMenuOpen(false)}
+                                  >
+                                    프로필 설정
+                                  </Link>
+                                </Button>
+                            )}
+                            <Button
+                                variant="outline"
+                                className="w-full border-border hover:border-primary hover:text-primary"
+                                onClick={handleLogout}
+                            >
+                              로그아웃
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                  )}
                 </div>
               )}
             </div>

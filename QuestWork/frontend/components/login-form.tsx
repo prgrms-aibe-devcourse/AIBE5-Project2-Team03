@@ -30,8 +30,15 @@ export function LoginForm() {
         console.log("로그인 응답 데이터:", data);
 
         // 1. 유저 기본 정보 저장
+<<<<<<< HEAD
         localStorage.setItem("userId", data.id.toString());
         localStorage.setItem("nickname", data.nickname);
+=======
+      localStorage.setItem("nickname", data.nickname || "");
+        localStorage.setItem("username", data.username || ""); // 이제 아이디가 정상 저장됩니다!
+        localStorage.setItem("role", data.role || "MEMBER");
+        localStorage.setItem("userId", data.id); // 💡 유저의 고유 번호(예: 34)를 저장!
+>>>>>>> origin/seokmin
 
         // 2. 권한(Role) 판별 및 교정 로직
         // DB 기준: 7=ADMIN, 8=MEMBER, 9=MANAGER

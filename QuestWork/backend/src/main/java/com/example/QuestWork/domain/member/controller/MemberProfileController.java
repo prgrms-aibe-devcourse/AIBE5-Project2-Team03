@@ -23,13 +23,13 @@ public class MemberProfileController {
     /**
      * 마이페이지 프로필 조회
      */
-    @GetMapping("/{userId}") // 💡 주소는 그대로지만 타입이 숫자형이 됩니다.
-    public ResponseEntity<MemberProfileDto> getProfile(@PathVariable Long userId) {
-        return ResponseEntity.ok(memberProfileService.getProfile(userId));
+    @GetMapping("/{username}") // userId 대신 username으로 받기
+    public ResponseEntity<MemberProfileDto> getProfile(@PathVariable String username) {
+        return ResponseEntity.ok(memberProfileService.getProfileByUsername(username));
     }
-    @PutMapping("/{userId}")
-    public ResponseEntity<String> updateProfile(@PathVariable Long userId, @RequestBody MemberUpdateDto dto) {
-        memberProfileService.updateProfile(userId, dto);
+    @PutMapping("/{username}")
+    public ResponseEntity<String> updateProfile(@PathVariable String username, @RequestBody MemberUpdateDto dto) {
+        memberProfileService.updateProfileByUsername(username, dto);
         return ResponseEntity.ok("수정 완료");
     }
 

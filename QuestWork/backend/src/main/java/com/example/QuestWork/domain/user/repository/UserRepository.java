@@ -13,6 +13,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     // UserRepository.java
+    Optional<User> findByUsername(String username); // n을 소문자로!
+    // UserRepository.java
 
     // 1. 기존 권한 삭제
     @Modifying
@@ -30,4 +32,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "WHERE ur.user_id = :userId",
             nativeQuery = true)
     String findRoleNameByUserId(@Param("userId") Long userId);
+
+    boolean existsByNickname(String nickname);
 }

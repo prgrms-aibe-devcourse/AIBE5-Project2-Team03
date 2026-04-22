@@ -31,16 +31,15 @@ public class QuestService {
     private final ObjectMapper objectMapper;
 
 
-    // 퀘스트 등록
     @Transactional
     public QuestResponseDto createQuest(QuestCreateRequestDto requestDto) {
-        ManagerProfileEntity manager = managerProfileRepository.findByUserId(requestDto.getManagerId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "매니저 프로필을 찾지 못했습니다"));
+        // 1. 34번 유저의 프로필(PK=3)을 찾습니다.
+        ManagerProfileEntity managerProfile = managerProfileRepository.findByUserId(requestDto.getManagerId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "매니저 프로필 없음"));
 
-        //String formDataJson = toJsonString(requestDto.getFormData());
-
+        // 2. 퀘스트 생성 (타입: ManagerProfileEntity)
         Quest quest = Quest.builder()
-                .managerId(manager)
+                .managerId(managerProfile) // 🟢 .getUser() 빼세요! 객체 그대로 넣어야 PK 3이 들어갑니다.
                 .title(requestDto.getTitle())
                 .formData(requestDto.getFormData().toString())
                 .rewardAmount(requestDto.getRewardAmount())
@@ -48,9 +47,8 @@ public class QuestService {
                 .status(QuestStatus.OPEN)
                 .build();
 
-        Quest savedQuest = questRepository.save(quest);
-        return QuestResponseDto.from(savedQuest, objectMapper);
-        }
+        return QuestResponseDto.from(questRepository.save(quest), objectMapper);
+    }
     // 퀘스트 하나 조회
     public QuestResponseDto getQuest(Long questId) {
         Quest quest = questRepository.findById(questId)
