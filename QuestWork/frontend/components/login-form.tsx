@@ -26,8 +26,9 @@ export function LoginForm() {
       })
 
       if (response.ok) {
-        const nickname = await response.text()
-        localStorage.setItem('nickname', nickname)
+        const data = await response.json()
+        localStorage.setItem('nickname', data.nickname)
+        localStorage.setItem('userId', String(data.id))
         window.location.href = '/'
       } else {
         const errorData = await response.json()

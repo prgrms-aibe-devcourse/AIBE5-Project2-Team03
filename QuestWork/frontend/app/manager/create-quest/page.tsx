@@ -66,11 +66,51 @@ export default function CreateQuestPage() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log('[v0] Quest creation form submitted:', formData)
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 3000)
+
+    const managerId = Number(localStorage.getItem('userId'))
+    if (!managerId) {
+      alert('로그인이 필요합니다.')
+      return
+    }
+
+    const requestBody = {
+      managerId,
+      title: formData.title,
+      rewardAmount: Number(formData.reward),
+      deadline: formData.deadline + 'T00:00:00',
+      formData: {
+        description: formData.description,
+        techStack: formData.techStack,
+        difficulty: formData.difficulty,
+        submissionFormats: formData.submissionFormats,
+      },
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/quests?managerId=${managerId}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody),
+        }
+      )
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Quest created:', data)
+        setSubmitted(true)
+        setTimeout(() => setSubmitted(false), 3000)
+      } else {
+        const error = await response.json()
+        alert(`퀘스트 생성 실패: ${error.message || '서버 오류가 발생했습니다'}`)
+      }
+    } catch (error) {
+      console.error('퀘스트 생성 중 오류:', error)
+      alert('서버 연결에 실패했습니다.')
+    }
   }
 
   return (
