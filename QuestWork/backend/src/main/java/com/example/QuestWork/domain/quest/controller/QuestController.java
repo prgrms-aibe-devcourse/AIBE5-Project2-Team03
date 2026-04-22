@@ -5,6 +5,7 @@ import com.example.QuestWork.domain.quest.constant.QuestStatus;
 import com.example.QuestWork.domain.quest.dto.QuestCreateRequestDto;
 import com.example.QuestWork.domain.quest.dto.QuestResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestUpdateRequestDto;
+import com.example.QuestWork.domain.quest.entity.Quest;
 import com.example.QuestWork.domain.quest.service.QuestService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

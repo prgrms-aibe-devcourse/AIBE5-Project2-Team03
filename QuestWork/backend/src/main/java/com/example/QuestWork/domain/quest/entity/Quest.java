@@ -1,6 +1,7 @@
 package com.example.QuestWork.domain.quest.entity;
 
 
+import com.example.QuestWork.domain.manager.entity.ManagerProfileEntity;
 import com.example.QuestWork.domain.quest.constant.QuestStatus;
 import com.example.QuestWork.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -29,7 +30,7 @@ public class Quest {
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name= "manager_id", nullable = false)
-    private User managerId;
+    private ManagerProfileEntity managerId;
 
     @Column(nullable = false, length = 200)
     private String title;

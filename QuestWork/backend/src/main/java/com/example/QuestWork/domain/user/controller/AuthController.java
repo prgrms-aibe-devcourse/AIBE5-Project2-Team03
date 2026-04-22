@@ -2,6 +2,7 @@ package com.example.QuestWork.domain.user.controller;
 
 import com.example.QuestWork.domain.user.dto.UserLoginRequestDto;
 import com.example.QuestWork.domain.user.dto.UserRequestDto;
+import com.example.QuestWork.domain.user.dto.UserResponseDto;
 import com.example.QuestWork.domain.user.dto.UserSignupRequesetDto;
 import com.example.QuestWork.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,8 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("login")
-    public ResponseEntity<String> login(@RequestBody UserLoginRequestDto dto) {
-        String nickname = userService.login(dto);
-        return ResponseEntity.ok(nickname);
-
+    public ResponseEntity<UserResponseDto> login(@RequestBody UserLoginRequestDto dto) {
+        return ResponseEntity.ok(userService.login(dto));
     }
 
     // 실제 입력이 들어오는 주소(3000:/api/auth/signup)

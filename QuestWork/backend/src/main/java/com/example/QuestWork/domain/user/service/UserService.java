@@ -7,6 +7,7 @@ import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
 import com.example.QuestWork.domain.member.repository.MemberProfileRepository;
 import com.example.QuestWork.domain.user.dto.UserLoginRequestDto;
 import com.example.QuestWork.domain.user.dto.UserRequestDto;
+import com.example.QuestWork.domain.user.dto.UserResponseDto;
 import com.example.QuestWork.domain.user.entity.User;
 import com.example.QuestWork.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +28,12 @@ public class UserService {
     private final ManagerProfileRepository managerProfileRepository;
 
     @Transactional(readOnly=true)
-    public String login(UserLoginRequestDto dto) {
+    public UserResponseDto login(UserLoginRequestDto dto) {
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다"));
         if(!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new RuntimeException("비밀번호가 틀렸습니다"); }
-        return user.getNickname();
+        return UserResponseDto.from(user);
     }
     @Transactional
     public void signUp(UserRequestDto dto) {
@@ -78,7 +79,3 @@ public class UserService {
         }
     }
     }
-
-
-
-
