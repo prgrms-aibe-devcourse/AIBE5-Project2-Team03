@@ -79,7 +79,7 @@ export default function CreateQuestPage() {
       managerId,
       title: formData.title,
       rewardAmount: Number(formData.reward),
-      deadline: formData.deadline + 'T00:00:00',
+      deadline: formData.deadline + 'T23:59:59',
       formData: {
         description: formData.description,
         techStack: formData.techStack,
@@ -104,8 +104,11 @@ export default function CreateQuestPage() {
         setSubmitted(true)
         setTimeout(() => setSubmitted(false), 3000)
       } else {
-        const error = await response.json()
-        alert(`퀘스트 생성 실패: ${error.message || '서버 오류가 발생했습니다'}`)
+        const error = await response.json().catch(() => ({}))
+        const detail = error.errors
+          ? error.errors.map((e: { field: string; defaultMessage: string }) => `${e.field}: ${e.defaultMessage}`).join('\n')
+          : (error.message || error.error || '서버 오류가 발생했습니다')
+        alert(`퀘스트 생성 실패:\n${detail}`)
       }
     } catch (error) {
       console.error('퀘스트 생성 중 오류:', error)

@@ -1,6 +1,7 @@
 package com.example.QuestWork.domain.quest.entity;
 
 
+import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
 import com.example.QuestWork.domain.quest.constant.SubmissionStatus;
 import com.example.QuestWork.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -9,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -34,7 +36,7 @@ public class QuestSubmission {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id")
-    private User member;
+    private MemberProfileEntity member;
 
     @Column(name = "submission_title", nullable = false, length = 200)
     private String submissionTitle;
@@ -58,13 +60,17 @@ public class QuestSubmission {
     @Builder.Default
     private SubmissionStatus status = SubmissionStatus.SUBMITTED;
 
+    @CreatedDate
+    @Column(name = "submitted_at", nullable = false, updatable = false)
+    private LocalDateTime submittedAt;
+
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     public void updateSubmission(
             String submissionTitle,
-            String submissionContext,
+            String submissionContent,
             String fileUrl,
             String repoUrl
     ) {
@@ -77,6 +83,28 @@ public class QuestSubmission {
         this.status = SubmissionStatus.UPDATED;
 
     }
+
+    public static QuestSubmission create(
+            Quest quest,
+            MemberProfileEntity member,
+            String submissionTitle,
+            String submissionContent,
+            String fileUrl,
+            String repoUrl
+    ) {
+        return QuestSubmission.builder()
+                .quest(quest)
+                .member(member)
+                .submissionTitle(submissionTitle)
+                .submissionContent(submissionContent)
+                .fileUrl(fileUrl)
+                .repoUrl(repoUrl)
+                .versionNo(1)
+                .status(SubmissionStatus.SUBMITTED)
+                .build();
+    }
+
+
 
 
 

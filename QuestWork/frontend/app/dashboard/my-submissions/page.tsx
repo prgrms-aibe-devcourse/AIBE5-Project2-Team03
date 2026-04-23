@@ -107,11 +107,18 @@ export default function MySubmissionsPage() {
                         {submission.rewardStatus}
                       </td>
                       <td className="px-4 py-4 text-right">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/quests/${submission.questId}`}>
-                            보기
-                          </Link>
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/quests/${submission.questId}`}>
+                              보기
+                            </Link>
+                          </Button>
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/dashboard/my-submissions/${submission.id}/edit`}>
+                              수정
+                            </Link>
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}

@@ -15,4 +15,5 @@ public interface MemberProfileRepository extends JpaRepository<MemberProfileEnti
     // 유저네임으로 프로필과 유저 정보를 한 번에 가져오는 쿼리 (성능 최적화)
     @Query("select mp from MemberProfileEntity mp join fetch mp.user u where u.username = :username")
     Optional<MemberProfileEntity> findByUsername(@Param("username") String username);
+    Optional<MemberProfileEntity> findByUserId(Long id);
 }

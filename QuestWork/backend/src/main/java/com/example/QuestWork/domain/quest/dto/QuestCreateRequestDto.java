@@ -1,9 +1,9 @@
 package com.example.QuestWork.domain.quest.dto;
 
-import com.example.QuestWork.domain.quest.constant.QuestStatus;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -31,6 +31,6 @@ public class QuestCreateRequestDto {
     private BigDecimal rewardAmount;
 
     @NotNull
-    @Future
+    @FutureOrPresent
     private LocalDateTime deadline;
 }

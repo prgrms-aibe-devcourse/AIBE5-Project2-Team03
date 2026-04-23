@@ -8,8 +8,6 @@ import com.example.QuestWork.domain.quest.entity.Quest;
 import com.example.QuestWork.domain.quest.repository.QuestRepository;
 import com.example.QuestWork.domain.manager.entity.ManagerProfileEntity;
 import com.example.QuestWork.domain.manager.repositroy.ManagerProfileRepository;
-import com.example.QuestWork.domain.user.entity.User;
-import com.example.QuestWork.domain.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +24,6 @@ import java.util.List;
 
 public class QuestService {
     private final QuestRepository questRepository;
-    private final UserRepository userRepository;
     private final ManagerProfileRepository managerProfileRepository;
     private final ObjectMapper objectMapper;
 
@@ -71,8 +68,8 @@ public class QuestService {
 
     //작성자별 퀘스트 조회
     public List<QuestResponseDto> getQuestByManager(Long managerId) {
-        User manager = userRepository.findById(managerId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 매니저를 찾지 못했습니다" + managerId));
+        ManagerProfileEntity manager = managerProfileRepository.findByUserId(managerId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 매니저를 찾지 못했습니다. userId=" + managerId));
 
         return questRepository.findByManagerId(manager)
                 .stream().map(quest -> QuestResponseDto.from(quest, objectMapper)).toList();
@@ -113,10 +110,10 @@ public class QuestService {
         quest.update(null, null, null, null, status);
         return QuestResponseDto.from(quest, objectMapper);
     }
-    //작성자 검증
-    public void validateQuestOwner(Quest quest, Long mangerId) {
-        if(!quest.getManagerId().getId().equals(mangerId)) {
-            throw new IllegalArgumentException("해당 퀘스트에 대한 수정 권환이 없습니다");
+    //작성자 검증 (managerId 파라미터는 users.id)
+    public void validateQuestOwner(Quest quest, Long managerId) {
+        if(!quest.getManagerId().getUser().getId().equals(managerId)) {
+            throw new IllegalArgumentException("해당 퀘스트에 대한 수정 권한이 없습니다");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.QuestWork.domain.quest.entity;
 
+import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
 import com.example.QuestWork.domain.quest.constant.ApplicationStatus;
 import com.example.QuestWork.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -36,7 +37,7 @@ public class QuestApplication {
 
         @ManyToOne(fetch=FetchType.LAZY, optional = false)
         @JoinColumn(name="member_id")
-        private User member;
+        private MemberProfileEntity member;
 
         @Enumerated(EnumType.STRING)
         @Column(nullable = false, length = 50)
@@ -49,5 +50,11 @@ public class QuestApplication {
 
         public void cancel() {
                 this.status = ApplicationStatus.CANCELED;
+        }
+
+        public static QuestApplication create(Quest quest, MemberProfileEntity member) {
+                return QuestApplication.builder()
+                        .quest(quest).member(member).status(ApplicationStatus.APPLIED)
+                        .build();
         }
 }
