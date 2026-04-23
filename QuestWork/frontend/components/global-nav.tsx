@@ -108,8 +108,8 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95 backdrop-blur-md">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-3 sm:px-6 lg:px-8">
-        <div className="flex min-w-0 items-center">
+      <nav className="mx-auto grid w-full max-w-[88rem] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-x-4 px-5 py-3 sm:gap-x-6 sm:px-8 lg:gap-x-10 lg:px-12 xl:gap-x-14 xl:px-16">
+        <div className="flex min-w-0 items-center justify-self-start md:pr-8 lg:pr-12">
           <Link
             href="/"
             className="inline-flex items-center gap-3 rounded-2xl px-1 py-1 transition-opacity hover:opacity-90"
@@ -134,7 +134,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
           </Link>
         </div>
 
-        <div className="hidden flex-1 items-center justify-center px-6 md:flex lg:px-10">
+        <div className="hidden items-center justify-self-center md:flex">
           <div className="flex items-center gap-1 rounded-full border border-border/70 bg-white/70 px-3 py-1.5 shadow-sm shadow-black/5 backdrop-blur-sm">
             <div
               className="relative"
@@ -228,7 +228,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center justify-end pl-4">
+        <div className="flex min-w-0 items-center justify-self-end md:pl-8 lg:pl-12">
           {isAuthenticated && nickname ? (
             <div
               className="relative"
