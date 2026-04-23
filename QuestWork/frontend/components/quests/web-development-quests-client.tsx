@@ -14,6 +14,14 @@ import { WEB_DEVELOPMENT_QUESTS } from '@/lib/mock-quests-data'
 
 const QUESTS_PER_PAGE = 10
 
+const EMPTY_FILTERS: QuestFiltersType = {
+  categories: [],
+  techStack: [],
+  minReward: null,
+  maxReward: null,
+  difficulty: [],
+}
+
 export function WebDevelopmentQuestsClient({
   initialQuery,
 }: {
@@ -21,13 +29,7 @@ export function WebDevelopmentQuestsClient({
 }) {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState(initialQuery)
-  const [filters, setFilters] = useState<QuestFiltersType>({
-    categories: [],
-    techStack: [],
-    minReward: null,
-    maxReward: null,
-    difficulty: [],
-  })
+  const [filters, setFilters] = useState<QuestFiltersType>(EMPTY_FILTERS)
 
   useEffect(() => {
     setSearchQuery(initialQuery)
@@ -60,7 +62,7 @@ export function WebDevelopmentQuestsClient({
 
       return true
     })
-  }, [filters, searchQuery])
+  }, [filters.techStack, searchQuery])
 
   const totalPages = Math.ceil(filteredQuests.length / QUESTS_PER_PAGE)
   const paginatedQuests = filteredQuests.slice(
@@ -85,14 +87,15 @@ export function WebDevelopmentQuestsClient({
       <main className="mx-auto max-w-[1380px] px-4 py-8 sm:px-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">
-            Web Development Quests
+            웹 개발 퀘스트
           </h1>
           <p className="text-sm text-foreground-muted">
-            웹사이트, 프론트엔드, 백엔드, 풀스택 관련 퀘스트
+            프론트엔드, 백엔드, 데이터베이스, 인프라 관련 퀘스트를
+            탐색해보세요.
           </p>
           <p className="mt-1 text-foreground-muted">
             {searchQuery.trim()
-              ? `"${searchQuery}" 검색 결과 ${filteredQuests.length}개`
+              ? `"${searchQuery}" 검색 결과 ${filteredQuests.length}개의 퀘스트가 있습니다.`
               : `${filteredQuests.length}개의 퀘스트를 확인해보세요.`}
           </p>
         </div>
@@ -127,19 +130,13 @@ export function WebDevelopmentQuestsClient({
             ) : (
               <div className="flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-border bg-surface py-12">
                 <p className="text-center text-foreground-muted">
-                  검색 조건에 맞는 퀘스트가 없습니다.
+                  선택한 조건에 맞는 퀘스트가 없습니다.
                 </p>
                 <Button
                   variant="outline"
                   onClick={() => {
                     setSearchQuery('')
-                    handleFiltersChange({
-                      categories: [],
-                      techStack: [],
-                      minReward: null,
-                      maxReward: null,
-                      difficulty: [],
-                    })
+                    handleFiltersChange(EMPTY_FILTERS)
                   }}
                 >
                   필터 초기화

@@ -51,9 +51,7 @@ export function SubmissionsReviewSection({
       <Card className="border border-border shadow-none">
         <div className="p-6">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-foreground">
-              제출 검토
-            </h2>
+            <h2 className="text-lg font-semibold text-foreground">제출 검토</h2>
             <p className="mt-1 text-sm text-foreground-muted">
               제출된 결과물을 비교하고 빠르게 검토를 진행해보세요.
             </p>
@@ -68,7 +66,7 @@ export function SubmissionsReviewSection({
                 <TableHead>퀘스트</TableHead>
                 <TableHead>제출일</TableHead>
                 <TableHead>상태</TableHead>
-                <TableHead className="text-right">동작</TableHead>
+                <TableHead className="text-right">작업</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -82,7 +80,10 @@ export function SubmissionsReviewSection({
                 </TableRow>
               ) : (
                 submissions.map((submission) => (
-                  <TableRow key={submission.id} className="hover:bg-surface-raised">
+                  <TableRow
+                    key={submission.id}
+                    className="hover:bg-surface-raised"
+                  >
                     <TableCell className="font-medium text-foreground">
                       {submission.freelancerName}
                     </TableCell>

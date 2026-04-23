@@ -39,9 +39,11 @@ export function PostedQuestsSection({ quests }: PostedQuestsSectionProps) {
       <div className="p-6">
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-foreground">등록한 퀘스트</h2>
+            <h2 className="text-lg font-semibold text-foreground">
+              등록한 퀘스트
+            </h2>
             <p className="mt-1 text-sm text-foreground-muted">
-              현재 등록된 퀘스트 상태를 확인하고 상세 화면으로 이동할 수 있습니다.
+              현재 등록한 퀘스트 상태를 확인하고 상세 화면으로 이동해보세요.
             </p>
           </div>
           <Button
@@ -55,7 +57,7 @@ export function PostedQuestsSection({ quests }: PostedQuestsSectionProps) {
         {quests.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border p-8 text-center">
             <p className="text-sm text-foreground-muted">
-              아직 등록된 퀘스트가 없습니다.
+              아직 등록한 퀘스트가 없습니다.
             </p>
           </div>
         ) : (

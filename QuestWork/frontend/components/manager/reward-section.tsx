@@ -15,11 +15,9 @@ export function RewardSection() {
     <Card className="border border-border shadow-none">
       <div className="p-6">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-foreground">
-            보상 관리
-          </h2>
+          <h2 className="text-lg font-semibold text-foreground">보상 관리</h2>
           <p className="mt-1 text-sm text-foreground-muted">
-            선정된 결과와 결제 상태를 확인하고 보상 지급을 진행해보세요.
+            우승자 선정 결과와 결제 상태를 확인하고 보상 지급을 진행해보세요.
           </p>
         </div>
 

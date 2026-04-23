@@ -8,64 +8,120 @@ import { cn } from '@/lib/utils'
 interface NavItem {
   label: string
   href: string
-  hash?: string
   icon: ReactNode
 }
 
 const NAV_ITEMS: NavItem[] = [
   {
-    label: '대시보드',
+    label: '개요',
     href: '/manager',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <rect x="1.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
-        <rect x="9.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
-        <rect x="1.5" y="9.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
-        <rect x="9.5" y="9.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+        <rect
+          x="1.5"
+          y="1.5"
+          width="5"
+          height="5"
+          rx="1"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+        <rect
+          x="9.5"
+          y="1.5"
+          width="5"
+          height="5"
+          rx="1"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+        <rect
+          x="1.5"
+          y="9.5"
+          width="5"
+          height="5"
+          rx="1"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+        <rect
+          x="9.5"
+          y="9.5"
+          width="5"
+          height="5"
+          rx="1"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
       </svg>
     ),
   },
   {
     label: '등록한 퀘스트',
-    href: '/manager#posted-quests',
-    hash: '#posted-quests',
+    href: '/manager/posted-quests',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M3 2.5h10a1 1 0 0 1 1 1V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1z" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M4.75 5.5h6.5M4.75 8h6.5M4.75 10.5h3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path
+          d="M3 2.5h10a1 1 0 0 1 1 1V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1z"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M4.75 5.5h6.5M4.75 8h6.5M4.75 10.5h3.5"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
       </svg>
     ),
   },
   {
     label: '제출 검토',
-    href: '/manager#submission-review',
-    hash: '#submission-review',
+    href: '/manager/submission-review',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M3 2.5h7l3 3V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-        <path d="M10 2.5V5a1 1 0 0 0 1 1h2M4.75 8.5h6.5M4.75 11h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path
+          d="M3 2.5h7l3 3V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1z"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M10 2.5V5a1 1 0 0 0 1 1h2M4.75 8.5h6.5M4.75 11h4"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
       </svg>
     ),
   },
   {
     label: '보상 관리',
-    href: '/manager#reward-management',
-    hash: '#reward-management',
+    href: '/manager/reward-management',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M8 4.5v7M6 6.5c0-.83.67-1.5 2-1.5s2 .67 2 1.5-1 1.5-2 1.5-2 .67-2 1.5.67 1.5 2 1.5 2-.67 2-1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path
+          d="M8 4.5v7M6 6.5c0-.83.67-1.5 2-1.5s2 .67 2 1.5-1 1.5-2 1.5-2 .67-2 1.5.67 1.5 2 1.5 2-.67 2-1.5"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
       </svg>
     ),
   },
   {
     label: '프로필 설정',
-    href: '/manager#profile-settings',
-    hash: '#profile-settings',
+    href: '/manager/profile-settings',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="8" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M8 1v2M8 13v2M1 8h2M13 8h2M2.93 2.93l1.41 1.41M11.66 11.66l1.41 1.41M2.93 13.07l1.41-1.41M11.66 4.34l1.41-1.41" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path
+          d="M8 1v2M8 13v2M1 8h2M13 8h2M2.93 2.93l1.41 1.41M11.66 11.66l1.41 1.41M2.93 13.07l1.41-1.41M11.66 4.34l1.41-1.41"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
       </svg>
     ),
   },
@@ -73,7 +129,6 @@ const NAV_ITEMS: NavItem[] = [
 
 export function ManagerSidebar() {
   const pathname = usePathname()
-  const [activeHash, setActiveHash] = useState('')
   const [userInfo, setUserInfo] = useState({
     nickname: 'Manager',
     initial: 'M',
@@ -87,14 +142,11 @@ export function ManagerSidebar() {
     setUserInfo({
       nickname: savedNickname,
       initial: savedNickname.charAt(0).toUpperCase() || 'M',
-      roleLabel: savedRole === 'ADMIN' ? '관리자 워크스페이스' : '매니저 워크스페이스',
+      roleLabel:
+        savedRole === 'ADMIN'
+          ? '관리자 워크스페이스'
+          : '매니저 워크스페이스',
     })
-
-    const syncHash = () => setActiveHash(window.location.hash)
-    syncHash()
-    window.addEventListener('hashchange', syncHash)
-
-    return () => window.removeEventListener('hashchange', syncHash)
   }, [])
 
   return (
@@ -121,10 +173,7 @@ export function ManagerSidebar() {
       <nav className="flex-1 p-3" aria-label="매니저 내비게이션">
         <ul className="space-y-0.5">
           {NAV_ITEMS.map((item) => {
-            const isOverview = !item.hash
-            const isActive =
-              pathname === '/manager' &&
-              ((isOverview && !activeHash) || (!isOverview && activeHash === item.hash))
+            const isActive = pathname === item.href
 
             return (
               <li key={item.href}>
@@ -160,7 +209,12 @@ export function ManagerSidebar() {
           className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium text-foreground-muted transition-colors hover:bg-surface-raised hover:text-foreground"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M8 3v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <path
+              d="M3 8h10M8 3v10"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
           </svg>
           퀘스트 생성
         </Link>

@@ -80,7 +80,7 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
 
       if (!response.ok) throw new Error('Failed to update manager profile')
 
-      setSuccessMessage('매니저 프로필이 저장되었습니다.')
+      setSuccessMessage('매니저 프로필이 업데이트되었습니다.')
       localStorage.setItem('nickname', data.nickname)
       setTimeout(() => setSuccessMessage(''), 3000)
     } catch (error) {
@@ -96,7 +96,7 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
       <div className="mb-6">
         <h2 className="text-lg font-semibold text-foreground">프로필 설정</h2>
         <p className="mt-1 text-sm text-foreground-muted">
-          매니저 계정에 연결된 기본 정보와 운영 정보를 수정할 수 있습니다.
+          매니저 계정의 기본 정보와 회사 정보를 수정할 수 있습니다.
         </p>
       </div>
 
@@ -137,7 +137,11 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
               <FormItem>
                 <FormLabel>담당자 이름</FormLabel>
                 <FormControl>
-                  <Input placeholder="담당자 이름" {...field} disabled={isLoading} />
+                  <Input
+                    placeholder="담당자 이름"
+                    {...field}
+                    disabled={isLoading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -151,7 +155,11 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
               <FormItem>
                 <FormLabel>회사명</FormLabel>
                 <FormControl>
-                  <Input placeholder="회사명" {...field} disabled={isLoading} />
+                  <Input
+                    placeholder="회사명"
+                    {...field}
+                    disabled={isLoading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -165,7 +173,11 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
               <FormItem>
                 <FormLabel>연락처</FormLabel>
                 <FormControl>
-                  <Input placeholder="010-0000-0000" {...field} disabled={isLoading} />
+                  <Input
+                    placeholder="010-0000-0000"
+                    {...field}
+                    disabled={isLoading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -179,7 +191,11 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
               <FormItem>
                 <FormLabel>사업자 번호</FormLabel>
                 <FormControl>
-                  <Input placeholder="000-00-00000" {...field} disabled={isLoading} />
+                  <Input
+                    placeholder="000-00-00000"
+                    {...field}
+                    disabled={isLoading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
