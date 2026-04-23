@@ -17,23 +17,18 @@ import { AlertCircle } from 'lucide-react'
 
 export default function ManagerDashboardPage() {
   const router = useRouter()
+
+  // 💡 상태 정의
+  const [dbQuests, setDbQuests] = useState<any[]>([]) // DB에서 가져온 퀘스트
+  const [isLoading, setIsLoading] = useState(false)   // 로딩 상태 추가
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null)
   const [userId, setUserId] = useState<number | null>(null)
   const [savedSubmissions, setSavedSubmissions] = useState<any[]>([])
 
   // 1. 페이지 권한 및 유저 정보 로드
   useEffect(() => {
-    const allKeys = {
-      userId: localStorage.getItem('userId'),
-      id: localStorage.getItem('id'),
-      role: localStorage.getItem('role')
-    }
-    console.log("로컬스토리지 상태:", allKeys)
-
-    // 'userId' 또는 'id'라는 키 중 존재하는 것을 숫자로 변환합니다.
-    const savedId = allKeys.userId || allKeys.id
-    const role = allKeys.role
-
+    const savedId = localStorage.getItem('userId') || localStorage.getItem('id')
+    const role = localStorage.getItem('role')
 
     if (role !== 'MANAGER') {
       setIsAuthorized(false)
@@ -46,7 +41,30 @@ export default function ManagerDashboardPage() {
     }
   }, [])
 
-  // 2. 제출된 데이터 로드
+  // 2. 백엔드에서 실제 데이터 가져오는 로직
+  useEffect(() => {
+    const fetchQuests = async () => {
+      if (!userId) return
+      setIsLoading(true)
+      try {
+        const response = await fetch(`http://localhost:8000/api/quests/manager/${userId}`)
+        if (!response.ok) throw new Error('데이터 로드 실패')
+        const data = await response.json()
+        setDbQuests(data)
+      } catch (error) {
+        console.error("Fetch Error:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    // 권한 확인이 끝난 후 권한이 있을 때만 실행
+    if (isAuthorized === true) {
+      fetchQuests()
+    }
+  }, [userId, isAuthorized])
+
+  // 3. 제출 데이터 로드 (기존 로직 유지)
   useEffect(() => {
     const stored = getStoredSubmissions().map((submission) => ({
       id: submission.id,
@@ -60,79 +78,23 @@ export default function ManagerDashboardPage() {
     setSavedSubmissions(stored)
   }, [])
 
-  // 3. Mock Data 설정 (메모이제이션)
-  const postedQuests = useMemo(() => [
-    {
-      id: '1',
-      title: 'React Admin Dashboard Performance Optimization',
-      status: 'open' as const,
-      reward: '₩1,000,000',
-      submissionsCount: 8,
-      createdAt: '2024-04-01',
-    },
-    {
-      id: '3',
-      title: 'REST API for Microservices Architecture',
-      status: 'open' as const,
-      reward: '₩1,500,000',
-      submissionsCount: 5,
-      createdAt: '2024-03-28',
-    },
-    {
-      id: '4',
-      title: 'Kubernetes Deployment & CI/CD Pipeline',
-      status: 'completed' as const,
-      reward: '₩2,000,000',
-      submissionsCount: 12,
-      createdAt: '2024-03-15',
-    },
-  ], [])
-
+  // 가짜 제출 데이터
   const submissions = useMemo(() => [
     {
-      id: '1',
+      id: 'mock-1',
       freelancerName: '김개발',
       questTitle: 'React Admin Dashboard Performance Optimization',
       questId: '1',
       submittedAt: '2024-04-10',
       status: 'reviewing' as const,
       githubUrl: 'https://github.com/example/react-dashboard',
-    },
-    {
-      id: '4',
-      freelancerName: '정데브옵스',
-      questTitle: 'Kubernetes Deployment & CI/CD Pipeline',
-      questId: '4',
-      submittedAt: '2024-04-05',
-      status: 'winner' as const,
-      githubUrl: 'https://github.com/example/k8s-setup',
-    },
+    }
   ], [])
 
   const allSubmissions = useMemo(
       () => [...savedSubmissions, ...submissions],
       [savedSubmissions, submissions]
   )
-
-  const mockQuests = useMemo(() => {
-    const today = new Date()
-    return WEB_DEVELOPMENT_QUESTS.map((quest, index) => {
-      const deadlineMatch = quest.deadline.match(/(\d+)일/)
-      const daysFromNow = deadlineMatch ? parseInt(deadlineMatch[1]) : 7
-      const deadlineDate = new Date(today)
-      deadlineDate.setDate(today.getDate() + daysFromNow)
-
-      return {
-        id: quest.id,
-        title: quest.title,
-        description: quest.description,
-        rewardAmount: parseInt(quest.reward.replace(/[^\d]/g, '')),
-        deadline: deadlineDate.toISOString().split('T')[0],
-        status: 'active' as const,
-        createdAt: new Date(today.getTime() - index * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      }
-    })
-  }, [])
 
   return (
       <div className="min-h-screen bg-background">
@@ -160,19 +122,20 @@ export default function ManagerDashboardPage() {
                 <p className="mt-1 text-muted-foreground">등록한 퀘스트와 제출 현황을 관리하세요.</p>
               </div>
 
-              {/* 탭 영역 */}
               <Tabs defaultValue="dashboard" className="space-y-4">
                 <TabsList>
                   <TabsTrigger value="dashboard">대시보드</TabsTrigger>
                   <TabsTrigger value="profile">프로필 설정</TabsTrigger>
                 </TabsList>
 
-                {/* 대시보드 탭 내용 */}
                 <TabsContent value="dashboard" className="space-y-6">
+                  {/* 통계 섹션: dbQuests 기반으로 수정 */}
                   <div className="grid gap-4 md:grid-cols-3">
                     <Card className="border p-5">
                       <p className="text-sm text-muted-foreground">활성 퀘스트</p>
-                      <p className="mt-2 text-3xl font-bold">{postedQuests.filter(q => q.status === 'open').length}</p>
+                      <p className="mt-2 text-3xl font-bold">
+                        {dbQuests.filter(q => q.status === 'OPEN').length}
+                      </p>
                     </Card>
                     <Card className="border p-5">
                       <p className="text-sm text-muted-foreground">총 제출</p>
@@ -180,18 +143,22 @@ export default function ManagerDashboardPage() {
                     </Card>
                     <Card className="border p-5 bg-blue-600 text-white">
                       <p className="text-sm opacity-80">총 지급액</p>
-                      <p className="mt-2 text-3xl font-bold">₩4,500,000</p>
+                      <p className="mt-2 text-3xl font-bold">
+                        ₩{dbQuests.reduce((acc, q) => acc + (q.rewardAmount || 0), 0).toLocaleString()}
+                      </p>
                     </Card>
                   </div>
 
                   <div className="grid gap-6 lg:grid-cols-2">
                     <div className="space-y-6">
-                      <PostedQuestsSection quests={postedQuests} />
+                      {/* 💡 dbQuests를 전달합니다. */}
+                      <PostedQuestsSection quests={dbQuests} />
                     </div>
                     <div className="space-y-6">
                       <Card className="border p-6">
                         <h3 className="text-lg font-semibold mb-4">퀘스트 데드라인 캘린더</h3>
-                        <Calendar quests={mockQuests} className="w-full" />
+                        {/* 💡 캘린더에도 실제 데이터를 전달합니다. */}
+                        <Calendar quests={dbQuests} className="w-full" />
                       </Card>
                       <RewardSection />
                     </div>
@@ -200,7 +167,6 @@ export default function ManagerDashboardPage() {
                   <SubmissionsReviewSection submissions={allSubmissions} />
                 </TabsContent>
 
-                {/* 프로필 설정 탭 내용 */}
                 <TabsContent value="profile">
                   {userId ? (
                       <ManagerProfileForm userId={userId} />

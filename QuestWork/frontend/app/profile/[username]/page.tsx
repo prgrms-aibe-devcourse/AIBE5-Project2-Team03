@@ -38,6 +38,7 @@ import {
   Link2,
   Lock,
   Calendar as CalendarIcon,
+  Bell,
 } from "lucide-react";
 
 // 인터페이스 정의 (기존과 동일)
@@ -213,7 +214,7 @@ export default function ProfilePage({
         deadline: selectedDate.toISOString().split("T")[0],
       };
       // 실제로는 API 호출, 여기서는 Mock 업데이트
-      MOCK_QUESTS.push(newQuest);
+      MOCK_QUESTS.push(newquest);
       setNewQuestTitle("");
       setNewQuestStatus("진행중");
       setSelectedDate(undefined);
@@ -262,6 +263,7 @@ export default function ProfilePage({
             level: draft.level, // "BRONZE", "SILVER" 등 대문자 문자열
             portfolioUrl: draft.portfolioUrl,
             totalCareerYears: Number(draft.totalCareerYears), // 반드시 숫자로 변환
+            techStack: draft.techStack, // 💡 기술 스택 데이터 추가
           }),
         },
       );
@@ -294,6 +296,54 @@ export default function ProfilePage({
       alert("저장에 실패했습니다. 서버 로그나 주소를 확인해주세요.");
     }
   };
+  // 비밀번호 변경 모달 상태
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [passwordDraft, setPasswordDraft] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+
+  const handlePasswordChange = async () => {
+    // 1. 유효성 검사
+    if (passwordDraft.newPassword !== passwordDraft.confirmPassword) {
+      alert("새 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    setIsPasswordLoading(true);
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/user/${profile?.username}/password`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            currentPassword: passwordDraft.currentPassword,
+            newPassword: passwordDraft.newPassword,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorMsg = await response.text();
+        throw new Error(errorMsg || "비밀번호 수정 실패");
+      }
+
+      alert("비밀번호가 성공적으로 변경되었습니다.");
+      setIsPasswordModalOpen(false);
+      setPasswordDraft({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
+      setIsPasswordLoading(false);
+    }
+  };
 
   if (isLoading)
     return (
@@ -309,25 +359,25 @@ export default function ProfilePage({
     );
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-white text-[#1e293b]">
       <GlobalNav />
 
       {/* 💡 상단 프로필 헤더 비주얼 강화 */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-primary/10 via-background to-background pt-16 pb-8 border-b">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
-          <div className="flex flex-col md:flex-row items-center gap-8">
+      <section className="relative overflow-hidden bg-white pt-32 pb-8">
+        <div className="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 relative">
+          <div className="flex flex-row items-center gap-8">
             {/* 이미지 수정 부분 */}
             <div className="relative group">
               <img
                 src={
                   isEditing
                     ? draft?.profileImageUrl ||
-                      "https://api.dicebear.com/7.x/avataaars/svg?seed=default"
+                      "https://api.dicebear.com/8.x/notionists/svg?seed=Felix&backgroundColor=ffdfbf&backgroundRotation=0,360&beardProbability=0&glassesProbability=100&glasses=variant02&smileProbability=100"
                     : profile.profileImageUrl ||
-                      "https://api.dicebear.com/7.x/avataaars/svg?seed=default"
+                      "https://api.dicebear.com/8.x/notionists/svg?seed=Felix&backgroundColor=ffdfbf&backgroundRotation=0,360&beardProbability=0&glassesProbability=100&glasses=variant02&smileProbability=100"
                 }
                 alt="Profile Avatar"
-                className="h-40 w-40 rounded-3xl border-4 border-background object-cover shadow-3xl transition-transform duration-300 group-hover:rotate-3 cursor-pointer"
+                className="h-64 w-64 rounded-3xl border-2 border-white object-cover shadow-xl transition-transform duration-300 group-hover:rotate-3 cursor-pointer"
                 onClick={() => isEditing && fileInputRef.current?.click()}
               />
               <input
@@ -337,68 +387,69 @@ export default function ProfilePage({
                 accept="image/*"
                 hidden
               />
-              <Badge className="absolute -bottom-3 -right-3 px-4 py-1.5 shadow-xl text-lg font-black tracking-wider rotate-6 bg-yellow-400 text-yellow-950 hover:bg-yellow-400/90">
-                {profile.level}
-              </Badge>
               {isEditing && (
                 <div className="absolute inset-x-2 bottom-2">
                   <Input
                     name="profileImageUrl"
                     value={draft?.profileImageUrl}
                     onChange={handleInputChange}
-                    className="h-8 text-xs bg-background/80"
+                    className="h-8 text-xs bg-white/80"
                     placeholder="https://..."
                   />
                 </div>
               )}
             </div>
 
-            <div className="flex-1 text-center md:text-left space-y-4">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex-1 space-y-6">
+              <div className="flex flex-col gap-4">
                 {isEditing ? (
-                  /* 이름 수정 */
+                  /* 닉네임 & 소개글 수정 모드 */
                   <div className="space-y-2 flex-1 max-w-md">
                     <Label>닉네임</Label>
                     <Input
                       name="nickname"
                       value={draft?.nickname}
                       onChange={handleInputChange}
-                      className="text-2xl font-black bg-background"
+                      className="text-4xl font-black bg-white rounded-2xl"
                       placeholder="활동 이름을 적어주세요."
                     />
                     <Label>소개글</Label>
                     <Textarea
                       name="intro"
-                      rows={3}
+                      rows={4}
                       value={draft?.intro}
                       onChange={handleInputChange}
                       placeholder="전문 분야나 프로젝트 경험을 자유롭게 적어주세요."
-                      className="bg-background leading-relaxed"
+                      className="bg-white leading-relaxed rounded-2xl"
                     />
                   </div>
                 ) : (
-                  <div>
-                    <h1 className="text-7xl font-black tracking-tighter text-foreground">
-                      {profile.nickname}
+                  /* 일반 표시 모드 */
+                  <div className="space-y-2">
+                    <h1 className="text-7xl font-extrabold tracking-tighter text-[#1e293b] flex items-center gap-4">
+                      {profile.nickname}{" "}
+                      <Badge className="px-4 py-2 rounded-full text-sm font-semibold bg-[#FEF3C7] text-[#92400E] border-0">
+                        {profile.level}
+                      </Badge>
                     </h1>
-                    <p className="text-xl text-muted-foreground font-medium mt-1">
+                    <p className="text-lg text-[#1e293b] font-medium">
                       @{profile.username} / 경력 {profile.totalCareerYears}년차
                     </p>
                     {profile.intro && (
-                      <p className="text-lg text-muted-foreground mt-4 italic leading-relaxed">
+                      <p className="text-base text-[#1e293b] mt-4 leading-relaxed font-normal italic">
                         "{profile.intro}"
                       </p>
                     )}
                   </div>
                 )}
 
-                <div className="flex gap-2 justify-center">
+                <div className="flex gap-4 justify-end">
                   {isEditing ? (
                     <>
                       <Button
                         onClick={saveProfile}
-                        size="lg"
-                        className="rounded-full gap-2 px-6"
+                        size="default"
+                        className="rounded-2xl gap-2 px-6 bg-purple-600 hover:bg-purple-700 text-white border-0 shadow-lg"
                       >
                         {" "}
                         <Save size={20} /> 저장{" "}
@@ -406,47 +457,135 @@ export default function ProfilePage({
                       <Button
                         variant="ghost"
                         onClick={() => setIsEditing(false)}
-                        className="rounded-full gap-2 px-6"
+                        className="rounded-2xl gap-2 px-6 border-gray-300 text-gray-700 hover:bg-gray-100"
                       >
                         {" "}
                         <X size={20} /> 취소{" "}
                       </Button>
                     </>
                   ) : (
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={() => setIsEditing(true)}
-                      className="rounded-full gap-2 px-6"
-                    >
-                      {" "}
-                      <Settings size={20} /> 프로필 수정{" "}
-                    </Button>
+                    <>
+                      {/* 🔒 비밀번호 변경 모달 추가 */}
+                      <Dialog
+                        open={isPasswordModalOpen}
+                        onOpenChange={setIsPasswordModalOpen}
+                      >
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="default"
+                            className="rounded-2xl px-6 text-purple-600 hover:bg-purple-50 hover:text-purple-700 shadow-sm"
+                          >
+                            비밀번호 변경
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px] rounded-2xl">
+                          <div className="grid gap-6 py-6">
+                            <div className="space-y-2">
+                              <Label>현재 비밀번호</Label>
+                              <Input
+                                type="password"
+                                value={passwordDraft.currentPassword}
+                                onChange={(e) =>
+                                  setPasswordDraft({
+                                    ...passwordDraft,
+                                    currentPassword: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <Separator />
+                            <div className="space-y-2">
+                              <Label>새 비밀번호</Label>
+                              <Input
+                                type="password"
+                                value={passwordDraft.newPassword}
+                                onChange={(e) =>
+                                  setPasswordDraft({
+                                    ...passwordDraft,
+                                    newPassword: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label>새 비밀번호 확인</Label>
+                              <Input
+                                type="password"
+                                value={passwordDraft.confirmPassword}
+                                onChange={(e) =>
+                                  setPasswordDraft({
+                                    ...passwordDraft,
+                                    confirmPassword: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <Button
+                              variant="outline"
+                              onClick={() => setIsDialogOpen(false)}
+                              className="rounded-xl"
+                            >
+                              취소
+                            </Button>
+                            <Button
+                              onClick={handlePasswordChange}
+                              disabled={isPasswordLoading}
+                              className="bg-red-600 hover:bg-red-700 text-white rounded-xl"
+                            >
+                              {isPasswordLoading
+                                ? "변경 중..."
+                                : "비밀번호 수정 완료"}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+
+                      <Button
+                        variant="ghost"
+                        size="default"
+                        onClick={() => setIsEditing(true)}
+                        className="rounded-2xl px-6 text-purple-600 hover:bg-purple-50 hover:text-purple-700 shadow-sm"
+                      >
+                        {" "}
+                        프로필 수정{" "}
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
 
-              {/* 레벨 & 경력 수정 모드 */}
+              {/* 레벨, 경력 & 알림 설정 섹션 (수정 모드일 때만 표시) */}
               {isEditing && (
-                <div className="grid grid-cols-2 gap-4 max-w-md p-4 bg-muted/40 rounded-2xl border">
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <Lock size={16} className="text-muted-foreground" />
-                      레벨
-                    </Label>
-                    <div className="bg-background border rounded-md px-3 py-2 text-sm opacity-50 cursor-not-allowed">
-                      {draft?.level}
+                <div className="flex flex-col gap-4 max-w-4xl">
+                  {/* 기존 레벨 & 경력 */}
+                  <div className="grid grid-cols-2 gap-4 flex-1 p-4 bg-gray-50 rounded-2xl border-0 shadow-sm">
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        {" "}
+                        <Lock size={16} className="text-slate-500" /> 레벨{" "}
+                      </Label>
+                      <div className="bg-white border rounded-md px-3 py-2 text-sm opacity-50 cursor-not-allowed">
+                        {" "}
+                        {draft?.level}{" "}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        {" "}
+                        <Lock size={16} className="text-slate-500" />{" "}
+                        경력(년){" "}
+                      </Label>
+                      <div className="bg-white border rounded-md px-3 py-2 text-sm opacity-50 cursor-not-allowed">
+                        {" "}
+                        {draft?.totalCareerYears}{" "}
+                      </div>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <Lock size={16} className="text-muted-foreground" />
-                      경력(년)
-                    </Label>
-                    <div className="bg-background border rounded-md px-3 py-2 text-sm opacity-50 cursor-not-allowed">
-                      {draft?.totalCareerYears}
-                    </div>
-                  </div>
+
+                  {/* 🔔 알림 설정 토글 추가 */}
                 </div>
               )}
             </div>
@@ -455,23 +594,24 @@ export default function ProfilePage({
       </section>
 
       {/* 💡 메인 레이아웃 분할 */}
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <main className="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
           {/* 왼쪽 컬럼: 소개 & 스킬 */}
-          <div className="lg:col-span-2 space-y-12">
+          <div className="lg:col-span-2 space-y-16">
             {/* 기술 스택 */}
             <section>
-              <h2 className="mb-6 text-2xl font-black flex items-center gap-2">
-                <Briefcase size={24} className="text-primary" /> 주요 기술 스택
+              <h2 className="mb-4 text-3xl font-black text-[#1e293b] flex items-center gap-3">
+                <Briefcase size={28} className="text-purple-600" /> 주요 기술
+                스택
               </h2>
               {isEditing ? (
-                <Card className="rounded-3xl p-6 bg-card">
+                <Card className="rounded-3xl p-8 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-0">
                   <Label className="mb-4 block">기술 스택 선택</Label>
-                  <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
+                  <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto">
                     {TECH_STACK_OPTIONS.map((tech) => (
                       <div
                         key={tech}
-                        className="flex items-center gap-2 cursor-pointer"
+                        className="flex items-center gap-3 cursor-pointer"
                       >
                         <input
                           type="checkbox"
@@ -498,19 +638,19 @@ export default function ProfilePage({
                   </div>
                 </Card>
               ) : (
-                <div className="flex flex-wrap gap-2.5">
+                <div className="flex flex-wrap gap-2">
                   {profile.techStack && profile.techStack.length > 0 ? (
                     profile.techStack.map((skill) => (
                       <Badge
                         key={skill}
                         variant="secondary"
-                        className="px-5 py-2 rounded-full text-sm font-semibold bg-white border dark:bg-zinc-800 text-foreground shadow-sm"
+                        className="px-4 py-2 rounded-full text-sm font-semibold bg-purple-100 text-purple-800 border-0"
                       >
                         #{skill}
                       </Badge>
                     ))
                   ) : (
-                    <p className="text-sm text-muted-foreground bg-muted p-4 rounded-xl">
+                    <p className="text-sm text-slate-500 bg-gray-50 p-4 rounded-2xl">
                       등록된 기술 스택이 없습니다.
                     </p>
                   )}
@@ -520,19 +660,19 @@ export default function ProfilePage({
 
             {/* 찜한/진행 중 퀘스트 */}
             <section>
-              <h2 className="mb-6 text-2xl font-black flex items-center gap-2">
-                <Award size={24} className="text-primary" /> 내 퀘스트 현황
+              <h2 className="mb-4 text-3xl font-black text-[#1e293b] flex items-center gap-3">
+                <Award size={28} className="text-purple-600" /> 내 퀘스트 현황
               </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 <div className="lg:col-span-1">
-                  <Card className="rounded-2xl p-6">
+                  <Card className="rounded-3xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-0">
                     <CardHeader className="pb-4">
-                      <CardTitle className="text-xl flex items-center gap-2">
-                        <CalendarIcon size={24} />
+                      <CardTitle className="text-2xl flex items-center gap-3 text-[#1e293b]">
+                        <CalendarIcon size={28} />
                         데드라인 캘린더
                       </CardTitle>
                       {getNextDeadline() && (
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-slate-500 mt-1">
                           다음 데드라인: {getNextDeadline()?.title} (
                           {getNextDeadline()?.days})
                         </p>
@@ -552,28 +692,29 @@ export default function ProfilePage({
                           ),
                         }}
                         modifiersClassNames={{
-                          deadline: "bg-primary/20 text-primary font-semibold",
+                          deadline:
+                            "bg-purple-200 text-purple-800 font-semibold",
                         }}
-                        className="rounded-md border-0 w-full"
+                        className="rounded-md border-0 w-full text-sm"
                       />
                     </CardContent>
                   </Card>
                 </div>
                 <div className="lg:col-span-1">
-                  <div className="mb-4 flex gap-2">
+                  <div className="mb-4 flex gap-3">
                     {(["전체", "진행중", "찜"] as const).map((filter) => (
                       <Button
                         key={filter}
-                        variant={questFilter === filter ? "default" : "outline"}
+                        variant="outline"
                         size="sm"
                         onClick={() => setQuestFilter(filter)}
-                        className="rounded-full"
+                        className="rounded-full px-4 py-2 border-purple-300 text-purple-600 hover:bg-purple-50 transition-all duration-200"
                       >
                         {filter}
                       </Button>
                     ))}
                   </div>
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                  <div className="space-y-6 max-h-96 overflow-y-auto">
                     {MOCK_QUESTS.filter(
                       (quest) =>
                         questFilter === "전체" || quest.status === questFilter,
@@ -594,14 +735,14 @@ export default function ProfilePage({
                       return (
                         <Card
                           key={quest.id}
-                          className="rounded-2xl p-4 hover:shadow-md transition-shadow"
+                          className="rounded-3xl p-8 hover:shadow-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-shadow duration-200 border-0"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <p className="font-semibold text-sm text-foreground">
+                              <p className="font-semibold text-sm text-[#1e293b]">
                                 {quest.title}
                               </p>
-                              <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                              <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
                                 <CalendarIcon size={14} />
                                 {quest.deadline} ({dDisplay})
                               </p>
@@ -612,7 +753,7 @@ export default function ProfilePage({
                                   ? "default"
                                   : "secondary"
                               }
-                              className="ml-4"
+                              className="ml-4 px-3 py-1 rounded-full bg-purple-100 text-purple-800 border-0"
                             >
                               {quest.status}
                             </Badge>
@@ -625,7 +766,7 @@ export default function ProfilePage({
               </div>
 
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
+                <DialogContent className="rounded-3xl">
                   <DialogHeader>
                     <DialogTitle>새로운 퀘스트 추가</DialogTitle>
                   </DialogHeader>
@@ -637,6 +778,7 @@ export default function ProfilePage({
                         value={newQuestTitle}
                         onChange={(e) => setNewQuestTitle(e.target.value)}
                         placeholder="퀘스트 제목을 입력하세요"
+                        className="rounded-xl"
                       />
                     </div>
                     <div>
@@ -647,7 +789,7 @@ export default function ProfilePage({
                           setNewQuestStatus(value)
                         }
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="rounded-xl">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -658,7 +800,7 @@ export default function ProfilePage({
                     </div>
                     <div>
                       <Label>데드라인</Label>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-slate-500 mt-1">
                         {selectedDate
                           ? selectedDate.toLocaleDateString()
                           : "날짜를 선택하세요"}
@@ -669,10 +811,15 @@ export default function ProfilePage({
                     <Button
                       variant="outline"
                       onClick={() => setIsDialogOpen(false)}
+                      className="rounded-xl"
                     >
                       취소
                     </Button>
-                    <Button onClick={addQuest} disabled={!newQuestTitle.trim()}>
+                    <Button
+                      onClick={addQuest}
+                      disabled={!newQuestTitle.trim()}
+                      className="rounded-xl"
+                    >
                       추가
                     </Button>
                   </DialogFooter>
@@ -682,38 +829,37 @@ export default function ProfilePage({
           </div>
 
           {/* 💡 오른쪽 컬럼: 통계 & 포트폴리오 */}
-          <aside className="space-y-12">
+          <aside className="space-y-16">
             {/* 통계 카드 그리드 */}
             <section className="space-y-4">
-              <Card className="rounded-3xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 p-6 flex items-center gap-6">
-                <DollarSign size={40} className="opacity-70 flex-shrink-0" />
+              <Card className="rounded-3xl bg-white text-[#1e293b] shadow-[0_4px_20px_rgba(0,0,0,0.03)] p-8 flex items-center gap-4 border-0">
+                <DollarSign
+                  size={48}
+                  className="opacity-80 flex-shrink-0 text-purple-600"
+                />
                 <div>
-                  <p className="text-sm font-medium opacity-80">누적 수익</p>
-                  <p className="text-4xl font-extrabold tracking-tight">
+                  <p className="text-sm font-medium opacity-90">누적 수익</p>
+                  <p className="text-5xl font-extrabold tracking-tight">
                     ₩{profile.totalReward.toLocaleString()}
                   </p>
                 </div>
               </Card>
 
               <div className="grid grid-cols-2 gap-4">
-                <Card className="rounded-2xl p-6 bg-muted/40">
-                  <p className="text-xs text-muted-foreground mb-1">
-                    완료 퀘스트
-                  </p>
+                <Card className="rounded-3xl p-8 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-0">
+                  <p className="text-xs text-slate-500 mb-1">완료 퀘스트</p>
                   <p className="text-3xl font-bold flex items-end gap-1">
                     {profile.completedQuestsCount}
-                    <span className="text-xs font-normal text-muted-foreground pb-1">
+                    <span className="text-xs font-normal text-slate-500 pb-1">
                       건
                     </span>
                   </p>
                 </Card>
-                <Card className="rounded-2xl p-6 bg-muted/40">
-                  <p className="text-xs text-muted-foreground mb-1">
-                    보유 뱃지
-                  </p>
+                <Card className="rounded-3xl p-8 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-0">
+                  <p className="text-xs text-slate-500 mb-1">보유 뱃지</p>
                   <p className="text-3xl font-bold flex items-end gap-1">
                     {profile.badgeCount}
-                    <span className="text-xs font-normal text-muted-foreground pb-1">
+                    <span className="text-xs font-normal text-slate-500 pb-1">
                       개
                     </span>
                   </p>
@@ -722,25 +868,24 @@ export default function ProfilePage({
             </section>
 
             {/* 포트폴리오 블로그 */}
-            <Card className="rounded-3xl shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Briefcase size={22} /> 포트폴리오 블로그
+            <Card className="rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-0">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-xl text-[#1e293b]">
+                  <Briefcase size={24} className="text-purple-600" /> 포트폴리오
+                  블로그
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-6 p-8">
                 {MOCK_BLOGS.map((blog) => (
                   <a
                     key={blog.id}
                     href="#"
-                    className="block p-4 rounded-xl hover:bg-muted/50 transition-colors border"
+                    className="block p-6 rounded-2xl hover:bg-gray-50 transition-colors border border-gray-200"
                   >
-                    <p className="font-semibold text-sm line-clamp-1 text-foreground">
+                    <p className="font-semibold text-sm line-clamp-1 text-[#1e293b]">
                       {blog.title}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {blog.date}
-                    </p>
+                    <p className="text-xs text-slate-500 mt-2">{blog.date}</p>
                   </a>
                 ))}
               </CardContent>
@@ -748,16 +893,18 @@ export default function ProfilePage({
 
             {/* 포트폴리오 링크 수정 (isEditing 모드) */}
             {isEditing && (
-              <Card className="rounded-3xl p-6 bg-card space-y-3">
-                <h3 className="font-semibold flex items-center gap-2">
+              <Card className="rounded-3xl p-8 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-4 border-0">
+                <h3 className="font-semibold flex items-center gap-3 text-lg">
                   {" "}
-                  <Link2 size={18} /> 포트폴리오 링크
+                  <Link2 size={20} className="text-purple-600" /> 포트폴리오
+                  링크
                 </h3>
                 <Input
                   name="portfolioUrl"
                   value={draft?.portfolioUrl}
                   onChange={handleInputChange}
                   placeholder="https://..."
+                  className="rounded-xl"
                 />
               </Card>
             )}

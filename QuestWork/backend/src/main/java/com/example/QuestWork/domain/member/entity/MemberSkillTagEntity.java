@@ -1,7 +1,7 @@
 package com.example.QuestWork.domain.member.entity;
 
 
-import com.example.QuestWork.domain.skill.SkillTagEntity;
+import com.example.QuestWork.domain.skill.entity.SkillTagEntity;
 import jakarta.persistence.*;
 
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class MemberSkillTagEntity {
     @JoinColumn(name = "member_id")
     private MemberProfileEntity memberProfile;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "skill_tag_id")
     private SkillTagEntity skillTag;
 

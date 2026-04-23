@@ -3,6 +3,8 @@ package com.example.QuestWork.domain.member.dto;
 import com.example.QuestWork.domain.member.constant.MemberLevel;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,4 +17,6 @@ public class MemberUpdateDto {
     private String portfolioUrl;    // 포트폴리오 링크
     private MemberLevel level;           // 등급 (예: "SILVER")
     private int totalCareerYears;   // 경력 연차
+
+    private List<String> techStack;
 }

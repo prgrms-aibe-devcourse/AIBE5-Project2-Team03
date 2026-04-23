@@ -1,4 +1,4 @@
-package com.example.QuestWork.domain.skill;
+package com.example.QuestWork.domain.skill.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

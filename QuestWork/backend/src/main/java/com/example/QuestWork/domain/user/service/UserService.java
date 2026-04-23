@@ -29,10 +29,12 @@ public class UserService {
 
     @Transactional(readOnly=true)
     public UserResponseDto login(UserLoginRequestDto dto) {
+
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다"));
         if(!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new RuntimeException("비밀번호가 틀렸습니다"); }
+        System.out.println("로그인 유저: " + user.getNickname() + ", 권한들: " + user.getRoleIds());
         return UserResponseDto.from(user);
     }
 

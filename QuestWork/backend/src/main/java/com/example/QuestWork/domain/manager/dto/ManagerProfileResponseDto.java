@@ -1,13 +1,12 @@
 package com.example.QuestWork.domain.manager.dto;
 
 import com.example.QuestWork.domain.manager.entity.ManagerProfileEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
-@Getter
-@Builder
-@AllArgsConstructor
+@Data
+@NoArgsConstructor  // 💡 1. 이게 있어야 'new ManagerProfileResponseDto()' 에러가 사라집니다.
+@AllArgsConstructor // 💡 2. 빌더나 전체 인자 생성자를 위해 필요합니다.
+@Builder            // 💡 3. 하단 from 메서드에서 .builder()를 쓰기 위해 필요합니다.
 public class ManagerProfileResponseDto {
     private String username;      // 아이디
     private String nickname;      // 유저 닉네임
@@ -18,8 +17,10 @@ public class ManagerProfileResponseDto {
     private String managerType;   // 매니저 타입 (COMPANY, INDIVIDUAL 등)
     private boolean approved;     // 승인 여부
 
-    // Entity를 DTO로 변환하는 정적 메서드
+    // Entity -> DTO 변환 메서드 (static factory method)
     public static ManagerProfileResponseDto from(ManagerProfileEntity entity) {
+        if (entity == null) return new ManagerProfileResponseDto();
+
         return ManagerProfileResponseDto.builder()
                 .username(entity.getUser().getUsername())
                 .nickname(entity.getUser().getNickname())
@@ -31,4 +32,5 @@ public class ManagerProfileResponseDto {
                 .approved(entity.isApproved())
                 .build();
     }
+
 }

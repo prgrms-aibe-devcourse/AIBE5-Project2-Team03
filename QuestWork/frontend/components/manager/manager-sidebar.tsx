@@ -75,28 +75,35 @@ export function ManagerSidebar() {
     })
 
     useEffect(() => {
-        // 클라이언트 사이드에서만 실행됨
         const savedNickname = localStorage.getItem('nickname') || '매니저'
+        const savedRole = localStorage.getItem('role') || 'MANAGER'
+
         setUserInfo({
             nickname: savedNickname,
-            initial: savedNickname.charAt(0).toUpperCase() // 이름 첫 글자 추출
+            initial: savedNickname.charAt(0).toUpperCase(),
+            role: savedRole // 유저 권한 정보도 추가로 저장
         })
     }, [])
 
   return (
-    <aside className="hidden w-56 flex-shrink-0 border-r border-border bg-surface lg:flex lg:flex-col">
-      {/* Company Info */}
-      <div className="border-b border-border p-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-            T
+      <aside className="hidden w-56 flex-shrink-0 border-r border-border bg-surface lg:flex lg:flex-col">
+          {/* Company Info */}
+          <div className="border-b border-border p-5">
+              <div className="flex items-center gap-3">
+                  {/* 💡 T 대신 이름의 첫 글자(initial)가 나오도록 수정 */}
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                      {userInfo.initial}
+                  </div>
+                  <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-foreground">
+                          {userInfo.nickname}
+                      </p>
+                      <p className="truncate text-xs text-foreground-muted">
+                          {userInfo.role === 'ADMIN' ? '관리자' : '매니저'}
+                      </p>
+                  </div>
+              </div>
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">테크스타트</p>
-            <p className="truncate text-xs text-foreground-muted">매니저</p>
-          </div>
-        </div>
-      </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-3" aria-label="매니저 내비게이션">

@@ -1,10 +1,12 @@
 package com.example.QuestWork.domain.member.entity;
 
 import com.example.QuestWork.domain.member.constant.MemberLevel;
+import com.example.QuestWork.domain.skill.entity.SkillTagEntity;
 import com.example.QuestWork.domain.user.entity.User;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
 
@@ -41,9 +43,18 @@ public class MemberProfileEntity {
 
     private int totalCareerYears;
 
-    // 기술 스택 목록과의 연결 (1:N)
-    @OneToMany(mappedBy = "memberProfile")
-    private List<com.example.QuestWork.domain.member.entity.MemberSkillTagEntity> skillTags;
+    @OneToMany(mappedBy = "memberProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default // Builder 사용 시 리스트 초기화 보존
+    private List<MemberSkillTagEntity> techStacks = new ArrayList<>();
+
+    // 기술 스택 업데이트 메서드 수정
+    public void updateTechStacks(List<MemberSkillTagEntity> newSkills) {
+        this.techStacks.clear();
+        if (newSkills != null) {
+            newSkills.forEach(skill -> skill.setMemberProfile(this)); // 양방향 편의 메서드
+            this.techStacks.addAll(newSkills);
+        }
+    }
 
 //프로필 업데이트 석민이꺼
     public void updateProfile(String intro, MemberLevel level, String portfolioUrl, int totalCareerYears) {
