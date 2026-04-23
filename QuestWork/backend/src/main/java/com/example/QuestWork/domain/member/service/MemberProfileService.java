@@ -46,6 +46,7 @@ public class MemberProfileService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "프로필 정보를 찾을 수 없습니다."));
 
         return MemberProfileDto.builder()
+                .userId(user.getId())
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .profileImageUrl(user.getProfile_image_url())

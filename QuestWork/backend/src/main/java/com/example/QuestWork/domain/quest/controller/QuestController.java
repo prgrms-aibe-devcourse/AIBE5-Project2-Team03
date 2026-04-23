@@ -38,8 +38,8 @@ public class QuestController {
         return ResponseEntity.ok(questService.getAllQuests());
     }
 
-    // 3. 퀘스트 하나 조회 (충돌 방지를 위해 id를 경로 변수로 유지)
-    @GetMapping("/detail/{questId}") // 💡 /detail을 붙여서 경로를 확실히 구분합니다.
+    // 3. 퀘스트 하나 조회 (표준 REST 방식)
+    @GetMapping("/{questId}") // 💡 /detail 제거
     public ResponseEntity<QuestResponseDto> getQuest(@PathVariable Long questId) {
         return ResponseEntity.ok(questService.getQuest(questId));
     }

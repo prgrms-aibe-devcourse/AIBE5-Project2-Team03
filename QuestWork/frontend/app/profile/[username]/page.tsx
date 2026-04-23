@@ -74,18 +74,51 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
   const [newQuestTitle, setNewQuestTitle] = useState('')
   const [newQuestStatus, setNewQuestStatus] = useState<'진행중' | '찜'>('진행중')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [walletBalance, setWalletBalance] = useState<number | null>(null)
+  const [walletLoading, setWalletLoading] = useState(true)
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false)
+  const [withdrawBank, setWithdrawBank] = useState('국민')
+  const [withdrawHolder, setWithdrawHolder] = useState('')
+  const [withdrawAccount, setWithdrawAccount] = useState('')
+  const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [withdrawError, setWithdrawError] = useState('')
+  const [withdrawSubmitting, setWithdrawSubmitting] = useState(false)
+
+
+  // 1. fetchWallet을 useEffect보다 먼저 정의하세요.
+  const fetchWallet = async (userId: number) => {
+    setWalletLoading(true);
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/settlement/wallet/${userId}`);
+      if (!response.ok) throw new Error("지갑 정보 로드 실패");
+      const data = await response.json();
+      setWalletBalance(data.balance); // 여기서 잔액이 업데이트됩니다.
+    } catch (error) {
+      console.error("Wallet fetch error:", error);
+      setWalletBalance(0);
+    } finally {
+      setWalletLoading(false);
+    }
+  };
 
   useEffect(() => {
     const decodedUsername = decodeURIComponent(params.username);
+
     const fetchProfile = async () => {
       setIsLoading(true);
+      console.log("1. 프로필 요청 시작:", decodedUsername);
       try {
         const response = await fetch(`http://localhost:8000/api/user/${decodedUsername}`);
+        console.log("2. 서버 응답 상태:", response.status);
+
         if (!response.ok) throw new Error("프로필 로드 실패");
-        const data: FreelancerProfile = await response.json();
+
+        const data = await response.json();
+        console.log("3. 받아온 전체 데이터:", data); // 여기서 필드명을 꼭 확인하세요!
+
         setProfile(data);
         setDraft({
-          nickname: data.nickname || '', // username을 nickname으로 변경!
+          nickname: data.nickname || '',
           profileImageUrl: data.profileImageUrl || '',
           intro: data.intro || '',
           portfolioUrl: data.portfolioUrl || '',
@@ -93,12 +126,23 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
           totalCareerYears: data.totalCareerYears || 0,
           techStack: data.techStack || []
         });
+
+        // 💡 여기서 필드명이 'userId'가 맞는지 확인이 필요합니다.
+        // 만약 로그에 'id: 32'라고 나온다면 data.id로 바꿔야 합니다.
+        if (data.userId) {
+          console.log("4. 지갑 조회 시도 ID:", data.userId);
+          fetchWallet(data.userId);
+        } else {
+          console.warn("⚠️ 데이터에 userId가 없습니다! 로그를 확인하세요.");
+        }
+
       } catch (error) {
-        console.error("Error:", error);
+        console.error("❌ 에러 발생:", error);
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchProfile();
   }, [params.username]);
 
@@ -119,6 +163,73 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
     }
   }
 
+  const handleWithdrawSubmit = async () => {
+    setWithdrawError('')
+    const amountNumber = Number(withdrawAmount.replace(/,/g, ''))
+
+    if (!profile?.userId) return; // 유저 정보가 없으면 중단
+    if (!withdrawHolder.trim()) {
+      setWithdrawError('예금주를 입력해주세요.')
+      return
+    }
+    if (!withdrawAccount.trim()) {
+      setWithdrawError('계좌번호를 입력해주세요.')
+      return
+    }
+    if (!withdrawAmount.trim() || isNaN(amountNumber) || amountNumber <= 0) {
+      setWithdrawError('올바른 출금 금액을 입력해주세요.')
+      return
+    }
+    if (walletBalance !== null && amountNumber > walletBalance) {
+      setWithdrawError('출금 금액이 현재 잔액을 초과합니다.')
+      return
+    }
+
+    setWithdrawSubmitting(true)
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/settlement/withdraw', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          userId: profile.userId,
+          amount: amountNumber,
+          bankName: withdrawBank,
+          accountNumber: withdrawAccount,
+          accountHolder: withdrawHolder
+        }),
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        // 💡 백엔드에서 보낸 에러 메시지(예: 잔액 부족)를 그대로 throw 합니다.
+        throw new Error(errorText || '출금 요청을 처리하지 못했습니다.')
+      }
+
+      // 1. 성공 알림
+      alert('출금 신청이 완료되었습니다.')
+
+      // 2. 모달 닫기 및 입력값 초기화
+      setIsWithdrawOpen(false)
+      setWithdrawBank('국민')
+      setWithdrawHolder('')
+      setWithdrawAccount('')
+      setWithdrawAmount('')
+
+      // 3. ⭐ 핵심: 지갑 잔액 갱신
+      // profile.userId가 있을 때만 다시 불러옵니다.
+      if (profile?.userId) {
+        await fetchWallet(profile.userId) // 👈 userId를 인자로 꼭 넣어주세요!
+      }
+
+    } catch (error: any) {
+      console.error('Withdraw error:', error)
+      // 💡 throw 된 Error 객체의 message를 에러 상태에 저장합니다.
+      setWithdrawError(error.message || '출금 신청 중 오류가 발생했습니다.')
+    } finally {
+      setWithdrawSubmitting(false)
+    }
+  }
+
   const addQuest = () => {
     if (selectedDate && newQuestTitle.trim()) {
       const newQuest = {
@@ -128,7 +239,7 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
         deadline: selectedDate.toISOString().split('T')[0]
       }
       // 실제로는 API 호출, 여기서는 Mock 업데이트
-      MOCK_QUESTS.push(newquest)
+      MOCK_QUESTS.push(newQuest)
       setNewQuestTitle('')
       setNewQuestStatus('진행중')
       setSelectedDate(undefined)
@@ -564,6 +675,90 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
                   <div>
                     <p className="text-sm font-medium opacity-90">누적 수익</p>
                     <p className="text-5xl font-extrabold tracking-tight">₩{profile.totalReward.toLocaleString()}</p>
+                  </div>
+                </Card>
+
+                <Card className="rounded-3xl bg-gradient-to-r from-green-50 to-emerald-50 text-[#1e293b] shadow-[0_4px_20px_rgba(0,0,0,0.03)] p-8 border-0">
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex items-center gap-4">
+                      <DollarSign size={48} className="opacity-80 flex-shrink-0 text-green-600" />
+                      <div>
+                        <p className="text-sm font-medium opacity-90">내 지갑</p>
+                        <p className="text-5xl font-extrabold tracking-tight text-green-700">
+                          {walletLoading ? '---' : `₩${walletBalance?.toLocaleString() || '0'}`}
+                        </p>
+                        <p className="text-sm text-slate-600 mt-2">현재 잔액을 기반으로 안전하게 출금할 수 있습니다.</p>
+                      </div>
+                    </div>
+
+                    <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="w-full lg:w-auto rounded-full border-green-300 text-green-700 hover:bg-green-100">
+                          출금 신청
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[520px] rounded-3xl">
+                        <DialogHeader>
+                          <DialogTitle>출금 신청</DialogTitle>
+                          <p className="text-sm text-slate-500 mt-2">은행 정보와 출금 금액을 입력하여 안전하게 요청하세요.</p>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <div className="grid gap-2">
+                            <Label>은행</Label>
+                            <Select value={withdrawBank} onValueChange={setWithdrawBank}>
+                              <SelectTrigger className="rounded-xl">
+                                <SelectValue placeholder="은행 선택" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="국민">국민</SelectItem>
+                                <SelectItem value="신한">신한</SelectItem>
+                                <SelectItem value="우리">우리</SelectItem>
+                                <SelectItem value="농협">농협</SelectItem>
+                                <SelectItem value="하나">하나</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="grid gap-2">
+                            <Label>예금주</Label>
+                            <Input
+                              value={withdrawHolder}
+                              onChange={(e) => setWithdrawHolder(e.target.value)}
+                              placeholder="예금주 이름 입력"
+                              className="rounded-xl"
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label>계좌번호</Label>
+                            <Input
+                              value={withdrawAccount}
+                              onChange={(e) => setWithdrawAccount(e.target.value)}
+                              placeholder="123-456-789012"
+                              className="rounded-xl"
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label>출금 금액</Label>
+                            <Input
+                              type="number"
+                              value={withdrawAmount}
+                              onChange={(e) => setWithdrawAmount(e.target.value)}
+                              placeholder={walletLoading ? '잔액 로딩 중...' : `최대 ₩${walletBalance?.toLocaleString() || '0'}`}
+                              className="rounded-xl"
+                            />
+                            <p className="text-sm text-slate-500">현재 잔액: {walletLoading ? '---' : `₩${walletBalance?.toLocaleString() || '0'}`}</p>
+                          </div>
+                          {withdrawError && <p className="text-sm text-red-600">{withdrawError}</p>}
+                        </div>
+                        <DialogFooter className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                          <Button variant="outline" onClick={() => setIsWithdrawOpen(false)} className="rounded-xl">
+                            닫기
+                          </Button>
+                          <Button onClick={handleWithdrawSubmit} disabled={withdrawSubmitting} className="rounded-xl bg-green-600 text-white hover:bg-green-700">
+                            {withdrawSubmitting ? '신청 중...' : '출금 신청'}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </Card>
 

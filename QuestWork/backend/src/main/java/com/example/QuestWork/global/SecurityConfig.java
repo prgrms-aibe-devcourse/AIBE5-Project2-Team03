@@ -30,6 +30,7 @@ public class SecurityConfig {
                                 "/api/admin/**",
                                 "/api/member/**",
                                 "/api/**",
+                                "/api/settlement/**",
                                 "/v3/api-docs/**",    // 스웨거가 생성하는 json 데이터 주소
                                 "/swagger-ui/**",     // 스웨거 UI 화면 주소
                                 "/swagger-ui.html"    // 스웨거 접속 메인 주소
