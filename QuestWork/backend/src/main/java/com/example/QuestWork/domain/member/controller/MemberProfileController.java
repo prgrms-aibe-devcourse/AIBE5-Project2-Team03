@@ -2,21 +2,12 @@ package com.example.QuestWork.domain.member.controller;
 
 import com.example.QuestWork.domain.member.dto.MemberPasswordUpdateDto;
 import com.example.QuestWork.domain.member.dto.MemberProfileDto;
-<<<<<<< HEAD
-
-
-import com.example.QuestWork.domain.member.dto.MemberSkillAddRequestDto;
-=======
->>>>>>> origin/seokmin
 import com.example.QuestWork.domain.member.dto.MemberUpdateDto;
 
 import com.example.QuestWork.domain.member.service.MemberProfileService;
-import com.example.QuestWork.domain.skill.SkillTagEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -42,21 +33,6 @@ public class MemberProfileController {
         return ResponseEntity.ok("수정 완료");
     }
 
-<<<<<<< HEAD
-    @PostMapping("/skills")
-    public ResponseEntity<String> addSkillToMember(@RequestBody MemberSkillAddRequestDto request) {
-        // 서비스(요리사)에게 스킬 추가 로직을 넘깁니다.
-        memberProfileService.addSkill(request.getMemberId(), request.getSkillTagId());
-        return ResponseEntity.ok("기술 스택이 성공적으로 등록되었습니다!");
-    }
-
-    @GetMapping("/skill-tags")
-    public ResponseEntity<List<SkillTagEntity>> getSkillTags() {
-        return ResponseEntity.ok(memberProfileService.getAllSkillTags());
-    }
-
-
-=======
     /**
      * 비밀번호 수정 (보안 강화)
      */
@@ -69,5 +45,4 @@ public class MemberProfileController {
         memberProfileService.updatePassword(username, dto);
         return ResponseEntity.ok("비밀번호 변경 완료");
     }
->>>>>>> origin/seokmin
 }
