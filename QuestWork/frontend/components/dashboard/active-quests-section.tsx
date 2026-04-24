@@ -51,7 +51,7 @@ export function ActiveQuestsSection({ quests }: ActiveQuestsSectionProps) {
                     <span>보상: {quest.reward}</span>
                   </div>
                 </div>
-                <div className="ml-4 flex-shrink-0">
+                <div className="ml-4 shrink-0">
                   <div className="w-12 h-6 bg-surface-raised rounded-full overflow-hidden">
                     <div
                       className="h-full bg-primary transition-all"

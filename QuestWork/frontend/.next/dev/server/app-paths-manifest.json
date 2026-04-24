@@ -7,14 +7,17 @@
   "/dashboard/my-submissions/page": "app/dashboard/my-submissions/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/login/page": "app/login/page.js",
+  "/manager/create-quest/page": "app/manager/create-quest/page.js",
   "/manager/page": "app/manager/page.js",
   "/manager/posted-quests/page": "app/manager/posted-quests/page.js",
-  "/manager/profile-settings/page": "app/manager/profile-settings/page.js",
-  "/manager/reward-management/page": "app/manager/reward-management/page.js",
-  "/manager/submission-review/page": "app/manager/submission-review/page.js",
+  "/manager/upgrade/page": "app/manager/upgrade/page.js",
   "/page": "app/page.js",
   "/profile/[username]/page": "app/profile/[username]/page.js",
   "/profile/settings/page": "app/profile/settings/page.js",
+  "/quests/[id]/apply/page": "app/quests/[id]/apply/page.js",
   "/quests/[id]/page": "app/quests/[id]/page.js",
-  "/quests/web-development/page": "app/quests/web-development/page.js"
+  "/quests/[id]/submit/page": "app/quests/[id]/submit/page.js",
+  "/quests/page": "app/quests/page.js",
+  "/quests/web-development/page": "app/quests/web-development/page.js",
+  "/signup/page": "app/signup/page.js"
 }

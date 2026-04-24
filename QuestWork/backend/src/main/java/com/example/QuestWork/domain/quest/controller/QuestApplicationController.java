@@ -4,8 +4,6 @@ import com.example.QuestWork.domain.quest.dto.QuestApplicationResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionRequestDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestUpdateSubmissionRequestDto;
-import com.example.QuestWork.domain.quest.entity.Quest;
-import com.example.QuestWork.domain.quest.entity.QuestApplication;
 import com.example.QuestWork.domain.quest.service.QuestApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +58,17 @@ public class QuestApplicationController {
     ) {
         QuestSubmissionResponseDto response = questApplicationService
                 .updateSubmission(submissionId, userId, requestDto);
+        return ResponseEntity.ok(response);
+    }
+
+    //내 지원 정보 조회 (퀘스트 + 유저 기준)
+    @GetMapping("/{questId}/applications/me")
+    public ResponseEntity<QuestApplicationResponseDto> getMyApplication(
+            @PathVariable Long questId,
+            @RequestParam Long userId
+    ) {
+        QuestApplicationResponseDto response = questApplicationService.getMyApplication(questId, userId);
+        if (response == null) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(response);
     }
 

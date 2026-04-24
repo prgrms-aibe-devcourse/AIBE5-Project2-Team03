@@ -10,13 +10,8 @@ import com.example.QuestWork.domain.quest.entity.Quest;
 import com.example.QuestWork.domain.quest.repository.QuestRepository;
 import com.example.QuestWork.domain.manager.entity.ManagerProfileEntity;
 import com.example.QuestWork.domain.manager.repositroy.ManagerProfileRepository;
-<<<<<<< HEAD
-=======
-import com.example.QuestWork.domain.user.entity.User;
-import com.example.QuestWork.domain.user.repository.UserRepository;
 import com.example.QuestWork.domain.wallet.entity.WalletEntity;
 import com.example.QuestWork.domain.wallet.repository.WalletRepository;
->>>>>>> seokmin
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

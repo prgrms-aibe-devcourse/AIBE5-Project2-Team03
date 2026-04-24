@@ -3,7 +3,6 @@ package com.example.QuestWork.domain.quest.entity;
 
 import com.example.QuestWork.domain.manager.entity.ManagerProfileEntity;
 import com.example.QuestWork.domain.quest.constant.QuestStatus;
-import com.example.QuestWork.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

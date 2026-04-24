@@ -1,8 +1,6 @@
 package com.example.QuestWork.domain.quest.dto;
 
-import com.example.QuestWork.domain.quest.constant.QuestStatus;
 import com.example.QuestWork.domain.quest.constant.SubmissionStatus;
-import com.example.QuestWork.domain.quest.entity.Quest;
 import com.example.QuestWork.domain.quest.entity.QuestSubmission;
 import lombok.Builder;
 import lombok.Getter;

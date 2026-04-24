@@ -31,29 +31,20 @@ export function LoginForm() {
 
         localStorage.setItem("nickname", data.nickname || "");
         localStorage.setItem("username", data.username || "");
-        localStorage.setItem("role", data.role || "MEMBER");
-        localStorage.setItem("userId", data.id);
+        localStorage.setItem("userId", String(data.id));
 
-        let userRole = "MEMBER";
-        const rawRole = (data.roleName || data.role || "")
-          .toString()
-          .toUpperCase();
-        const roleId = Number(data.roleId || (data.role && data.role.id));
-
-        if (roleId === 7 || rawRole === "ADMIN") {
-          userRole = "ADMIN";
-        } else if (roleId === 9 || rawRole === "MANAGER" || data.id === 34) {
-          userRole = "MANAGER";
-        } else if (roleId === 8 || rawRole === "MEMBER" || rawRole === "USER") {
-          userRole = "MEMBER";
-        }
+        const userRole =
+          data.role === "ADMIN"
+            ? "ADMIN"
+            : data.role === "MANAGER"
+              ? "MANAGER"
+              : "MEMBER";
 
         localStorage.setItem("role", userRole);
 
         let targetPath = "/";
         if (userRole === "ADMIN") targetPath = "/admin";
         else if (userRole === "MANAGER") targetPath = "/manager";
-        else if (userRole === "MEMBER") targetPath = "/";
 
         console.log(`확정 권한: ${userRole} | 이동 경로: ${targetPath}`);
         window.location.href = targetPath;

@@ -1,6 +1,5 @@
 package com.example.QuestWork.domain.user.entity;
 
-import com.example.QuestWork.domain.role.constant.RoleStatus;
 import com.example.QuestWork.domain.user.constant.AuthProvider;
 import com.example.QuestWork.domain.user.constant.UserStatus;
 import jakarta.persistence.*;
@@ -66,6 +65,7 @@ public class User {
     )
 // 💡 중요: roles 테이블과 조인하여 'name' 컬럼(MANAGER, MEMBER)을 가져옵니다.
     @Column(name = "role_id")
+    @Builder.Default
     private Set<Long> roleIds = new HashSet<>();
 
     // @Setter는 제거하고 필요한 메서드만 직접 작성

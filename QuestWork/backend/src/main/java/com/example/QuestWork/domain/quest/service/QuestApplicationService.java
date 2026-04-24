@@ -2,6 +2,7 @@ package com.example.QuestWork.domain.quest.service;
 
 import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
 import com.example.QuestWork.domain.member.repository.MemberProfileRepository;
+import com.example.QuestWork.domain.quest.constant.ApplicationStatus;
 import com.example.QuestWork.domain.quest.dto.QuestApplicationResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionRequestDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionResponseDto;
@@ -34,7 +35,7 @@ public class QuestApplicationService {
         Quest quest = getQuest(questId);
         MemberProfileEntity member = getMemberProfile(userId);
 
-        if (questApplicationRepository.existsByQuestAndMember(quest, member)) {
+        if (questApplicationRepository.existsByQuestAndMemberAndStatus(quest, member, ApplicationStatus.APPLIED)) {
             throw new IllegalStateException("이미 지원한 퀘스트입니다.");
         }
 
@@ -101,6 +102,16 @@ public class QuestApplicationService {
         }
 
         application.cancel();
+    }
+
+    // 특정 퀘스트에 대한 지원 정보 조회 (userId 기준, APPLIED 상태만)
+    public QuestApplicationResponseDto getMyApplication(Long questId, Long userId) {
+        Quest quest = getQuest(questId);
+        MemberProfileEntity member = getMemberProfile(userId);
+        return questApplicationRepository.findByQuestAndMember(quest, member)
+                .filter(a -> a.getStatus() == ApplicationStatus.APPLIED)
+                .map(QuestApplicationResponseDto::from)
+                .orElse(null);
     }
 
     // 제출물 단건 조회

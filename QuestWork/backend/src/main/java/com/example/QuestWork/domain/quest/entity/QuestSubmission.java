@@ -3,13 +3,11 @@ package com.example.QuestWork.domain.quest.entity;
 
 import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
 import com.example.QuestWork.domain.quest.constant.SubmissionStatus;
-import com.example.QuestWork.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

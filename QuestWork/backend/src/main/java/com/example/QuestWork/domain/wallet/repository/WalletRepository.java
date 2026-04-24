@@ -1,10 +1,8 @@
 package com.example.QuestWork.domain.wallet.repository;
 
 import com.example.QuestWork.domain.wallet.entity.WalletEntity;
-import com.example.QuestWork.domain.wallet.entity.WalletTransaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 // 지갑 레포지토리

@@ -49,7 +49,7 @@ export default function CreateQuestPage() {
     }
 
     setIsCheckingRole(false);
-  }, [router]);
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

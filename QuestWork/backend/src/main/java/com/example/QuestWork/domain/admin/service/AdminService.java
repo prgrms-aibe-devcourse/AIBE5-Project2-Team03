@@ -3,7 +3,6 @@ package com.example.QuestWork.domain.admin.service;
 
 
 import com.example.QuestWork.domain.admin.dto.AdminUserResponseDto;
-import com.example.QuestWork.domain.role.repository.RoleRepository;
 import com.example.QuestWork.domain.user.constant.UserStatus;
 import com.example.QuestWork.domain.user.entity.User;
 import com.example.QuestWork.domain.user.repository.UserRepository;
@@ -14,14 +13,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.management.relation.Role;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class AdminService {
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
 
 
     @Transactional(readOnly = true)

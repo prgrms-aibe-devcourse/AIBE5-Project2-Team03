@@ -32,6 +32,10 @@
       "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
       "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
     ],
+    "[project]/app/manager/create-quest/page": [
+      "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
+      "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
+    ],
     "[project]/app/manager/page": [
       "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
       "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
@@ -40,15 +44,7 @@
       "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
       "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
     ],
-    "[project]/app/manager/profile-settings/page": [
-      "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
-      "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
-    ],
-    "[project]/app/manager/reward-management/page": [
-      "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
-      "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
-    ],
-    "[project]/app/manager/submission-review/page": [
+    "[project]/app/manager/upgrade/page": [
       "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
       "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
     ],
@@ -64,11 +60,27 @@
       "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
       "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
     ],
+    "[project]/app/quests/[id]/apply/page": [
+      "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
+      "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
+    ],
     "[project]/app/quests/[id]/page": [
       "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
       "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
     ],
+    "[project]/app/quests/[id]/submit/page": [
+      "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
+      "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
+    ],
+    "[project]/app/quests/page": [
+      "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
+      "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
+    ],
     "[project]/app/quests/web-development/page": [
+      "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
+      "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
+    ],
+    "[project]/app/signup/page": [
       "static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2",
       "static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2"
     ]

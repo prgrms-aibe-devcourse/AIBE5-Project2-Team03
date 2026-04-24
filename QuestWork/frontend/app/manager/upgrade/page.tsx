@@ -114,7 +114,7 @@ export default function ManagerUpgradePage() {
     setRole(storedRole);
 
     if (storedRole === "MANAGER") {
-      router.replace("/manager");
+      router.replace("/manager/create-quest");
     }
   }, [router]);
 

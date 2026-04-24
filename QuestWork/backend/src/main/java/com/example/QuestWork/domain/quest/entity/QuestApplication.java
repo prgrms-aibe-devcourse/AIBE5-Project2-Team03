@@ -2,7 +2,6 @@ package com.example.QuestWork.domain.quest.entity;
 
 import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
 import com.example.QuestWork.domain.quest.constant.ApplicationStatus;
-import com.example.QuestWork.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +22,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+                                                                                                                                        @Builder
 @EntityListeners(AuditingEntityListener.class)
 public class QuestApplication {
 
