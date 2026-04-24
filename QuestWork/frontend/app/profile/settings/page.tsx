@@ -15,12 +15,12 @@ export default function ProfileSettingsPage() {
       <main className="px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8">
-            <p className="text-sm font-semibold text-primary">Settings</p>
+            <p className="text-sm font-semibold text-primary">설정</p>
             <h1 className="mt-1 text-3xl font-bold text-foreground">
               계정 설정
             </h1>
             <p className="mt-2 text-foreground-muted">
-              로그인 정보, 이메일, 알림 수신 여부와 계정 상태를 관리하세요.
+              로그인 정보, 이메일, 알림 수신 여부와 계정 공개 범위를 관리할 수 있습니다.
             </p>
           </div>
 
@@ -31,7 +31,7 @@ export default function ProfileSettingsPage() {
                   이메일
                 </h2>
                 <p className="mt-1 text-sm text-foreground-muted">
-                  계정과 알림에 사용할 이메일 주소입니다.
+                  계정 및 알림에 사용할 이메일 주소를 설정합니다.
                 </p>
               </div>
               <div className="space-y-4 p-6">
@@ -56,7 +56,7 @@ export default function ProfileSettingsPage() {
                   비밀번호 변경
                 </h2>
                 <p className="mt-1 text-sm text-foreground-muted">
-                  안전한 계정 보호를 위해 주기적으로 비밀번호를 변경하세요.
+                  계정 보안을 위해 주기적으로 비밀번호를 변경해 주세요.
                 </p>
               </div>
               <div className="grid gap-4 p-6 md:grid-cols-2">
@@ -98,7 +98,7 @@ export default function ProfileSettingsPage() {
                   알림 설정
                 </h2>
                 <p className="mt-1 text-sm text-foreground-muted">
-                  퀘스트와 계정 관련 알림을 받을 방식을 선택하세요.
+                  퀘스트와 계정 관련 알림 수신 여부를 선택해보세요.
                 </p>
               </div>
               <div className="divide-y divide-border p-6">
@@ -106,7 +106,7 @@ export default function ProfileSettingsPage() {
                   <div>
                     <p className="font-medium text-foreground">퀘스트 알림</p>
                     <p className="mt-1 text-sm text-foreground-muted">
-                      참여 중인 퀘스트의 마감, 댓글, 선정 결과를 받습니다.
+                      참여 중인 퀘스트의 마감, 선정, 상태 변경 알림을 받습니다.
                     </p>
                   </div>
                   <Switch defaultChecked aria-label="퀘스트 알림" />
@@ -115,7 +115,7 @@ export default function ProfileSettingsPage() {
                   <div>
                     <p className="font-medium text-foreground">수익 알림</p>
                     <p className="mt-1 text-sm text-foreground-muted">
-                      보상 지급과 정산 상태 변경 알림을 받습니다.
+                      보상 지급 및 정산 상태 변경 알림을 받습니다.
                     </p>
                   </div>
                   <Switch defaultChecked aria-label="수익 알림" />
@@ -124,7 +124,7 @@ export default function ProfileSettingsPage() {
                   <div>
                     <p className="font-medium text-foreground">마케팅 알림</p>
                     <p className="mt-1 text-sm text-foreground-muted">
-                      새로운 기능과 추천 퀘스트 소식을 받습니다.
+                      새로운 기능과 추천 퀘스트 소식을 받아봅니다.
                     </p>
                   </div>
                   <Switch aria-label="마케팅 알림" />
@@ -135,7 +135,7 @@ export default function ProfileSettingsPage() {
             <Card className="border border-border">
               <div className="border-b border-border p-6">
                 <h2 className="text-xl font-semibold text-foreground">
-                  계정 설정
+                  계정 상태
                 </h2>
                 <p className="mt-1 text-sm text-foreground-muted">
                   계정 공개 범위와 계정 상태를 관리합니다.
@@ -146,7 +146,7 @@ export default function ProfileSettingsPage() {
                   <div>
                     <p className="font-medium text-foreground">프로필 공개</p>
                     <p className="mt-1 text-sm text-foreground-muted">
-                      다른 사용자가 내 포트폴리오 프로필을 볼 수 있습니다.
+                      다른 사용자가 내 포트폴리오와 프로필을 볼 수 있습니다.
                     </p>
                   </div>
                   <Switch defaultChecked aria-label="프로필 공개" />

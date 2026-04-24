@@ -13,7 +13,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   {
-    label: 'Overview',
+    label: '개요',
     href: '/dashboard',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -25,7 +25,7 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: 'My Quests',
+    label: '내 퀘스트',
     href: '/dashboard/my-quests',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -35,7 +35,7 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: 'My Submissions',
+    label: '내 제출물',
     href: '/dashboard/my-submissions',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -45,7 +45,7 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: 'Earnings',
+    label: '수익 관리',
     href: '/dashboard/earnings',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -55,7 +55,7 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: 'Blog Management',
+    label: '블로그 관리',
     href: '/dashboard/blog-management',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -76,11 +76,11 @@ export function DashboardSidebar() {
           Dashboard
         </p>
         <p className="mt-1 text-sm text-foreground-muted">
-          Work summary and workspace menu
+          작업 현황과 주요 메뉴를 빠르게 확인해보세요
         </p>
       </div>
 
-      <nav className="flex-1 p-3" aria-label="Dashboard navigation">
+      <nav className="flex-1 p-3" aria-label="대시보드 내비게이션">
         <ul className="space-y-0.5">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href
@@ -121,7 +121,7 @@ export function DashboardSidebar() {
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M3 8h10M8 3v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          Find Quests
+          퀘스트 찾기
         </Link>
       </div>
     </aside>

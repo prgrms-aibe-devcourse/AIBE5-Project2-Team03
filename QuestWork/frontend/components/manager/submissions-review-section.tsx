@@ -35,9 +35,9 @@ const statusBadgeColor = {
 }
 
 const statusLabel = {
-  reviewing: 'Reviewing',
-  winner: 'Winner',
-  rejected: 'Rejected',
+  reviewing: '검토 중',
+  winner: '선정됨',
+  rejected: '반려됨',
 }
 
 export function SubmissionsReviewSection({
@@ -51,11 +51,9 @@ export function SubmissionsReviewSection({
       <Card className="border border-border shadow-none">
         <div className="p-6">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-foreground">
-              Submission Review
-            </h2>
+            <h2 className="text-lg font-semibold text-foreground">제출 검토</h2>
             <p className="mt-1 text-sm text-foreground-muted">
-              Compare incoming work and move quickly from review to decision.
+              제출된 결과물을 비교하고 빠르게 검토를 진행해보세요.
             </p>
           </div>
         </div>
@@ -64,11 +62,11 @@ export function SubmissionsReviewSection({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Freelancer</TableHead>
-                <TableHead>Quest</TableHead>
-                <TableHead>Submitted</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Action</TableHead>
+                <TableHead>개발자</TableHead>
+                <TableHead>퀘스트</TableHead>
+                <TableHead>제출일</TableHead>
+                <TableHead>상태</TableHead>
+                <TableHead className="text-right">작업</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -76,13 +74,16 @@ export function SubmissionsReviewSection({
                 <TableRow>
                   <TableCell colSpan={5} className="py-8 text-center">
                     <p className="text-foreground-muted">
-                      No submissions are waiting for review.
+                      현재 검토 대기 중인 제출물이 없습니다.
                     </p>
                   </TableCell>
                 </TableRow>
               ) : (
                 submissions.map((submission) => (
-                  <TableRow key={submission.id} className="hover:bg-surface-raised">
+                  <TableRow
+                    key={submission.id}
+                    className="hover:bg-surface-raised"
+                  >
                     <TableCell className="font-medium text-foreground">
                       {submission.freelancerName}
                     </TableCell>
@@ -103,7 +104,7 @@ export function SubmissionsReviewSection({
                         size="sm"
                         onClick={() => setSelectedSubmission(submission)}
                       >
-                        Review
+                        검토하기
                       </Button>
                     </TableCell>
                   </TableRow>

@@ -8,23 +8,23 @@ import { Button } from "@/components/ui/button";
 
 const QUEST_CATEGORIES = [
   {
-    title: "Web Development",
-    description: "Frontend, backend, and full-stack product build quests.",
+    title: "웹 개발",
+    description: "프론트엔드, 백엔드, 풀스택 제품 개발 퀘스트를 확인해보세요.",
     route: "/quests/web-development",
   },
   {
-    title: "Mobile Development",
-    description: "iOS, Android, and React Native app delivery work.",
+    title: "모바일 개발",
+    description: "iOS, Android, React Native 앱 개발 퀘스트를 둘러보세요.",
     route: "/quests/mobile-development",
   },
   {
-    title: "Software Development",
-    description: "Product engineering, platform work, and custom systems.",
+    title: "소프트웨어 개발",
+    description: "제품 엔지니어링, 플랫폼 구축, 맞춤형 시스템 개발 퀘스트입니다.",
     route: "/quests/software-development",
   },
   {
-    title: "WordPress Development",
-    description: "Theme customization, plugin work, and site maintenance.",
+    title: "워드프레스 개발",
+    description: "테마 수정, 플러그인 개발, 사이트 유지보수 퀘스트를 만나보세요.",
     route: "/quests/wordpress-development",
   },
 ];
@@ -137,7 +137,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                 onClick={() => setIsQuestsOpen((open) => !open)}
                 className="rounded-full px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
               >
-                Quests
+                퀘스트
               </button>
 
               {isQuestsOpen && (
@@ -167,7 +167,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
               href="/dashboard"
               className="rounded-full px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
             >
-              Dashboard
+              대시보드
             </Link>
 
             <Link
@@ -230,7 +230,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                     </Avatar>
 
                     <p className="mt-3 text-base font-semibold text-foreground">
-                      Welcome back, {nickname}
+                      {nickname}님, 다시 오셨네요
                     </p>
 
                     <div className="mt-4 space-y-2">
@@ -243,8 +243,8 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                           onClick={() => setIsUserMenuOpen(false)}
                         >
                           {role === "MANAGER"
-                            ? "Manager Dashboard"
-                            : "View Profile"}
+                            ? "매니저 대시보드"
+                            : "프로필 보기"}
                         </Link>
                       </Button>
                       <Button
@@ -256,7 +256,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                           href="/profile/settings"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
-                          Profile Settings
+                          프로필 설정
                         </Link>
                       </Button>
                       <Button
@@ -264,7 +264,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                         className="w-full border-border hover:border-primary hover:text-primary"
                         onClick={handleLogout}
                       >
-                        Log Out
+                        로그아웃
                       </Button>
                     </div>
                   </div>
@@ -277,7 +277,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
               className="h-10 rounded-full border-border bg-white/70 px-5 text-sm text-foreground shadow-none transition-all duration-200 hover:border-primary/40 hover:bg-primary-light/35 hover:text-primary"
               asChild
             >
-              <Link href="/login">Login</Link>
+              <Link href="/login">로그인</Link>
             </Button>
           )}
         </div>

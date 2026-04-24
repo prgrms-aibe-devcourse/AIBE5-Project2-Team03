@@ -96,7 +96,7 @@ export const WEB_DEVELOPMENT_QUESTS: Quest[] = [
     title: 'Python Data Processing Pipeline',
     description:
       'Create an ETL pipeline to process large datasets with data validation, transformation, and export capabilities.',
-    techStack: ['Python', 'Pandas', 'PostgreSQL'],
+    techStack: ['Python', 'PostgreSQL', 'Git'],
     reward: '₩900,000',
     deadline: '4일 남음',
     participants: 11,
@@ -106,7 +106,7 @@ export const WEB_DEVELOPMENT_QUESTS: Quest[] = [
     title: 'React Component Library',
     description:
       'Design and implement a reusable component library with Storybook documentation and TypeScript support.',
-    techStack: ['React', 'TypeScript', 'Storybook'],
+    techStack: ['React', 'TypeScript', 'Redux'],
     reward: '₩700,000',
     deadline: '8일 남음',
     participants: 25,
@@ -116,7 +116,7 @@ export const WEB_DEVELOPMENT_QUESTS: Quest[] = [
     title: 'WordPress Plugin Development',
     description:
       'Build a custom WordPress plugin with admin settings, shortcodes, and comprehensive documentation.',
-    techStack: ['PHP', 'WordPress'],
+    techStack: ['PHP', 'MySQL', 'Git'],
     reward: '₩600,000',
     deadline: '9일 남음',
     participants: 7,
@@ -126,7 +126,7 @@ export const WEB_DEVELOPMENT_QUESTS: Quest[] = [
     title: 'Mobile App UI/UX Redesign',
     description:
       'Redesign the user interface of an existing mobile application to improve user experience and accessibility.',
-    techStack: ['React Native', 'Design'],
+    techStack: ['React Native', 'Figma'],
     reward: '₩950,000',
     deadline: '5일 남음',
     participants: 19,
@@ -146,7 +146,7 @@ export const WEB_DEVELOPMENT_QUESTS: Quest[] = [
     title: 'Next.js E-commerce Platform',
     description:
       'Build a full-stack e-commerce platform with payment integration, product management, and order tracking.',
-    techStack: ['Next.js', 'React', 'Stripe'],
+    techStack: ['Next.js', 'React', 'PostgreSQL'],
     reward: '₩2,500,000',
     deadline: '14일 남음',
     participants: 28,
@@ -156,7 +156,7 @@ export const WEB_DEVELOPMENT_QUESTS: Quest[] = [
     title: 'Node.js Chat Application',
     description:
       'Develop a real-time chat application with WebSocket support, user authentication, and message persistence.',
-    techStack: ['Node.js', 'Socket.io', 'MongoDB'],
+    techStack: ['Node.js', 'MongoDB', 'TypeScript'],
     reward: '₩1,100,000',
     deadline: '8일 남음',
     participants: 14,
@@ -176,7 +176,7 @@ export const WEB_DEVELOPMENT_QUESTS: Quest[] = [
     title: 'Docker Container Optimization',
     description:
       'Optimize Docker containers for production use, including security hardening and performance tuning.',
-    techStack: ['Docker', 'Linux'],
+    techStack: ['Docker', 'AWS', 'Git'],
     reward: '₩850,000',
     deadline: '6일 남음',
     participants: 6,
@@ -186,7 +186,7 @@ export const WEB_DEVELOPMENT_QUESTS: Quest[] = [
     title: 'Java Microservices Architecture',
     description:
       'Design a microservices-based system using Spring Boot with service discovery and load balancing.',
-    techStack: ['Java', 'Spring', 'Eureka'],
+    techStack: ['Java', 'Spring', 'Redis'],
     reward: '₩1,700,000',
     deadline: '11일 남음',
     participants: 16,

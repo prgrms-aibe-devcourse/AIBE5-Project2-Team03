@@ -23,6 +23,7 @@ export function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [audience, setAudience] = useState<Audience>("freelancer");
+  const [role, setRole] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] =
     useState<QuestCategorySlug>("web-development");
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,6 +43,10 @@ export function HeroSection() {
       if (autoSlideRef.current) clearTimeout(autoSlideRef.current);
     };
   }, [isHovered, currentSlide]);
+
+  useEffect(() => {
+    setRole(localStorage.getItem("role"));
+  }, []);
 
   const goToSlide = (index: number) => setCurrentSlide(index);
   const prevSlide = () =>
@@ -142,7 +147,7 @@ export function HeroSection() {
                       : "text-white/75 hover:bg-white/10 hover:text-white"
                   }`}
                 >
-                  기업 · 매니저
+                  기업 및 매니저
                 </button>
               </div>
 
@@ -171,7 +176,11 @@ export function HeroSection() {
                 </form>
               ) : (
                 <Link
-                  href="/manager/create-quest"
+                  href={
+                    role === "MANAGER"
+                      ? "/manager/create-quest"
+                      : "/manager/upgrade"
+                  }
                   className="inline-flex min-h-14 w-fit items-center justify-center rounded-full bg-[#6D28D9] px-8 text-base font-bold text-white shadow-xl shadow-[#6D28D9]/35 transition hover:bg-[#5B21B6] focus:outline-none focus:ring-2 focus:ring-[#A78BFA] focus:ring-offset-2 focus:ring-offset-black/40"
                 >
                   퀘스트 등록하기

@@ -3,22 +3,22 @@ import { BadgeCheck, BriefcaseBusiness, Coins, Users } from "lucide-react";
 const PLATFORM_STATS = [
   {
     value: "1200+",
-    label: "Developers",
+    label: "등록 개발자",
     Icon: Users,
   },
   {
     value: "350+",
-    label: "Active Quests",
+    label: "진행 중인 퀘스트",
     Icon: BriefcaseBusiness,
   },
   {
     value: "KRW 48M",
-    label: "Total Rewards",
+    label: "누적 보상 금액",
     Icon: Coins,
   },
   {
     value: "92%",
-    label: "Success Rate",
+    label: "매칭 성공률",
     Icon: BadgeCheck,
   },
 ];

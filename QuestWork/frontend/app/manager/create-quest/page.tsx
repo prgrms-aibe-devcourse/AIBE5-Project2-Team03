@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { GlobalNav } from "@/components/global-nav";
 import { ManagerSidebar } from "@/components/manager/manager-sidebar";
 import { Card } from "@/components/ui/card";
@@ -25,6 +26,8 @@ const SUBMISSION_FORMAT_OPTIONS = [
 ];
 
 export default function CreateQuestPage() {
+  const router = useRouter();
+  const [isCheckingRole, setIsCheckingRole] = useState(true);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -36,6 +39,17 @@ export default function CreateQuestPage() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+
+    if (role !== "MANAGER") {
+      router.replace("/manager/upgrade");
+      return;
+    }
+
+    setIsCheckingRole(false);
+  }, [router]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -114,6 +128,10 @@ export default function CreateQuestPage() {
       alert("서버 연결에 실패했습니다.");
     }
   };
+
+  if (isCheckingRole) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">

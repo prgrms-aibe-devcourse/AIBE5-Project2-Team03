@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 // import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,6 +20,14 @@ export default function SignupPage() {
   // const [emailCodeSent, setEmailCodeSent] = useState(false)
   // const [emailCode, setEmailCode] = useState('')
   // const [emailVerified, setEmailVerified] = useState(false)
+
+  useEffect(() => {
+    const requestedRole = new URLSearchParams(window.location.search).get('role')
+
+    if (requestedRole === 'MANAGER' || requestedRole === 'MEMBER') {
+      setFormData(prev => ({ ...prev, roleType: requestedRole }))
+    }
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target

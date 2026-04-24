@@ -26,9 +26,9 @@ const statusBadgeColor = {
 }
 
 const statusLabel = {
-  OPEN: 'Open',
-  CLOSED: 'Closed',
-  COMPLETED: 'Completed',
+  OPEN: '진행 중',
+  CLOSED: '종료됨',
+  COMPLETED: '완료됨',
 }
 
 export function PostedQuestsSection({ quests }: PostedQuestsSectionProps) {
@@ -39,23 +39,25 @@ export function PostedQuestsSection({ quests }: PostedQuestsSectionProps) {
       <div className="p-6">
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-foreground">Posted Quests</h2>
+            <h2 className="text-lg font-semibold text-foreground">
+              등록한 퀘스트
+            </h2>
             <p className="mt-1 text-sm text-foreground-muted">
-              Review active postings, monitor status, and jump into quest details.
+              현재 등록한 퀘스트 상태를 확인하고 상세 화면으로 이동해보세요.
             </p>
           </div>
           <Button
             className="bg-primary text-primary-foreground hover:bg-primary-hover"
             onClick={() => router.push('/manager/create-quest')}
           >
-            Create Quest
+            퀘스트 생성
           </Button>
         </div>
 
         {quests.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border p-8 text-center">
             <p className="text-sm text-foreground-muted">
-              No quests have been posted yet.
+              아직 등록한 퀘스트가 없습니다.
             </p>
           </div>
         ) : (
@@ -72,7 +74,7 @@ export function PostedQuestsSection({ quests }: PostedQuestsSectionProps) {
                       {quest.title}
                     </h3>
                     <p className="mt-2 text-xs text-foreground-muted">
-                      Created on {new Date(quest.createdAt).toLocaleDateString()}
+                      등록일 {new Date(quest.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                   <Badge className={statusBadgeColor[quest.status]}>
@@ -83,20 +85,20 @@ export function PostedQuestsSection({ quests }: PostedQuestsSectionProps) {
                 <div className="mt-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-6">
                     <div>
-                      <p className="text-xs text-foreground-muted">Reward</p>
+                      <p className="text-xs text-foreground-muted">보상 금액</p>
                       <p className="text-sm font-semibold text-primary">
                         {quest.rewardAmount?.toLocaleString()} KRW
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-foreground-muted">Submissions</p>
+                      <p className="text-xs text-foreground-muted">제출 수</p>
                       <p className="text-sm font-semibold text-foreground">
                         {quest.submissionsCount || 0}
                       </p>
                     </div>
                   </div>
                   <Button variant="outline" size="sm" className="shrink-0">
-                    View Details
+                    상세 보기
                   </Button>
                 </div>
               </Link>

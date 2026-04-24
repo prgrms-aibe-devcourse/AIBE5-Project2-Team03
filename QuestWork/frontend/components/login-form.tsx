@@ -27,19 +27,14 @@ export function LoginForm() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("로그인 응답 데이터:", data);
+        console.log("로그인 응답 데이터", data);
 
-        // 1. 유저 기본 정보 저장
         localStorage.setItem("nickname", data.nickname || "");
-        localStorage.setItem("username", data.username || ""); // 이제 아이디가 정상 저장됩니다!
+        localStorage.setItem("username", data.username || "");
         localStorage.setItem("role", data.role || "MEMBER");
-        localStorage.setItem("userId", data.id); // 💡 유저의 고유 번호(예: 34)를 저장!
+        localStorage.setItem("userId", data.id);
 
-        // 2. 권한(Role) 판별 및 교정 로직
-        // DB 기준: 7=ADMIN, 8=MEMBER, 9=MANAGER
-        let userRole = "MEMBER"; // 기본값
-
-        // 백엔드에서 올 수 있는 모든 권한 필드 체크
+        let userRole = "MEMBER";
         const rawRole = (data.roleName || data.role || "")
           .toString()
           .toUpperCase();
@@ -47,31 +42,25 @@ export function LoginForm() {
 
         if (roleId === 7 || rawRole === "ADMIN") {
           userRole = "ADMIN";
-        }
-        // 34번 유저이거나 roleId가 9이거나 "MANAGER" 문자열이 포함된 경우
-        else if (roleId === 9 || rawRole === "MANAGER" || data.id === 34) {
+        } else if (roleId === 9 || rawRole === "MANAGER" || data.id === 34) {
           userRole = "MANAGER";
         } else if (roleId === 8 || rawRole === "MEMBER" || rawRole === "USER") {
           userRole = "MEMBER";
         }
 
-        // 3. 로컬스토리지에 표준화된 Role 저장 (대시보드 경고 해결용)
         localStorage.setItem("role", userRole);
 
-        // 4. 역할별 이동 경로 설정
         let targetPath = "/";
         if (userRole === "ADMIN") targetPath = "/admin";
         else if (userRole === "MANAGER") targetPath = "/manager";
-        else if (userRole === "MEMBER") targetPath = "/"; // 일반 유저는 메인으로
+        else if (userRole === "MEMBER") targetPath = "/";
 
-        console.log(`✅ 확정 권한: ${userRole} | 이동 경로: ${targetPath}`);
-
-        // 5. 페이지 이동
+        console.log(`확정 권한: ${userRole} | 이동 경로: ${targetPath}`);
         window.location.href = targetPath;
       } else {
         const errorData = await response.json();
         alert(
-          `로그인 실패: ${errorData.message || "아이디 또는 비밀번호를 확인해주세요"}`,
+          `로그인에 실패했습니다: ${errorData.message || "아이디와 비밀번호를 다시 확인해 주세요."}`,
         );
       }
     } catch (error) {
@@ -81,7 +70,7 @@ export function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="mx-auto w-full max-w-md">
       <div className="rounded-2xl border border-border bg-background p-8 shadow-lg shadow-primary/5">
         <div className="mb-8 text-center">
           <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">
@@ -89,7 +78,7 @@ export function LoginForm() {
           </div>
           <h1 className="text-2xl font-bold text-foreground">로그인</h1>
           <p className="mt-2 text-sm text-foreground-muted">
-            서비스를 이용하려면 로그인해주세요
+            QuestWork를 이용하려면 로그인해 주세요.
           </p>
         </div>
 
@@ -104,7 +93,7 @@ export function LoginForm() {
             <Input
               id="userId"
               type="text"
-              placeholder="아이디를 입력하세요"
+              placeholder="아이디를 입력해 주세요"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               className="h-12 border-border bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20"
@@ -122,7 +111,7 @@ export function LoginForm() {
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="비밀번호를 입력하세요"
+                placeholder="비밀번호를 입력해 주세요"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="h-12 border-border bg-surface pr-12 focus:border-primary focus:ring-2 focus:ring-primary/20"
@@ -231,7 +220,7 @@ export function LoginForm() {
       </div>
 
       <p className="mt-6 text-center text-sm text-foreground-muted">
-        계정이 없으신가요?{" "}
+        아직 계정이 없으신가요?{" "}
         <button
           type="button"
           onClick={() => setIsSignupOpen(true)}

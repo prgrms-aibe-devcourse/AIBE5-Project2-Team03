@@ -57,7 +57,7 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
         })
       } catch (error) {
         console.error('Fetch Error:', error)
-        setErrorMessage('We could not load the current manager profile.')
+        setErrorMessage('현재 매니저 프로필 정보를 불러오지 못했습니다.')
       } finally {
         setIsLoading(false)
       }
@@ -80,12 +80,12 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
 
       if (!response.ok) throw new Error('Failed to update manager profile')
 
-      setSuccessMessage('Manager profile saved successfully.')
+      setSuccessMessage('매니저 프로필이 업데이트되었습니다.')
       localStorage.setItem('nickname', data.nickname)
       setTimeout(() => setSuccessMessage(''), 3000)
     } catch (error) {
       console.error('Update Error:', error)
-      setErrorMessage('Something went wrong while saving your changes.')
+      setErrorMessage('변경 사항을 저장하는 중 오류가 발생했습니다.')
     } finally {
       setIsLoading(false)
     }
@@ -94,9 +94,9 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
   return (
     <Card className="border border-border p-6 shadow-none">
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-foreground">Profile Settings</h2>
+        <h2 className="text-lg font-semibold text-foreground">프로필 설정</h2>
         <p className="mt-1 text-sm text-foreground-muted">
-          Update the public and operational information tied to your manager account.
+          매니저 계정의 기본 정보와 회사 정보를 수정할 수 있습니다.
         </p>
       </div>
 
@@ -121,7 +121,7 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
             name="nickname"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Display Name</FormLabel>
+                <FormLabel>표시 이름</FormLabel>
                 <FormControl>
                   <Input {...field} disabled={isLoading} />
                 </FormControl>
@@ -135,9 +135,13 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
             name="managerName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Manager Name</FormLabel>
+                <FormLabel>담당자 이름</FormLabel>
                 <FormControl>
-                  <Input placeholder="Manager name" {...field} disabled={isLoading} />
+                  <Input
+                    placeholder="담당자 이름"
+                    {...field}
+                    disabled={isLoading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -149,9 +153,13 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
             name="companyName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company Name</FormLabel>
+                <FormLabel>회사명</FormLabel>
                 <FormControl>
-                  <Input placeholder="Company name" {...field} disabled={isLoading} />
+                  <Input
+                    placeholder="회사명"
+                    {...field}
+                    disabled={isLoading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -163,9 +171,13 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
             name="contactPhone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Contact Phone</FormLabel>
+                <FormLabel>연락처</FormLabel>
                 <FormControl>
-                  <Input placeholder="010-0000-0000" {...field} disabled={isLoading} />
+                  <Input
+                    placeholder="010-0000-0000"
+                    {...field}
+                    disabled={isLoading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -177,9 +189,13 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
             name="businessNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Business Number</FormLabel>
+                <FormLabel>사업자 번호</FormLabel>
                 <FormControl>
-                  <Input placeholder="000-00-00000" {...field} disabled={isLoading} />
+                  <Input
+                    placeholder="000-00-00000"
+                    {...field}
+                    disabled={isLoading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -193,14 +209,14 @@ export function ManagerProfileForm({ userId }: { userId: number }) {
               onClick={() => form.reset()}
               disabled={isLoading}
             >
-              Reset
+              초기화
             </Button>
             <Button
               type="submit"
               disabled={isLoading}
               className="bg-primary text-primary-foreground hover:bg-primary-hover"
             >
-              {isLoading ? 'Saving...' : 'Save Changes'}
+              {isLoading ? '저장 중...' : '변경 사항 저장'}
             </Button>
           </div>
         </form>
