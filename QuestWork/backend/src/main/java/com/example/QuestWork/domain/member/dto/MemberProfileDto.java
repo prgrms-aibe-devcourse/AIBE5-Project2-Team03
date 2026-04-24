@@ -10,6 +10,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberProfileDto {
+    // 0. 유저 고유 번호 추가 (지갑 조회 등에 필요)
+    private Long userId;            // 이 부분을 추가해주세요!
     // 1. 유저 기본 정보 (User 엔티티와 조인해서 가져올 내용)
     private String username;        // 식별용 ID (@kim-dev)
     private String nickname;        // 표시될 이름 (김개발)

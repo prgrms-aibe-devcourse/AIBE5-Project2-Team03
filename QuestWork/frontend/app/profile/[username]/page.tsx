@@ -27,19 +27,7 @@ import {
 } from "@/components/ui/select";
 
 // Lucide 아이콘 (필요시 pnpm install lucide-react 필요, 없다면 텍스트로 대체 가능)
-import {
-  User,
-  Briefcase,
-  DollarSign,
-  Award,
-  Settings,
-  Save,
-  X,
-  Link2,
-  Lock,
-  Calendar as CalendarIcon,
-  Bell,
-} from "lucide-react";
+import { User, Briefcase, DollarSign, Award, Settings, Save, X, Link2, Lock, Calendar as CalendarIcon, Bell, Wallet, Coins } from 'lucide-react'
 
 // 인터페이스 정의 (기존과 동일)
 interface FreelancerProfile {
@@ -54,6 +42,7 @@ interface FreelancerProfile {
   completedQuestsCount: number;
   techStack: string[];
   badgeCount: number;
+  userId?: number;
 }
 
 interface ProfileDraft {
@@ -140,70 +129,147 @@ export default function ProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const params = use(paramsPromise);
-  const [profile, setProfile] = useState<FreelancerProfile | null>(null);
-  const [draft, setDraft] = useState<ProfileDraft | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [questFilter, setQuestFilter] = useState<"전체" | "진행중" | "찜">(
-    "전체",
-  );
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newQuestTitle, setNewQuestTitle] = useState("");
-  const [newQuestStatus, setNewQuestStatus] = useState<"진행중" | "찜">(
-    "진행중",
-  );
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [profile, setProfile] = useState<FreelancerProfile | null>(null)
+  const [draft, setDraft] = useState<ProfileDraft | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [questFilter, setQuestFilter] = useState<'전체' | '진행중' | '찜'>('전체')
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [newQuestTitle, setNewQuestTitle] = useState('')
+  const [newQuestStatus, setNewQuestStatus] = useState<'진행중' | '찜'>('진행중')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [walletBalance, setWalletBalance] = useState<number | null>(null)
+  const [walletLoading, setWalletLoading] = useState(true)
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false)
+  const [withdrawBank, setWithdrawBank] = useState('국민')
+  const [withdrawHolder, setWithdrawHolder] = useState('')
+  const [withdrawAccount, setWithdrawAccount] = useState('')
+  const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [withdrawError, setWithdrawError] = useState('')
+  const [withdrawSubmitting, setWithdrawSubmitting] = useState(false)
 
-  useEffect(() => {
-    const decodedUsername = decodeURIComponent(params.username);
-    const fetchProfile = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `http://localhost:8000/api/user/${decodedUsername}`,
-        );
-        if (!response.ok) throw new Error("프로필 로드 실패");
-        const data: FreelancerProfile = await response.json();
-        setProfile(data);
-        setDraft({
-          nickname: data.nickname || "", // username을 nickname으로 변경!
-          profileImageUrl: data.profileImageUrl || "",
-          intro: data.intro || "",
-          portfolioUrl: data.portfolioUrl || "",
-          level: data.level || "BRONZE",
-          totalCareerYears: data.totalCareerYears || 0,
-          techStack: data.techStack || [],
-        });
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [params.username]);
 
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setDraft((prev) => (prev ? { ...prev, [name]: value } : null));
+  // 1. fetchWallet을 useEffect보다 먼저 정의하세요.
+  const fetchWallet = async (userId: number) => {
+    setWalletLoading(true);
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/settlement/wallet/${userId}`);
+      if (!response.ok) throw new Error("지갑 정보 로드 실패");
+      const data = await response.json();
+      setWalletBalance(data.balance); // 여기서 잔액이 업데이트됩니다.
+    } catch (error) {
+      console.error("Wallet fetch error:", error);
+      setWalletBalance(0);
+    } finally {
+      setWalletLoading(false);
+    }
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  // 2. ⭐ fetchProfile을 useEffect 밖으로 꺼내서 정의합니다.
+  const fetchProfile = async () => {
+    const decodedUsername = decodeURIComponent(params.username);
+    setIsLoading(true);
+    try {
+      const response = await fetch(`http://localhost:8000/api/user/${decodedUsername}`);
+      if (!response.ok) throw new Error("프로필 로드 실패");
+
+      const data = await response.json();
+      setProfile(data);
+      setDraft({
+        nickname: data.nickname || '',
+        profileImageUrl: data.profileImageUrl || '',
+        intro: data.intro || '',
+        portfolioUrl: data.portfolioUrl || '',
+        level: data.level || 'BRONZE',
+        totalCareerYears: data.totalCareerYears || 0,
+        techStack: data.techStack || []
+      });
+
+      if (data.userId) {
+        fetchWallet(data.userId);
+      }
+    } catch (error) {
+      console.error("❌ 프로필 로드 에러:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+// 3. 페이지 로드 시에는 fetchProfile만 호출
+  useEffect(() => {
+    if (params.username) {
+      fetchProfile();
+    }
+  }, [params.username]);
+
+// 4. 출금 핸들러 수정
+  const handleWithdrawSubmit = async () => {
+    setWithdrawError('');
+    const amountNumber = Number(withdrawAmount.replace(/,/g, ''));
+
+    if (!profile?.userId) return;
+    // ... (유효성 검사 로직 생략) ...
+
+    setWithdrawSubmitting(true);
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/settlement/withdraw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: profile.userId,
+          amount: amountNumber,
+          bankName: withdrawBank,
+          accountNumber: withdrawAccount,
+          accountHolder: withdrawHolder
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || '출금 요청을 처리하지 못했습니다.');
+      }
+
+      alert('출금 신청이 완료되었습니다.');
+
+      // 모달 및 입력값 초기화
+      setIsWithdrawOpen(false);
+      setWithdrawBank('국민');
+      setWithdrawHolder('');
+      setWithdrawAccount('');
+      setWithdrawAmount('');
+
+      // ⭐ 핵심: 여기서 두 함수를 호출하여 화면을 갱신합니다.
+      // fetchProfile이 밖으로 나왔기 때문에 이제 정상 호출됩니다!
+      await fetchWallet(profile.userId);
+      await fetchProfile();
+
+    } catch (error: any) {
+      console.error('Withdraw error:', error);
+      setWithdrawError(error.message || '출금 신청 중 오류가 발생했습니다.');
+    } finally {
+      setWithdrawSubmitting(false);
+    }
+  };
+  // 5. 파일 변경 핸들러 (이게 없어서 에러가 났던 겁니다!)
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        const result = event.target?.result as string;
-        setDraft((prev) =>
-          prev ? { ...prev, profileImageUrl: result } : null,
-        );
-      };
-      reader.readAsDataURL(file);
+        const result = event.target?.result as string
+        // 이미지 미리보기를 위해 draft 상태 업데이트
+        setDraft((prev: any) => prev ? { ...prev, profileImageUrl: result } : null)
+      }
+      reader.readAsDataURL(file)
     }
   };
+
+// 6. 입력값 변경 핸들러 (혹시 이것도 에러 나면 추가하세요)
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setDraft((prev: any) => prev ? { ...prev, [name]: value } : null)
+  }
 
   const addQuest = () => {
     if (selectedDate && newQuestTitle.trim()) {
@@ -214,11 +280,11 @@ export default function ProfilePage({
         deadline: selectedDate.toISOString().split("T")[0],
       };
       // 실제로는 API 호출, 여기서는 Mock 업데이트
-      MOCK_QUESTS.push(newQuest);
-      setNewQuestTitle("");
-      setNewQuestStatus("진행중");
-      setSelectedDate(undefined);
-      setIsDialogOpen(false);
+      MOCK_QUESTS.push(newQuest)
+      setNewQuestTitle('')
+      setNewQuestStatus('진행중')
+      setSelectedDate(undefined)
+      setIsDialogOpen(false)
     }
   };
 
@@ -364,7 +430,7 @@ export default function ProfilePage({
 
       {/* 💡 상단 프로필 헤더 비주얼 강화 */}
       <section className="relative overflow-hidden bg-white pt-32 pb-8">
-        <div className="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 relative">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 relative">
           <div className="flex flex-row items-center gap-8">
             {/* 이미지 수정 부분 */}
             <div className="relative group">
@@ -479,7 +545,7 @@ export default function ProfilePage({
                             비밀번호 변경
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px] rounded-2xl">
+                        <DialogContent className="sm:max-w-106.25 rounded-2xl">
                           <div className="grid gap-6 py-6">
                             <div className="space-y-2">
                               <Label>현재 비밀번호</Label>
@@ -594,7 +660,7 @@ export default function ProfilePage({
       </section>
 
       {/* 💡 메인 레이아웃 분할 */}
-      <main className="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 py-20">
+      <main className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
           {/* 왼쪽 컬럼: 소개 & 스킬 */}
           <div className="lg:col-span-2 space-y-16">
@@ -656,48 +722,99 @@ export default function ProfilePage({
                   )}
                 </div>
               )}
-            </section>
 
-            {/* 찜한/진행 중 퀘스트 */}
-            <section>
-              <h2 className="mb-4 text-3xl font-black text-[#1e293b] flex items-center gap-3">
-                <Award size={28} className="text-purple-600" /> 내 퀘스트 현황
-              </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <div className="lg:col-span-1">
-                  <Card className="rounded-3xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-0">
-                    <CardHeader className="pb-4">
-                      <CardTitle className="text-2xl flex items-center gap-3 text-[#1e293b]">
-                        <CalendarIcon size={28} />
-                        데드라인 캘린더
-                      </CardTitle>
-                      {getNextDeadline() && (
-                        <p className="text-sm text-slate-500 mt-1">
-                          다음 데드라인: {getNextDeadline()?.title} (
-                          {getNextDeadline()?.days})
-                        </p>
-                      )}
-                    </CardHeader>
-                    <CardContent className="p-0">
-                      <Calendar
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={(date) => {
-                          setSelectedDate(date);
-                          setIsDialogOpen(true);
-                        }}
-                        modifiers={{
-                          deadline: MOCK_QUESTS.map(
-                            (q) => new Date(q.deadline),
-                          ),
-                        }}
-                        modifiersClassNames={{
-                          deadline:
-                            "bg-purple-200 text-purple-800 font-semibold",
-                        }}
-                        className="rounded-md border-0 w-full text-sm"
-                      />
-                    </CardContent>
+                <Card className="rounded-3xl bg-linear-to-r from-green-50 to-emerald-50 text-[#1e293b] shadow-[0_4px_20px_rgba(0,0,0,0.03)] p-8 border-0">
+                  {/* 위: 아이콘 + 텍스트 + 금액 */}
+                  <div className="flex items-center gap-6 mb-6">
+                    <Wallet size={48} className="opacity-80 shrink-0 text-green-600" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium opacity-90">내 지갑</p>
+                      <p className="text-4xl lg:text-5xl font-extrabold tracking-tight text-green-700">
+                        {walletLoading ? '---' : `₩${walletBalance?.toLocaleString() || '0'}`}
+                      </p>
+                      <p className="text-sm text-slate-600 mt-2">안전하게 출금할 수 있습니다.</p>
+                    </div>
+                  </div>
+
+                  {/* 아래: 출금 신청 버튼 */}
+                  <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full rounded-full px-8 py-3 bg-green-600 text-white hover:bg-green-700 shadow-md">
+                        출금 신청
+                      </Button>
+                    </DialogTrigger>
+                      <DialogContent className="sm:max-w-130 rounded-3xl">
+                        <DialogHeader>
+                          <DialogTitle>출금 신청</DialogTitle>
+                          <p className="text-sm text-slate-500 mt-2">은행 정보와 출금 금액을 입력하여 안전하게 요청하세요.</p>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <div className="grid gap-2">
+                            <Label>은행</Label>
+                            <Select value={withdrawBank} onValueChange={setWithdrawBank}>
+                              <SelectTrigger className="rounded-xl">
+                                <SelectValue placeholder="은행 선택" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="국민">국민</SelectItem>
+                                <SelectItem value="신한">신한</SelectItem>
+                                <SelectItem value="우리">우리</SelectItem>
+                                <SelectItem value="농협">농협</SelectItem>
+                                <SelectItem value="하나">하나</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="grid gap-2">
+                            <Label>예금주</Label>
+                            <Input
+                              value={withdrawHolder}
+                              onChange={(e) => setWithdrawHolder(e.target.value)}
+                              placeholder="예금주 이름 입력"
+                              className="rounded-xl"
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label>계좌번호</Label>
+                            <Input
+                              value={withdrawAccount}
+                              onChange={(e) => setWithdrawAccount(e.target.value)}
+                              placeholder="123-456-789012"
+                              className="rounded-xl"
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label>출금 금액</Label>
+                            <Input
+                              type="number"
+                              value={withdrawAmount}
+                              onChange={(e) => setWithdrawAmount(e.target.value)}
+                              placeholder={walletLoading ? '잔액 로딩 중...' : `최대 ₩${walletBalance?.toLocaleString() || '0'}`}
+                              className="rounded-xl"
+                            />
+                            <p className="text-sm text-slate-500">현재 잔액: {walletLoading ? '---' : `₩${walletBalance?.toLocaleString() || '0'}`}</p>
+                          </div>
+                          {withdrawError && <p className="text-sm text-red-600">{withdrawError}</p>}
+                        </div>
+                        <DialogFooter className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                          <Button variant="outline" onClick={() => setIsWithdrawOpen(false)} className="rounded-xl">
+                            닫기
+                          </Button>
+                          <Button onClick={handleWithdrawSubmit} disabled={withdrawSubmitting} className="rounded-xl bg-green-600 text-white hover:bg-green-700">
+                            {withdrawSubmitting ? '신청 중...' : '출금 신청'}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                </Card>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="rounded-3xl p-8 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-0">
+                    <p className="text-xs text-slate-500 mb-1">완료 퀘스트</p>
+                    <p className="text-3xl font-bold flex items-end gap-1">{profile.completedQuestsCount}<span className="text-xs font-normal text-slate-500 pb-1">건</span></p>
+                  </Card>
+                  <Card className="rounded-3xl p-8 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-0">
+                    <p className="text-xs text-slate-500 mb-1">보유 뱃지</p>
+                    <p className="text-3xl font-bold flex items-end gap-1">{profile.badgeCount}<span className="text-xs font-normal text-slate-500 pb-1">개</span></p>
                   </Card>
                 </div>
                 <div className="lg:col-span-1">
@@ -763,7 +880,6 @@ export default function ProfilePage({
                     })}
                   </div>
                 </div>
-              </div>
 
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="rounded-3xl">
@@ -835,12 +951,12 @@ export default function ProfilePage({
               <Card className="rounded-3xl bg-white text-[#1e293b] shadow-[0_4px_20px_rgba(0,0,0,0.03)] p-8 flex items-center gap-4 border-0">
                 <DollarSign
                   size={48}
-                  className="opacity-80 flex-shrink-0 text-purple-600"
+                  className="opacity-80 shrink-0 text-purple-600"
                 />
                 <div>
                   <p className="text-sm font-medium opacity-90">누적 수익</p>
                   <p className="text-5xl font-extrabold tracking-tight">
-                    ₩{profile.totalReward.toLocaleString()}
+                    ₩{profile?.totalReward.toLocaleString()}
                   </p>
                 </div>
               </Card>
@@ -849,7 +965,7 @@ export default function ProfilePage({
                 <Card className="rounded-3xl p-8 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-0">
                   <p className="text-xs text-slate-500 mb-1">완료 퀘스트</p>
                   <p className="text-3xl font-bold flex items-end gap-1">
-                    {profile.completedQuestsCount}
+                    {profile?.completedQuestsCount}
                     <span className="text-xs font-normal text-slate-500 pb-1">
                       건
                     </span>
@@ -858,7 +974,7 @@ export default function ProfilePage({
                 <Card className="rounded-3xl p-8 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-0">
                   <p className="text-xs text-slate-500 mb-1">보유 뱃지</p>
                   <p className="text-3xl font-bold flex items-end gap-1">
-                    {profile.badgeCount}
+                    {profile?.badgeCount}
                     <span className="text-xs font-normal text-slate-500 pb-1">
                       개
                     </span>
