@@ -6,11 +6,10 @@ import {
   QuestFilters,
   type QuestFilters as QuestFiltersType,
 } from '@/components/quest-filters'
-import { QuestCard } from '@/components/quest-card'
+import { QuestCard, type Quest } from '@/components/quest-card'
 import { QuestSearch } from '@/components/quest-search'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/pagination'
-import { WEB_DEVELOPMENT_QUESTS } from '@/lib/mock-quests-data'
 
 const QUESTS_PER_PAGE = 10
 
@@ -24,8 +23,10 @@ const EMPTY_FILTERS: QuestFiltersType = {
 
 export function WebDevelopmentQuestsClient({
   initialQuery,
+  initialQuests,
 }: {
   initialQuery: string
+  initialQuests: Quest[]
 }) {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState(initialQuery)
@@ -37,7 +38,7 @@ export function WebDevelopmentQuestsClient({
   }, [initialQuery])
 
   const filteredQuests = useMemo(() => {
-    return WEB_DEVELOPMENT_QUESTS.filter((quest) => {
+    return initialQuests.filter((quest) => {
       if (searchQuery.trim()) {
         const query = searchQuery.trim().toLowerCase()
         const matchesQuery = [quest.title, quest.description, ...quest.techStack]
@@ -62,7 +63,7 @@ export function WebDevelopmentQuestsClient({
 
       return true
     })
-  }, [filters.techStack, searchQuery])
+  }, [filters.techStack, initialQuests, searchQuery])
 
   const totalPages = Math.ceil(filteredQuests.length / QUESTS_PER_PAGE)
   const paginatedQuests = filteredQuests.slice(

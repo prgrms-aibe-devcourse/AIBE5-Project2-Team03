@@ -9,22 +9,24 @@ import { Button } from "@/components/ui/button";
 const QUEST_CATEGORIES = [
   {
     title: "웹 개발",
-    description: "프론트엔드, 백엔드, 풀스택 제품 개발 퀘스트를 확인해보세요.",
+    description:
+      "프론트엔드, 백엔드, 풀스택 프로젝트 퀘스트를 확인해보세요.",
     route: "/quests/web-development",
   },
   {
     title: "모바일 개발",
-    description: "iOS, Android, React Native 앱 개발 퀘스트를 둘러보세요.",
+    description: "iOS, Android, React Native 기반 퀘스트를 둘러보세요.",
     route: "/quests/mobile-development",
   },
   {
     title: "소프트웨어 개발",
-    description: "제품 엔지니어링, 플랫폼 구축, 맞춤형 시스템 개발 퀘스트입니다.",
+    description:
+      "데스크톱 앱, 시스템 툴, 자동화 프로젝트 관련 퀘스트입니다.",
     route: "/quests/software-development",
   },
   {
     title: "워드프레스 개발",
-    description: "테마 수정, 플러그인 개발, 사이트 유지보수 퀘스트를 만나보세요.",
+    description: "커스텀 테마, 플러그인 개발, 유지보수 퀘스트를 모았습니다.",
     route: "/quests/wordpress-development",
   },
 ];
@@ -35,7 +37,9 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   const [username, setUsername] = useState<string | null>(null);
   const [nickname, setNickname] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [role, setRole] = useState<"USER" | "MANAGER">("USER");
+  const [role, setRole] = useState<"USER" | "MEMBER" | "MANAGER" | "ADMIN">(
+    "USER",
+  );
 
   const questsCloseRef = useRef<NodeJS.Timeout | null>(null);
   const userMenuCloseRef = useRef<NodeJS.Timeout | null>(null);
@@ -68,10 +72,14 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
     setProfileImage(
       localStorage.getItem("profileImage") || localStorage.getItem("avatar"),
     );
+
     const storedRole = localStorage.getItem("role") as
       | "USER"
+      | "MEMBER"
       | "MANAGER"
+      | "ADMIN"
       | null;
+
     setRole(storedRole || "USER");
   }, []);
 
@@ -83,6 +91,11 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
     )}`;
   const profileHref = `/profile/${encodeURIComponent(username || "")}`;
   const avatarFallback = nickname?.trim().slice(0, 1).toUpperCase() || "Q";
+  const dashboardHref = !isAuthenticated
+    ? "/login"
+    : role === "MANAGER"
+      ? "/manager"
+      : "/dashboard";
 
   const handleLogout = () => {
     localStorage.removeItem("username");
@@ -164,7 +177,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
             </div>
 
             <Link
-              href="/dashboard"
+              href={dashboardHref}
               className="rounded-full px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
             >
               대시보드
@@ -230,23 +243,23 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                     </Avatar>
 
                     <p className="mt-3 text-base font-semibold text-foreground">
-                      {nickname}님, 다시 오셨네요
+                      {nickname}님 반갑습니다
                     </p>
 
                     <div className="mt-4 space-y-2">
-                      <Button
-                        asChild
-                        className="w-full bg-primary text-primary-foreground hover:bg-primary-hover"
-                      >
-                        <Link
-                          href={role === "MANAGER" ? "/manager" : profileHref}
-                          onClick={() => setIsUserMenuOpen(false)}
+                      {role !== "MANAGER" ? (
+                        <Button
+                          asChild
+                          className="w-full bg-primary text-primary-foreground hover:bg-primary-hover"
                         >
-                          {role === "MANAGER"
-                            ? "매니저 대시보드"
-                            : "프로필 보기"}
-                        </Link>
-                      </Button>
+                          <Link
+                            href={profileHref}
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            프로필 보기
+                          </Link>
+                        </Button>
+                      ) : null}
                       <Button
                         variant="outline"
                         className="w-full border-border hover:border-primary hover:text-primary"

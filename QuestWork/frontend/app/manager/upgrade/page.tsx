@@ -107,7 +107,7 @@ const PROFILE_CLUSTER = [
 export default function ManagerUpgradePage() {
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
-  const ctaHref = useMemo(() => "/signup?role=MANAGER", []);
+  const ctaHref = useMemo(() => "/login", []);
 
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
@@ -150,7 +150,8 @@ export default function ManagerUpgradePage() {
                   </h1>
 
                   <p className="max-w-xl text-lg leading-8 text-foreground-muted">
-                    퀘스트를 등록하고 더 많은 개발자와 함께 프로젝트를 진행해보세요.
+                    퀘스트를 등록하고 더 많은 개발자와 함께 프로젝트를
+                    진행해보세요.
                   </p>
                 </div>
 
@@ -189,13 +190,19 @@ export default function ManagerUpgradePage() {
                         <span
                           className={`absolute z-20 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary ${profile.badgeClassName ?? ""}`}
                         >
-                          {profile.status === "Active" ? "활동 중" : "응답 가능"}
+                          {profile.status === "Active"
+                            ? "활동 중"
+                            : "응답 가능"}
                         </span>
                       ) : null}
 
-                      <div className={`flex h-full flex-col ${profile.bodyClassName}`}>
+                      <div
+                        className={`flex h-full flex-col ${profile.bodyClassName}`}
+                      >
                         <div className="flex justify-center">
-                          <Avatar className={`${profile.avatarClassName} ring-4 ring-white/80`}>
+                          <Avatar
+                            className={`${profile.avatarClassName} ring-4 ring-white/80`}
+                          >
                             <AvatarImage
                               src={profile.image}
                               alt={profile.name}
@@ -265,7 +272,10 @@ export default function ManagerUpgradePage() {
 
             <div className="mt-10 text-center text-sm text-foreground-muted">
               이미 계정이 있으신가요?{" "}
-              <Link href="/login" className="font-semibold text-primary hover:underline">
+              <Link
+                href="/login"
+                className="font-semibold text-primary hover:underline"
+              >
                 로그인하기
               </Link>
             </div>

@@ -13,6 +13,7 @@ export interface Quest {
   reward: string
   deadline: string
   participants: number
+  category?: string
 }
 
 interface QuestCardProps {
@@ -24,6 +25,11 @@ export function QuestCard({ quest }: QuestCardProps) {
     <Link href={`/quests/${quest.id}`} className="block">
       <Card className="group flex h-full flex-col overflow-hidden rounded-lg border border-border shadow transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
         <div className="border-b border-border px-4 py-3.5">
+          {quest.category ? (
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+              {quest.category}
+            </p>
+          ) : null}
           <h3 className="line-clamp-2 text-lg font-semibold text-foreground transition-colors group-hover:text-primary">
             {quest.title}
           </h3>

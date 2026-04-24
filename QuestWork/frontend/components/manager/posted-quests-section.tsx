@@ -1,38 +1,38 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 interface Quest {
-  id: number
-  title: string
-  status: 'OPEN' | 'CLOSED' | 'COMPLETED'
-  rewardAmount: number
-  createdAt: string
-  submissionsCount?: number
+  id: number;
+  title: string;
+  status: "OPEN" | "CLOSED" | "COMPLETED";
+  rewardAmount: number;
+  createdAt: string;
+  submissionsCount?: number;
 }
 
 interface PostedQuestsSectionProps {
-  quests: Quest[]
+  quests: Quest[];
 }
 
 const statusBadgeColor = {
-  OPEN: 'bg-green-100 text-green-700',
-  CLOSED: 'bg-slate-100 text-slate-700',
-  COMPLETED: 'bg-primary-light text-primary',
-}
+  OPEN: "bg-green-100 text-green-700",
+  CLOSED: "bg-slate-100 text-slate-700",
+  COMPLETED: "bg-primary-light text-primary",
+};
 
 const statusLabel = {
-  OPEN: '진행 중',
-  CLOSED: '종료됨',
-  COMPLETED: '완료됨',
-}
+  OPEN: "진행 중",
+  CLOSED: "종료됨",
+  COMPLETED: "완료됨",
+};
 
 export function PostedQuestsSection({ quests }: PostedQuestsSectionProps) {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <Card className="border border-border shadow-none">
@@ -48,7 +48,7 @@ export function PostedQuestsSection({ quests }: PostedQuestsSectionProps) {
           </div>
           <Button
             className="bg-primary text-primary-foreground hover:bg-primary-hover"
-            onClick={() => router.push('/manager/create-quest')}
+            onClick={() => router.push("/manager/create-quest")}
           >
             퀘스트 생성
           </Button>
@@ -65,7 +65,7 @@ export function PostedQuestsSection({ quests }: PostedQuestsSectionProps) {
             {quests.map((quest) => (
               <Link
                 key={quest.id}
-                href={`/manager/quests/${quest.id}`}
+                href={`/quests/${quest.id}`}
                 className="block rounded-lg border border-border p-4 transition-colors hover:bg-surface"
               >
                 <div className="flex items-start justify-between gap-4">
@@ -107,5 +107,5 @@ export function PostedQuestsSection({ quests }: PostedQuestsSectionProps) {
         )}
       </div>
     </Card>
-  )
+  );
 }
