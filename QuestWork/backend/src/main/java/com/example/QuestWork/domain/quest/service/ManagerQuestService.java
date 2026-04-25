@@ -1,5 +1,7 @@
 package com.example.QuestWork.domain.quest.service;
 
+import com.example.QuestWork.domain.escrows.entity.Escrow;
+import com.example.QuestWork.domain.escrows.repository.EscrowRepository;
 import com.example.QuestWork.domain.manager.entity.ManagerProfileEntity;
 import com.example.QuestWork.domain.manager.repositroy.ManagerProfileRepository;
 import com.example.QuestWork.domain.quest.dto.*;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,6 +32,7 @@ public class ManagerQuestService {
     private final QuestWinnerRepository questWinnerRepository;
     private final ManagerProfileRepository managerProfileRepository;
     private final UserRepository userRepository;
+    private final EscrowRepository escrowRepository;
 
 
     //본인이 등록한 모든 퀘스트 목록 조회
@@ -73,6 +77,23 @@ public class ManagerQuestService {
 
         QuestWinner winner = QuestWinner.create(quest, submission);
         QuestWinner savedWinner = questWinnerRepository.save(winner);
+
+        // 제출물 상태를 WINNER로 변경
+        submission.markAsWinner();
+        questSubmissionRepository.save(submission);
+
+        // 에스크로 생성 (아직 없는 경우만)
+        if (!escrowRepository.existsByQuestId(questId)) {
+            ManagerProfileEntity manager = getManagerProfile(userId);
+            Escrow escrow = Escrow.builder()
+                    .questId(questId)
+                    .managerId(manager.getId())
+                    .amount(quest.getRewardAmount())
+                    .status("LOCKED")
+                    .depositedAt(LocalDateTime.now())
+                    .build();
+            escrowRepository.save(escrow);
+        }
 
         return QuestWinnerResponseDto.from(savedWinner);
     }

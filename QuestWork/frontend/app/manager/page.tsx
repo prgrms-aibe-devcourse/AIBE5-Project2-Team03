@@ -3,7 +3,7 @@
 import { StatCard } from '@/components/dashboard/stat-card'
 import { ManagerWorkspaceShell } from '@/components/manager/manager-workspace-shell'
 import { PostedQuestsSection } from '@/components/manager/posted-quests-section'
-import { RewardSection, type RewardWinner } from '@/components/manager/reward-section'
+import { RewardSection, type QuestRewardItem } from '@/components/manager/reward-section'
 import { useManagerDashboardData } from '@/components/manager/use-manager-dashboard-data'
 import { Calendar } from '@/components/ui/calendar'
 import { Card } from '@/components/ui/card'
@@ -21,11 +21,26 @@ export default function ManagerDashboardPage() {
     totalRewardBudget,
   } = useManagerDashboardData()
 
-  const latestWinner: RewardWinner | null = (() => {
-    const w = allSubmissions.find((s) => s.status === 'winner')
-    if (!w) return null
-    return { nickname: w.freelancerName, questTitle: w.questTitle, questId: Number(w.questId), memberId: w.memberId, rewardAmount: w.rewardAmount }
-  })()
+  // 대시보드용: 우승자 있는 퀘스트만 최대 3개 표시
+  const rewardItems: QuestRewardItem[] = dbQuests
+    .map((quest) => {
+      const winner = allSubmissions.find(
+        (s) => s.questId === String(quest.id) && s.status === 'winner',
+      )
+      if (!winner) return null
+      return {
+        questId: quest.id,
+        questTitle: quest.title,
+        rewardAmount: quest.rewardAmount,
+        winnerNickname: winner.freelancerName,
+        winnerMemberId: winner.memberId,
+        submissionId: winner.submissionId,
+        submissionTitle: winner.freelancerName,
+        githubUrl: winner.githubUrl,
+      } satisfies QuestRewardItem
+    })
+    .filter((item): item is QuestRewardItem => item !== null)
+    .slice(0, 3)
 
   return (
     <ManagerWorkspaceShell
@@ -85,7 +100,7 @@ export default function ManagerDashboardPage() {
             </div>
           </Card>
 
-          <RewardSection winner={latestWinner} userId={userId} />
+          <RewardSection items={rewardItems} userId={userId} />
         </div>
       </section>
     </ManagerWorkspaceShell>

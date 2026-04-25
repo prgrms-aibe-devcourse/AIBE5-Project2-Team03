@@ -47,21 +47,12 @@ export default function MyQuestsPage() {
       return
     }
 
-    const fetchMyApplications = async () => {
+    const fetchMyQuests = async () => {
       try {
-        // 전체 퀘스트를 가져온 후 내가 지원한 것을 필터
-        const res = await fetch('http://localhost:8000/api/quests')
+        const res = await fetch(`http://localhost:8000/api/quests/applied?userId=${userId}`)
         if (!res.ok) throw new Error('퀘스트 조회 실패')
-        const allQuests: QuestItem[] = await res.json()
-
-        // 각 퀘스트에 대해 내 지원 여부 확인
-        const checks = allQuests.map((quest) =>
-          fetch(
-            `http://localhost:8000/api/quests/${quest.id}/applications/me?userId=${userId}`,
-          ).then((r) => (r.ok && r.status !== 204 ? quest : null)),
-        )
-        const results = await Promise.all(checks)
-        setQuests(results.filter((q): q is QuestItem => q !== null))
+        const data: QuestItem[] = await res.json()
+        setQuests(data)
       } catch (e) {
         console.error(e)
       } finally {
@@ -69,7 +60,7 @@ export default function MyQuestsPage() {
       }
     }
 
-    fetchMyApplications()
+    fetchMyQuests()
   }, [router])
 
   const formatDeadline = (deadline: string) => {

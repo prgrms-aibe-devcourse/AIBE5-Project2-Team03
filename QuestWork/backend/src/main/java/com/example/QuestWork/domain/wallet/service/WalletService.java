@@ -2,6 +2,7 @@ package com.example.QuestWork.domain.wallet.service;
 
 import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
 import com.example.QuestWork.domain.member.repository.MemberProfileRepository;
+import com.example.QuestWork.domain.escrows.repository.EscrowRepository;
 import com.example.QuestWork.domain.payment.entity.Payment;
 import com.example.QuestWork.domain.payment.repository.PaymentRepository;
 import com.example.QuestWork.domain.wallet.entity.WalletEntity;
@@ -26,6 +27,7 @@ public class WalletService {
     private final WithdrawRequestRepository withdrawRequestRepository;
     private final MemberProfileRepository memberProfileRepository;
     private final PaymentRepository paymentRepository;
+    private final EscrowRepository escrowRepository;
 
     /**
      * 1. 출금 신청 (사용자)
@@ -117,6 +119,14 @@ public class WalletService {
 
         wallet.addBalance(finalAmount);
         walletRepository.save(wallet);
+
+        // 에스크로 RELEASED 처리
+        escrowRepository.findByQuestId(questId).ifPresent(escrow -> {
+            if ("LOCKED".equals(escrow.getStatus())) {
+                escrow.release();
+                escrowRepository.save(escrow);
+            }
+        });
 
         // Payment에서 originalAmount와 fee 가져오기 (없으면 계산된 값 사용)
         Payment payment = paymentRepository.findByQuestIdAndMemberId(questId, freelancerId).orElse(null);

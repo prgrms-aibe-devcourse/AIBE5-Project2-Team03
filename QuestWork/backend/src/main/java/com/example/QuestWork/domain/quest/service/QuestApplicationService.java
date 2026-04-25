@@ -4,6 +4,7 @@ import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
 import com.example.QuestWork.domain.member.repository.MemberProfileRepository;
 import com.example.QuestWork.domain.quest.constant.ApplicationStatus;
 import com.example.QuestWork.domain.quest.dto.QuestApplicationResponseDto;
+import com.example.QuestWork.domain.quest.dto.QuestResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionRequestDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestUpdateSubmissionRequestDto;
@@ -13,9 +14,12 @@ import com.example.QuestWork.domain.quest.entity.QuestSubmission;
 import com.example.QuestWork.domain.quest.repository.QuestApplicationRepository;
 import com.example.QuestWork.domain.quest.repository.QuestRepository;
 import com.example.QuestWork.domain.quest.repository.QuestSubmissionRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +31,7 @@ public class QuestApplicationService {
     private final MemberProfileRepository memberProfileRepository;
     private final QuestApplicationRepository questApplicationRepository;
     private final QuestSubmissionRepository questSubmissionRepository;
+    private final ObjectMapper objectMapper;
 
 
     //퀘스트 지원 대답
@@ -76,6 +81,25 @@ public class QuestApplicationService {
         );
         QuestSubmission savedSubmission = questSubmissionRepository.save(submission);
         return QuestSubmissionResponseDto.from(savedSubmission);
+    }
+
+    // 내가 지원한 모든 퀘스트 목록 (APPLIED 상태만)
+    public List<QuestResponseDto> getMyAppliedQuests(Long userId) {
+        MemberProfileEntity member = getMemberProfile(userId);
+        return questApplicationRepository.findAllByMember(member)
+                .stream()
+                .filter(app -> app.getStatus() == ApplicationStatus.APPLIED)
+                .map(app -> QuestResponseDto.from(app.getQuest(), objectMapper))
+                .toList();
+    }
+
+    // 내가 제출한 모든 제출물 목록
+    public List<QuestSubmissionResponseDto> getMySubmissions(Long userId) {
+        MemberProfileEntity member = getMemberProfile(userId);
+        return questSubmissionRepository.findAllByMember(member)
+                .stream()
+                .map(QuestSubmissionResponseDto::from)
+                .toList();
     }
 
     //제출한 제출물 수정 대답

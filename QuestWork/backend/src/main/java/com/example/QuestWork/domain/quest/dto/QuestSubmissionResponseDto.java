@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class QuestSubmissionResponseDto {
     private Long submissionId;
     private Long questId;
+    private String questTitle;
     private Long memberId;
     private String nickname;
 
@@ -30,6 +31,7 @@ public class QuestSubmissionResponseDto {
         return QuestSubmissionResponseDto.builder()
                 .submissionId(questSubmission.getId())
                 .questId(questSubmission.getQuest().getId())
+                .questTitle(questSubmission.getQuest().getTitle())
                 .memberId(questSubmission.getMember().getId())
                 .nickname(questSubmission.getMember().getUser().getNickname())
                 .submissionTitle(questSubmission.getSubmissionTitle())

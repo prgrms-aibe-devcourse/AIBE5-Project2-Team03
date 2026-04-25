@@ -26,5 +26,8 @@ public class AdminStatsResponse {
 
     // 3. 그래프용 (주간 거래 규모 추이)
     private List<DailyRevenueDto> dailyRevenues;
+
+    // 4. 그래프용 (월간 거래 규모 추이)
+    private List<DailyRevenueDto> monthlyRevenues;
 }
 

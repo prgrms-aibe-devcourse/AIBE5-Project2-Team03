@@ -54,6 +54,9 @@ public class AdminStatsService {
         // 5. 최근 7일간 거래 추이
         List<DailyRevenueDto> dailyRevenues = escrowRepository.getDailyReleasedAmount(startOfToday.minusDays(7));
 
+        // 6. 최근 12개월 월간 거래 추이
+        List<DailyRevenueDto> monthlyRevenues = escrowRepository.getMonthlyReleasedAmount(startOfToday.minusMonths(12));
+
         System.out.println("======= ADMIN DASHBOARD LOG END =======");
 
         return AdminStatsResponse.builder()
@@ -62,6 +65,7 @@ public class AdminStatsService {
                 .totalLockedEscrow(lockedAmount != null ? lockedAmount : BigDecimal.ZERO)
                 .pendingWithdrawalCount(pendingWithdrawals)
                 .dailyRevenues(dailyRevenues != null ? dailyRevenues : new ArrayList<>())
+                .monthlyRevenues(monthlyRevenues != null ? monthlyRevenues : new ArrayList<>())
                 .build();
     }
 }

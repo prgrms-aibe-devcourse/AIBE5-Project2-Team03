@@ -82,6 +82,10 @@ public class QuestSubmission {
 
     }
 
+    public void markAsWinner() {
+        this.status = SubmissionStatus.WINNER;
+    }
+
     public static QuestSubmission create(
             Quest quest,
             MemberProfileEntity member,
