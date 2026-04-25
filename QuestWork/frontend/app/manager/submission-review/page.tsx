@@ -5,7 +5,7 @@ import { SubmissionsReviewSection } from '@/components/manager/submissions-revie
 import { useManagerDashboardData } from '@/components/manager/use-manager-dashboard-data'
 
 export default function ManagerSubmissionReviewPage() {
-  const { allSubmissions, isAuthorized } = useManagerDashboardData()
+  const { allSubmissions, isAuthorized, userId } = useManagerDashboardData()
 
   return (
     <ManagerWorkspaceShell
@@ -13,7 +13,7 @@ export default function ManagerSubmissionReviewPage() {
       description="제출된 결과물을 비교하고, 우승자 선정 전 필요한 검토를 진행해보세요."
       isAuthorized={isAuthorized}
     >
-      <SubmissionsReviewSection submissions={allSubmissions} />
+      <SubmissionsReviewSection submissions={allSubmissions} userId={userId} />
     </ManagerWorkspaceShell>
   )
 }

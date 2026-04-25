@@ -3,7 +3,7 @@
 import { StatCard } from '@/components/dashboard/stat-card'
 import { ManagerWorkspaceShell } from '@/components/manager/manager-workspace-shell'
 import { PostedQuestsSection } from '@/components/manager/posted-quests-section'
-import { RewardSection } from '@/components/manager/reward-section'
+import { RewardSection, type RewardWinner } from '@/components/manager/reward-section'
 import { useManagerDashboardData } from '@/components/manager/use-manager-dashboard-data'
 import { Calendar } from '@/components/ui/calendar'
 import { Card } from '@/components/ui/card'
@@ -13,12 +13,19 @@ export default function ManagerDashboardPage() {
     dbQuests,
     isLoading,
     isAuthorized,
+    userId,
     activeQuestCount,
     closedQuestCount,
     allSubmissions,
     reviewingCount,
     totalRewardBudget,
   } = useManagerDashboardData()
+
+  const latestWinner: RewardWinner | null = (() => {
+    const w = allSubmissions.find((s) => s.status === 'winner')
+    if (!w) return null
+    return { nickname: w.freelancerName, questTitle: w.questTitle, questId: Number(w.questId), memberId: w.memberId, rewardAmount: w.rewardAmount }
+  })()
 
   return (
     <ManagerWorkspaceShell
@@ -78,7 +85,7 @@ export default function ManagerDashboardPage() {
             </div>
           </Card>
 
-          <RewardSection />
+          <RewardSection winner={latestWinner} userId={userId} />
         </div>
       </section>
     </ManagerWorkspaceShell>

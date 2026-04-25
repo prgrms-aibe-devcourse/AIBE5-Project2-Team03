@@ -13,4 +13,5 @@ public interface QuestSubmissionRepository extends JpaRepository<QuestSubmission
     List<QuestSubmission> findAllByQuest(Quest quest);
     List<QuestSubmission> findAllByMember(MemberProfileEntity member);
 
+
 }

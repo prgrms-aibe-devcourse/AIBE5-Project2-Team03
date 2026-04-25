@@ -2,8 +2,7 @@ package com.example.QuestWork.domain.member.service;
 
 import com.example.QuestWork.domain.member.dto.MemberPasswordUpdateDto;
 import com.example.QuestWork.domain.member.dto.MemberProfileDto;
-
-
+import com.example.QuestWork.domain.member.constant.MemberLevel;
 import com.example.QuestWork.domain.member.dto.MemberUpdateDto;
 import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
 import com.example.QuestWork.domain.member.entity.MemberSkillTagEntity;
@@ -34,16 +33,24 @@ public class MemberProfileService {
 
     /**
      * 1. 마이페이지 프로필 조회 (단순 조회용)
+     * - member_profiles 행이 없는 기존 계정은 자동으로 기본 프로필을 생성한다
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public MemberProfileDto getProfileByUsername(String username) {
         // [검증] 주소창의 username으로 유저가 존재하는지 확인
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."));
 
-        // [조회] 해당 유저의 프로필 엔티티 가져오기
+        // [조회] 해당 유저의 프로필 엔티티 가져오기 - 없으면 자동 생성
         MemberProfileEntity profile = memberProfileRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "프로필 정보를 찾을 수 없습니다."));
+                .orElseGet(() -> memberProfileRepository.save(
+                        MemberProfileEntity.builder()
+                                .user(user)
+                                .level(MemberLevel.BRONZE)
+                                .badgeCount(0)
+                                .totalReward(java.math.BigDecimal.ZERO)
+                                .build()
+                ));
 
         return MemberProfileDto.builder()
                 .userId(user.getId())

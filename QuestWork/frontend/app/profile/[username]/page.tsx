@@ -154,7 +154,7 @@ export default function ProfilePage({
   const fetchWallet = async (userId: number) => {
     setWalletLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/settlement/wallet/${userId}`);
+      const response = await fetch(`http://localhost:8000/api/settlement/wallet/${userId}`);
       if (!response.ok) throw new Error("지갑 정보 로드 실패");
       const data = await response.json();
       setWalletBalance(data.balance); // 여기서 잔액이 업데이트됩니다.
@@ -213,7 +213,7 @@ export default function ProfilePage({
 
     setWithdrawSubmitting(true);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/settlement/withdraw', {
+      const response = await fetch('http://localhost:8000/api/settlement/withdraw', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

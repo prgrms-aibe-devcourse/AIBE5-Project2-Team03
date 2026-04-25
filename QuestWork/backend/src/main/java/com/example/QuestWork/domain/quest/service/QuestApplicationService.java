@@ -35,8 +35,16 @@ public class QuestApplicationService {
         Quest quest = getQuest(questId);
         MemberProfileEntity member = getMemberProfile(userId);
 
-        if (questApplicationRepository.existsByQuestAndMemberAndStatus(quest, member, ApplicationStatus.APPLIED)) {
-            throw new IllegalStateException("이미 지원한 퀘스트입니다.");
+        // 기존 레코드 확인 (APPLIED/CANCELED 모두 포함)
+        java.util.Optional<QuestApplication> existing = questApplicationRepository.findByQuestAndMember(quest, member);
+        if (existing.isPresent()) {
+            QuestApplication existingApp = existing.get();
+            if (existingApp.getStatus() == ApplicationStatus.APPLIED) {
+                throw new IllegalStateException("이미 지원한 퀘스트입니다.");
+            }
+            // CANCELED 상태면 재활성화 (DB 유니크 제약 우회)
+            existingApp.reApply();
+            return QuestApplicationResponseDto.from(existingApp);
         }
 
         QuestApplication application = QuestApplication.create(quest, member);
@@ -112,6 +120,19 @@ public class QuestApplicationService {
                 .filter(a -> a.getStatus() == ApplicationStatus.APPLIED)
                 .map(QuestApplicationResponseDto::from)
                 .orElse(null);
+    }
+    //멤버 본인 제출물 조회
+    public QuestSubmissionResponseDto getMySubmission(Long questId, Long userId) {
+        Quest quest = questRepository.findById(questId)
+                .orElseThrow(() -> new IllegalArgumentException("퀘스트를 찾을 수 없습니다."));
+
+        MemberProfileEntity member = memberProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 프로필을 찾을 수 없습니다."));
+
+        QuestSubmission submission = questSubmissionRepository.findByQuestAndMember(quest, member)
+                .orElseThrow(() -> new IllegalArgumentException("제출 결과가 없습니다."));
+
+        return QuestSubmissionResponseDto.from(submission);
     }
 
     // 제출물 단건 조회

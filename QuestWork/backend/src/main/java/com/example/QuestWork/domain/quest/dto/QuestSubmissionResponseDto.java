@@ -14,6 +14,7 @@ public class QuestSubmissionResponseDto {
     private Long submissionId;
     private Long questId;
     private Long memberId;
+    private String nickname;
 
     private String submissionTitle;
     private String submissionContent;
@@ -30,6 +31,7 @@ public class QuestSubmissionResponseDto {
                 .submissionId(questSubmission.getId())
                 .questId(questSubmission.getQuest().getId())
                 .memberId(questSubmission.getMember().getId())
+                .nickname(questSubmission.getMember().getUser().getNickname())
                 .submissionTitle(questSubmission.getSubmissionTitle())
                 .submissionContent(questSubmission.getSubmissionContent())
                 .fileUrl(questSubmission.getFileUrl())

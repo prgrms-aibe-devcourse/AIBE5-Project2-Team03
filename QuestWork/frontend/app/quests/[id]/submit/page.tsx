@@ -57,7 +57,7 @@ export default function QuestSubmitPage() {
   useEffect(() => {
     const fetchQuest = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/quests/detail/${questId}`)
+        const res = await fetch(`http://localhost:8000/api/quests/${questId}`)
         if (!res.ok) throw new Error('퀘스트 정보를 불러올 수 없습니다.')
         const data = await res.json()
         setQuest(data)

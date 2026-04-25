@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface ManagerProfileRepository extends JpaRepository<ManagerProfileEntity, Long> {
-    java.util.Optional<ManagerProfileEntity> findByUserId(Long userId);
+    Optional<ManagerProfileEntity> findByUserId(Long userId);
     Optional<ManagerProfileEntity> findByUserUsername(String username);
 
 }

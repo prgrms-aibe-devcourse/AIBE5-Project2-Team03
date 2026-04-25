@@ -12,4 +12,5 @@ public interface QuestRepository extends JpaRepository<Quest, Long> {
     List<Quest> findByStatus(QuestStatus status);
     List<Quest> findByManagerId(ManagerProfileEntity managerId);
     List<Quest> findByManagerId_Id(Long managerProfileId);
+    List<Quest> findAllByManagerId(ManagerProfileEntity manager);
 }

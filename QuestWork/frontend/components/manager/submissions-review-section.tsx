@@ -26,6 +26,7 @@ interface Submission {
 
 interface SubmissionsReviewSectionProps {
   submissions: Submission[]
+  userId?: number | null
 }
 
 const statusBadgeColor = {
@@ -41,13 +42,68 @@ const statusLabel = {
 }
 
 export function SubmissionsReviewSection({
-  submissions,
+  submissions: initialSubmissions,
+  userId,
 }: SubmissionsReviewSectionProps) {
-  const [selectedSubmission, setSelectedSubmission] =
-    useState<Submission | null>(null)
+  const [submissions, setSubmissions] = useState<Submission[]>(initialSubmissions)
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
+  const [selectingId, setSelectingId] = useState<string | null>(null)
+  const [selectError, setSelectError] = useState<string | null>(null)
+
+  // initialSubmissions가 바뀌면 동기화
+  useState(() => {
+    setSubmissions(initialSubmissions)
+  })
+
+  const handleSelectWinner = async (submissionId: string) => {
+    const submission = submissions.find((s) => s.id === submissionId)
+    if (!submission) return
+
+    const uid = userId ?? Number(localStorage.getItem('userId'))
+    if (!uid) {
+      setSelectError('로그인이 필요합니다.')
+      return
+    }
+
+    setSelectingId(submissionId)
+    setSelectError(null)
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/manager/quests/${submission.questId}/winner?userId=${uid}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ submissionId: Number(submissionId) }),
+        },
+      )
+      if (!res.ok) {
+        const text = await res.text()
+        throw new Error(text || '우승자 선정에 실패했습니다.')
+      }
+
+      // 로컬 상태 업데이트: 해당 제출물 → winner
+      setSubmissions((prev) =>
+        prev.map((s) =>
+          s.questId === submission.questId
+            ? { ...s, status: s.id === submissionId ? 'winner' : 'rejected' }
+            : s,
+        ),
+      )
+    } catch (e) {
+      setSelectError(e instanceof Error ? e.message : '오류가 발생했습니다.')
+    } finally {
+      setSelectingId(null)
+      setSelectedSubmission(null)
+    }
+  }
 
   return (
     <>
+      {selectError && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {selectError}
+        </div>
+      )}
       <Card className="border border-border shadow-none">
         <div className="p-6">
           <div className="mb-4">
@@ -102,6 +158,7 @@ export function SubmissionsReviewSection({
                       <Button
                         variant="outline"
                         size="sm"
+                        disabled={submission.status !== 'reviewing' || !!selectingId}
                         onClick={() => setSelectedSubmission(submission)}
                       >
                         검토하기
@@ -119,10 +176,8 @@ export function SubmissionsReviewSection({
         <SubmissionModal
           submission={selectedSubmission}
           onClose={() => setSelectedSubmission(null)}
-          onSelect={(id) => {
-            console.log('[manager-dashboard] Winner selected:', id)
-            setSelectedSubmission(null)
-          }}
+          onSelect={handleSelectWinner}
+          isSelecting={selectingId === selectedSubmission.id}
         />
       )}
     </>

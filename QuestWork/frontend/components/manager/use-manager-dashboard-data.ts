@@ -1,55 +1,98 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { getStoredSubmissions } from '@/lib/quest-submissions'
+import { useEffect, useState } from 'react'
 
-interface StoredSubmission {
+export interface ManagerSubmission {
   id: string
+  submissionId: number
   freelancerName: string
   questTitle: string
   questId: string
+  memberId: number
+  rewardAmount: number
   submittedAt: string
   status: 'reviewing' | 'winner' | 'rejected'
   githubUrl: string
 }
 
+function mapSubmissionStatus(apiStatus: string): 'reviewing' | 'winner' | 'rejected' {
+  if (apiStatus === 'WINNER') return 'winner'
+  if (apiStatus === 'REJECTED') return 'rejected'
+  return 'reviewing'
+}
+
 export function useManagerDashboardData() {
   const [dbQuests, setDbQuests] = useState<any[]>([])
+  const [allSubmissions, setAllSubmissions] = useState<ManagerSubmission[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null)
   const [userId, setUserId] = useState<number | null>(null)
-  const [savedSubmissions, setSavedSubmissions] = useState<StoredSubmission[]>(
-    [],
-  )
 
   useEffect(() => {
-    const savedId =
-      localStorage.getItem('userId') || localStorage.getItem('id')
+    const savedId = localStorage.getItem('userId') || localStorage.getItem('id')
     const role = localStorage.getItem('role')
-
     setIsAuthorized(role === 'MANAGER')
-
-    if (savedId) {
-      setUserId(Number(savedId))
-    }
+    if (savedId) setUserId(Number(savedId))
   }, [])
 
   useEffect(() => {
-    const fetchQuests = async () => {
+    const fetchData = async () => {
       if (!userId) return
-
       setIsLoading(true)
       try {
-        const response = await fetch(
-          `http://localhost:8000/api/quests/manager/${userId}`,
+        // 1. 매니저 퀘스트 목록 조회
+        const questRes = await fetch(
+          `http://localhost:8000/api/manager/quests?userId=${userId}`,
+        )
+        if (!questRes.ok) throw new Error('Failed to load manager quests')
+        const rawQuests: any[] = await questRes.json()
+
+        // questId → id 매핑 (PostedQuestsSection 호환)
+        const mappedQuests = rawQuests.map((q) => ({
+          id: q.questId,
+          questId: q.questId,
+          title: q.title,
+          rewardAmount: Number(q.rewardAmount),
+          status: q.status,
+          deadline: q.deadline,
+          createdAt: q.createdAt,
+          description: '',
+          submissionsCount: 0,
+        }))
+
+        // 2. 각 퀘스트의 제출물 목록 조회
+        const submissionPromises = mappedQuests.map((quest) =>
+          fetch(
+            `http://localhost:8000/api/manager/quests/${quest.questId}/submissions?userId=${userId}`,
+          )
+            .then((r) => (r.ok ? r.json() : []))
+            .then((subs: any[]) =>
+              subs.map<ManagerSubmission>((sub) => ({
+                id: String(sub.submissionId),
+                submissionId: sub.submissionId,
+                freelancerName: sub.nickname,
+                questTitle: quest.title,
+                questId: String(quest.questId),
+                memberId: sub.memberId,
+                rewardAmount: quest.rewardAmount,
+                submittedAt: sub.submittedAt?.split('T')[0] ?? '',
+                status: mapSubmissionStatus(sub.status),
+                githubUrl: sub.repoUrl || sub.fileUrl || '',
+              })),
+            ),
         )
 
-        if (!response.ok) {
-          throw new Error('Failed to load manager quests')
-        }
+        const submissionResults = await Promise.all(submissionPromises)
+        const allSubs = submissionResults.flat()
 
-        const data = await response.json()
-        setDbQuests(data)
+        // 제출 수 업데이트
+        const questsWithCount = mappedQuests.map((q) => ({
+          ...q,
+          submissionsCount: allSubs.filter((s) => s.questId === String(q.questId)).length,
+        }))
+
+        setDbQuests(questsWithCount)
+        setAllSubmissions(allSubs)
       } catch (error) {
         console.error('Fetch Error:', error)
       } finally {
@@ -58,59 +101,14 @@ export function useManagerDashboardData() {
     }
 
     if (isAuthorized === true) {
-      fetchQuests()
+      fetchData()
     }
   }, [isAuthorized, userId])
 
-  useEffect(() => {
-    const stored = getStoredSubmissions().map((submission) => ({
-      id: submission.id,
-      freelancerName: submission.freelancerName,
-      questTitle: submission.questTitle,
-      questId: submission.questId,
-      submittedAt: submission.submittedAt,
-      status: 'reviewing' as const,
-      githubUrl:
-        submission.githubUrl ??
-        `File submission: ${submission.fileName ?? 'attachment'}`,
-    }))
-
-    setSavedSubmissions(stored)
-  }, [])
-
-  const mockSubmissions = useMemo(
-    () => [
-      {
-        id: 'mock-1',
-        freelancerName: 'Kim Developer',
-        questTitle: 'React Admin Dashboard Performance Optimization',
-        questId: '1',
-        submittedAt: '2024-04-10',
-        status: 'reviewing' as const,
-        githubUrl: 'https://github.com/example/react-dashboard',
-      },
-    ],
-    [],
-  )
-
-  const allSubmissions = useMemo(
-    () => [...savedSubmissions, ...mockSubmissions],
-    [mockSubmissions, savedSubmissions],
-  )
-
-  const activeQuestCount = dbQuests.filter(
-    (quest) => quest.status === 'OPEN',
-  ).length
-  const closedQuestCount = dbQuests.filter(
-    (quest) => quest.status !== 'OPEN',
-  ).length
-  const totalRewardBudget = dbQuests.reduce(
-    (acc, quest) => acc + (quest.rewardAmount || 0),
-    0,
-  )
-  const reviewingCount = allSubmissions.filter(
-    (submission) => submission.status === 'reviewing',
-  ).length
+  const activeQuestCount = dbQuests.filter((q) => q.status === 'OPEN').length
+  const closedQuestCount = dbQuests.filter((q) => q.status !== 'OPEN').length
+  const totalRewardBudget = dbQuests.reduce((acc, q) => acc + (q.rewardAmount || 0), 0)
+  const reviewingCount = allSubmissions.filter((s) => s.status === 'reviewing').length
 
   return {
     dbQuests,
