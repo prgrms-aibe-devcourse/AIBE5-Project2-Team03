@@ -36,6 +36,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
   const [nickname, setNickname] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [role, setRole] = useState<"USER" | "MEMBER" | "MANAGER" | "ADMIN">(
     "USER",
@@ -67,47 +68,69 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
     };
 
   useEffect(() => {
-    setUsername(localStorage.getItem("username"));
-    setNickname(localStorage.getItem("nickname"));
-    setProfileImage(
-      localStorage.getItem("profileImage") || localStorage.getItem("avatar"),
-    );
+    // 💡 데이터를 불러오는 로직을 함수로 분리
+    const loadUserData = () => {
+      const storedId = localStorage.getItem("userId");
+      const storedNickname = localStorage.getItem("nickname");
+      const storedUsername = localStorage.getItem("username");
+      const storedProfileImage = localStorage.getItem("profileImage") || localStorage.getItem("avatar");
+      const storedRole = localStorage.getItem("role") as any;
 
-    const storedRole = localStorage.getItem("role") as
-      | "USER"
-      | "MEMBER"
-      | "MANAGER"
-      | "ADMIN"
-      | null;
+      setUserId(storedId);
+      setNickname(storedNickname);
+      setUsername(storedUsername);
+      setProfileImage(storedProfileImage);
+      setRole(storedRole || "USER");
+    };
 
-    setRole(storedRole || "USER");
+    // 1. 컴포넌트 마운트 시 실행
+    loadUserData();
+
+    // 2. 💡 소셜 로그인 후 저장될 때의 변화를 감지하기 위해 storage 이벤트 리스너 추가
+    window.addEventListener("storage", loadUserData);
+    return () => window.removeEventListener("storage", loadUserData);
   }, []);
 
   const isAuthenticated = isLoggedIn || Boolean(nickname);
+
+  // 💡 프로필 경로 우선순위 조정: 소셜 로그인 유저는 userId(PK)가 필수입니다.
+  // userId가 없으면 username을, 둘 다 없으면 기본 profile 경로로 보냅니다.
+  const profileHref = userId
+      ? `/profile/${userId}`
+      : (username ? `/profile/${username}` : "/profile");
+
   const userProfileImage =
-    profileImage ||
-    `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
-      nickname || "questwork-user",
-    )}`;
-  const profileHref = `/profile/${encodeURIComponent(username || "")}`;
+      profileImage ||
+      `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
+          nickname || "questwork-user",
+      )}`;
+
   const avatarFallback = nickname?.trim().slice(0, 1).toUpperCase() || "Q";
+
   const dashboardHref = !isAuthenticated
-    ? "/login"
-    : role === "MANAGER"
-      ? "/manager"
-      : "/dashboard";
+      ? "/login"
+      : role === "MANAGER"
+          ? "/manager"
+          : "/dashboard";
 
   const handleLogout = () => {
+    // 💡 로그아웃 시 모든 정보 삭제
+    localStorage.removeItem("userId");
     localStorage.removeItem("username");
     localStorage.removeItem("nickname");
     localStorage.removeItem("profileImage");
     localStorage.removeItem("avatar");
     localStorage.removeItem("role");
+
+    setUserId(null);
     setUsername(null);
     setNickname(null);
     setProfileImage(null);
     setRole("USER");
     setIsUserMenuOpen(false);
+
+    // 로그아웃 후 홈으로 이동하거나 새로고침
+    window.location.href = "/";
   };
 
   return (

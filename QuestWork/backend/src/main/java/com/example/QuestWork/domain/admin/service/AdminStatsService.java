@@ -34,34 +34,30 @@ public class AdminStatsService {
 
         System.out.println("======= ADMIN DASHBOARD LOG START =======");
 
-        // 1. 오늘 발생 수수료 수익 (기준 컬럼을 paidAt으로 변경한 쿼리 호출)
-        // 이제 파라미터를 넘기지 않고 DB의 CURRENT_DATE를 사용합니다.
+        // 1. 오늘 수익
         BigDecimal todayFee = paymentRepository.calculateTodayFee();
-        System.out.println("1. Today Fee Result (based on paidAt): " + todayFee);
-
-        // 2. 인출 가능 잔액 (누적 수수료 합계)
+        // 2. 이번 달 수익
+        BigDecimal monthFee = paymentRepository.calculateMonthFee();
+        // 3. 인출 가능 잔액 (누적 수익)
         BigDecimal totalAccumulatedFee = paymentRepository.sumAllFees();
-        System.out.println("2. Total Accumulated Fee Result: " + totalAccumulatedFee);
-
-        // 3. 현재 LOCKED 상태인 에스크로 총액
+        // 4. 예치 잔액 (에스크로)
         BigDecimal lockedAmount = escrowRepository.sumAmountByStatus("LOCKED");
-        System.out.println("3. Total Locked Amount: " + lockedAmount);
-
-        // 4. 출금 대기 건수
+        // 5. 출금 대기 건수
         long pendingWithdrawals = withdrawRepository.countByStatus(WithdrawStatus.REQUESTED);
-        System.out.println("4. Pending Withdrawals Count: " + pendingWithdrawals);
 
-        // 5. 최근 7일간 거래 추이
-        List<DailyRevenueDto> dailyRevenues = escrowRepository.getDailyReleasedAmount(startOfToday.minusDays(7));
-
-        System.out.println("======= ADMIN DASHBOARD LOG END =======");
+        // [수정] 인터페이스 프로젝션을 사용하여 주간/월간 데이터 가져오기
+        // Repository의 반환 타입이 List<DailyRevenueProjection>이어야 합니다.
+        List<DailyRevenueDto.DailyRevenueProjection> dailyRevenues = paymentRepository.getWeeklyRevenueStats();
+        List<DailyRevenueDto.DailyRevenueProjection> monthlyRevenues = paymentRepository.getMonthlyRevenueStats();
 
         return AdminStatsResponse.builder()
                 .todayFeeRevenue(todayFee != null ? todayFee : BigDecimal.ZERO)
+                .monthFeeRevenue(monthFee != null ? monthFee : BigDecimal.ZERO)
                 .availableBalance(totalAccumulatedFee != null ? totalAccumulatedFee : BigDecimal.ZERO)
                 .totalLockedEscrow(lockedAmount != null ? lockedAmount : BigDecimal.ZERO)
                 .pendingWithdrawalCount(pendingWithdrawals)
-                .dailyRevenues(dailyRevenues != null ? dailyRevenues : new ArrayList<>())
+                .dailyRevenues(dailyRevenues)     // 인터페이스 리스트 전달
+                .monthlyRevenues(monthlyRevenues) // 인터페이스 리스트 전달
                 .build();
     }
 }
