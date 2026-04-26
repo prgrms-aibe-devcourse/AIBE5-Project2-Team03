@@ -51,6 +51,10 @@ public class QuestApplication {
                 this.status = ApplicationStatus.CANCELED;
         }
 
+        public void reApply() {
+                this.status = ApplicationStatus.APPLIED;
+        }
+
         public static QuestApplication create(Quest quest, MemberProfileEntity member) {
                 return QuestApplication.builder()
                         .quest(quest).member(member).status(ApplicationStatus.APPLIED)

@@ -13,6 +13,7 @@ public interface QuestRepository extends JpaRepository<Quest, Long> {
     List<Quest> findByStatus(QuestStatus status);
     List<Quest> findByManagerId(ManagerProfileEntity managerId);
     List<Quest> findByManagerId_Id(Long managerProfileId);
+    List<Quest> findAllByManagerId(ManagerProfileEntity manager);
 
     @Query("SELECT COUNT(q) FROM Quest q WHERE q.status IN ('OPEN', 'IN_PROGRESS')")
     long countActiveQuests();

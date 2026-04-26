@@ -2,30 +2,75 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { GlobalNav } from '@/components/global-nav'
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+<<<<<<< HEAD
 import {
   formatSubmissionStatus,
   getStoredSubmissions,
   type StoredSubmission,
 } from '@/lib/quest-submissions'
+=======
+
+interface Submission {
+  submissionId: number
+  questId: number
+  questTitle: string
+  submissionTitle: string
+  status: string
+  submittedAt: string
+  repoUrl: string | null
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  SUBMITTED: '제출 완료',
+  UPDATED: '수정 완료',
+  WINNER: '우승자 선정',
+}
+>>>>>>> origin/kyungsu
 
 const STATUS_CLASS: Record<string, string> = {
-  '선정 완료': 'bg-green-100 text-green-700',
-  '검토 중': 'bg-blue-100 text-blue-700',
-  '제출 완료': 'bg-primary-light text-primary',
+  SUBMITTED: 'bg-blue-100 text-blue-700',
+  UPDATED: 'bg-primary-light text-primary',
+  WINNER: 'bg-green-100 text-green-700',
 }
 
 export default function MySubmissionsPage() {
+<<<<<<< HEAD
   const [submissions, setSubmissions] = useState<StoredSubmission[]>([])
 
   useEffect(() => {
     const userId = localStorage.getItem('userId')
     setSubmissions(getStoredSubmissions(userId))
   }, [])
+=======
+  const router = useRouter()
+  const [submissions, setSubmissions] = useState<Submission[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId')
+    if (!userId) { router.push('/login'); return }
+
+    const fetchSubmissions = async () => {
+      try {
+        const res = await fetch(`http://localhost:8000/api/quests/my-submissions?userId=${userId}`)
+        if (!res.ok) throw new Error('제출물 조회 실패')
+        const data: Submission[] = await res.json()
+        setSubmissions(data)
+      } catch (e) {
+        console.error(e)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchSubmissions()
+  }, [router])
+>>>>>>> origin/kyungsu
 
   return (
     <div className="min-h-screen bg-background">
@@ -42,6 +87,7 @@ export default function MySubmissionsPage() {
           </p>
         </div>
 
+<<<<<<< HEAD
         <Card className="border border-border">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -113,9 +159,73 @@ export default function MySubmissionsPage() {
                   </tr>
                 )}
               </tbody>
+=======
+        {loading ? (
+          <p className="text-sm text-foreground-muted">불러오는 중...</p>
+        ) : submissions.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border p-12 text-center">
+            <p className="text-sm text-foreground-muted">아직 제출한 결과물이 없습니다.</p>
+            <Button asChild className="mt-4 bg-primary text-primary-foreground hover:bg-primary-hover">
+              <Link href="/quests">퀘스트 둘러보기</Link>
+            </Button>
+          </div>
+        ) : (
+          <Card className="border border-border">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-surface">
+                    <th className="px-4 py-4 text-left font-semibold text-foreground">퀘스트</th>
+                    <th className="px-4 py-4 text-left font-semibold text-foreground">제출 제목</th>
+                    <th className="px-4 py-4 text-left font-semibold text-foreground">제출일</th>
+                    <th className="px-4 py-4 text-left font-semibold text-foreground">상태</th>
+                    <th className="px-4 py-4 text-right font-semibold text-foreground">링크 / 상세</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {submissions.map((s) => (
+                    <tr
+                      key={s.submissionId}
+                      className="border-b border-border transition-colors last:border-b-0 hover:bg-surface"
+                    >
+                      <td className="px-4 py-4">
+                        <p className="font-medium text-foreground">{s.questTitle}</p>
+                        <p className="mt-0.5 text-xs text-foreground-muted">Quest #{s.questId}</p>
+                      </td>
+                      <td className="px-4 py-4 text-foreground-muted max-w-[200px] truncate">
+                        {s.submissionTitle}
+                      </td>
+                      <td className="px-4 py-4 text-foreground-muted whitespace-nowrap">
+                        {s.submittedAt ? s.submittedAt.split('T')[0] : '-'}
+                      </td>
+                      <td className="px-4 py-4">
+                        <Badge className={STATUS_CLASS[s.status] ?? 'bg-slate-100 text-slate-700'}>
+                          {STATUS_LABEL[s.status] ?? s.status}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-4 text-right space-x-2">
+                        {s.repoUrl && (
+                          <a
+                            href={s.repoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary underline mr-2"
+                          >
+                            GitHub
+                          </a>
+                        )}
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/quests/${s.questId}`}>보기</Link>
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+>>>>>>> origin/kyungsu
               </table>
             </div>
           </Card>
+        )}
       </DashboardShell>
     </div>
   )

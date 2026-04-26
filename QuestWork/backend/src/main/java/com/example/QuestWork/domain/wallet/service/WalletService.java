@@ -2,8 +2,11 @@ package com.example.QuestWork.domain.wallet.service;
 
 import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
 import com.example.QuestWork.domain.member.repository.MemberProfileRepository;
+import com.example.QuestWork.domain.escrows.repository.EscrowRepository;
 import com.example.QuestWork.domain.payment.entity.Payment;
 import com.example.QuestWork.domain.payment.repository.PaymentRepository;
+import com.example.QuestWork.domain.quest.constant.QuestStatus;
+import com.example.QuestWork.domain.quest.repository.QuestRepository;
 import com.example.QuestWork.domain.wallet.entity.WalletEntity;
 import com.example.QuestWork.domain.wallet.entity.WalletTransaction;
 import com.example.QuestWork.domain.wallet.repository.WalletRepository;
@@ -26,6 +29,8 @@ public class WalletService {
     private final WithdrawRequestRepository withdrawRequestRepository;
     private final MemberProfileRepository memberProfileRepository;
     private final PaymentRepository paymentRepository;
+    private final EscrowRepository escrowRepository;
+    private final QuestRepository questRepository;
 
     /**
      * 1. 출금 신청 (사용자)
@@ -117,6 +122,26 @@ public class WalletService {
 
         wallet.addBalance(finalAmount);
         walletRepository.save(wallet);
+
+        // 에스크로 RELEASED 처리
+        escrowRepository.findByQuestId(questId).ifPresent(escrow -> {
+            if ("LOCKED".equals(escrow.getStatus())) {
+                escrow.release();
+                escrowRepository.save(escrow);
+            }
+        });
+
+        // Payment RELEASED 처리 (통계 쿼리 정합성)
+        paymentRepository.findByQuestIdAndMemberId(questId, freelancerId).ifPresent(payment -> {
+            payment.markAsReleased();
+            paymentRepository.save(payment);
+        });
+
+        // 퀘스트 상태 FINISHED로 변경
+        questRepository.findById(questId).ifPresent(quest -> {
+            quest.updateStatus(QuestStatus.FINISHED);
+            questRepository.save(quest);
+        });
 
         // Payment에서 originalAmount와 fee 가져오기 (없으면 계산된 값 사용)
         Payment payment = paymentRepository.findByQuestIdAndMemberId(questId, freelancerId).orElse(null);

@@ -52,4 +52,8 @@ public class Payment {
         this.paidAt = paidAt;
         this.createdAt = createdAt;
     }
+
+    public void markAsReleased() {
+        this.status = "RELEASED";
+    }
 }

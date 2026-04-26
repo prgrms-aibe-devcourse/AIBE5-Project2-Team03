@@ -22,7 +22,7 @@ import { User, Briefcase, DollarSign, Award, Settings, Save, X, Link2, Lock, Cal
 
 // 인터페이스 정의 (기존과 동일)
 interface FreelancerProfile {
-  userId?: number | string
+  userId: number
   username: string
   nickname: string
   profileImageUrl: string | null
@@ -60,7 +60,12 @@ const TECH_STACK_OPTIONS = [
   'HTML', 'CSS', 'Tailwind CSS', 'GraphQL', 'REST API', 'Git', 'Linux', 'Firebase', 'Supabase'
 ]
 
+<<<<<<< HEAD:QuestWork/frontend/app/profile/[id]/page.tsx
 export default function ProfilePage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
+=======
+// 진행 중 퀘스트 모의 데이터 제거 - 실제 API에서 가져옵니다
+export default function ProfilePage({ params: paramsPromise }: { params: Promise<{ username: string }> }) {
+>>>>>>> origin/kyungsu:QuestWork/frontend/app/profile/[username]/page.tsx
   const params = use(paramsPromise);
   const [profile, setProfile] = useState<FreelancerProfile | null>(null)
   const [draft, setDraft] = useState<ProfileDraft | null>(null)
@@ -78,19 +83,36 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
   const [withdrawAmount, setWithdrawAmount] = useState('')
   const [withdrawError, setWithdrawError] = useState('')
   const [withdrawSubmitting, setWithdrawSubmitting] = useState(false)
+<<<<<<< HEAD:QuestWork/frontend/app/profile/[id]/page.tsx
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [quests, setQuests] = useState<StoredAppliedQuest[]>([])
+=======
+  const [appliedQuests, setAppliedQuests] = useState<Array<{id: number, title: string, deadline: string, status: string}>>([])
+>>>>>>> origin/kyungsu:QuestWork/frontend/app/profile/[username]/page.tsx
 
+  const fetchAppliedQuests = async (userId: number) => {
+    try {
+      const res = await fetch(`http://localhost:8000/api/quests/applied?userId=${userId}`)
+      if (!res.ok) return
+      const data = await res.json()
+      setAppliedQuests(data.map((q: any) => ({
+        id: q.id,
+        title: q.title,
+        deadline: q.deadline ? q.deadline.split(' ')[0] : '',
+        status: '진행중'
+      })))
+    } catch {
+      // ignore
+    }
+  }
 
-
-  // 1. 지갑 정보 가져오기 (API 주소를 8000번 포트로 통일 권장)
-  const fetchWallet = async (userId: number | string) => {
+  const fetchWallet = async (userId: number) => {
     setWalletLoading(true);
     try {
       const response = await fetch(`http://localhost:8000/api/settlement/wallet/${userId}`);
       if (!response.ok) throw new Error("지갑 정보 로드 실패");
       const data = await response.json();
-      setWalletBalance(data.balance);
+      setWalletBalance(data.balance); // 여기서 잔액이 업데이트됩니다.
     } catch (error) {
       console.error("Wallet fetch error:", error);
       setWalletBalance(0);
@@ -99,13 +121,12 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
     }
   };
 
-  // 2. ⭐ 프로필 정보 가져오기 (params.id 사용)
+  // 2. ⭐ fetchProfile을 useEffect 밖으로 꺼내서 정의합니다.
   const fetchProfile = async () => {
-    const currentId = params.id; // 주소창의 숫자 ID ([id] 폴더명 기준)
+    const decodedUsername = decodeURIComponent(params.username);
     setIsLoading(true);
     try {
-      // 💡 여기서 에러 났을 거예요. 정의되지 않은 userId 대신 currentId 사용!
-      const response = await fetch(`http://127.0.0.1:8000/api/user/${currentId}`);
+      const response = await fetch(`http://localhost:8000/api/user/${decodedUsername}`);
       if (!response.ok) throw new Error("프로필 로드 실패");
 
       const data = await response.json();
@@ -120,9 +141,9 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
         techStack: data.techStack || []
       });
 
-      // 데이터 안에 userId(PK)가 있으면 지갑 정보 호출
-      if (data.userId || currentId) {
-        fetchWallet(data.userId || currentId);
+      if (data.userId) {
+        fetchWallet(data.userId);
+        fetchAppliedQuests(data.userId);
       }
     } catch (error) {
       console.error("❌ 프로필 로드 에러:", error);
@@ -131,31 +152,28 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
     }
   };
 
-  // 3. 페이지 진입 시 실행 (username -> id로 감시 대상 변경)
+// 3. 페이지 로드 시에는 fetchProfile만 호출
   useEffect(() => {
-    if (params.id) {
+    if (params.username) {
       fetchProfile();
     }
-  }, [params.id]);
+  }, [params.username]);
 
+<<<<<<< HEAD:QuestWork/frontend/app/profile/[id]/page.tsx
   useEffect(() => {
     const userId = localStorage.getItem('userId')
     setQuests(getStoredAppliedQuests(userId))
   }, [])
 
   // 4. ⭐ 출금 핸들러 (요청하신 대로 유지 및 보완)
+=======
+// 4. 출금 핸들러 수정
+>>>>>>> origin/kyungsu:QuestWork/frontend/app/profile/[username]/page.tsx
   const handleWithdrawSubmit = async () => {
     setWithdrawError('');
     const amountNumber = Number(withdrawAmount.replace(/,/g, ''));
 
-    // DB PK인 userId가 필요합니다. (profile 데이터에 담겨있어야 함)
-    const targetUserId = profile?.userId || params.id;
-
-    if (!targetUserId) {
-      alert("사용자 정보를 확인할 수 없습니다.");
-      return;
-    }
-
+    if (!profile?.userId) return;
     // ... (유효성 검사 로직 생략) ...
 
     setWithdrawSubmitting(true);
@@ -164,7 +182,7 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: targetUserId,
+          userId: profile.userId,
           amount: amountNumber,
           bankName: withdrawBank,
           accountNumber: withdrawAccount,
@@ -178,11 +196,17 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
       }
 
       alert('출금 신청이 완료되었습니다.');
+
+      // 모달 및 입력값 초기화
       setIsWithdrawOpen(false);
+      setWithdrawBank('국민');
+      setWithdrawHolder('');
+      setWithdrawAccount('');
       setWithdrawAmount('');
 
-      // 갱신 호출
-      await fetchWallet(targetUserId);
+      // ⭐ 핵심: 여기서 두 함수를 호출하여 화면을 갱신합니다.
+      // fetchProfile이 밖으로 나왔기 때문에 이제 정상 호출됩니다!
+      await fetchWallet(profile.userId);
       await fetchProfile();
 
     } catch (error: any) {
@@ -192,55 +216,119 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
       setWithdrawSubmitting(false);
     }
   };
+  // 5. 파일 변경 핸들러 (이게 없어서 에러가 났던 겁니다!)
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const result = event.target?.result as string
+        // 이미지 미리보기를 위해 draft 상태 업데이트
+        setDraft((prev: any) => prev ? { ...prev, profileImageUrl: result } : null)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
-  // 5. 프로필 저장 로직 (params.id 기반)
+// 6. 입력값 변경 핸들러 (혹시 이것도 에러 나면 추가하세요)
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setDraft((prev: any) => prev ? { ...prev, [name]: value } : null)
+  }
+
+  const addQuest = () => {
+    if (selectedDate && newQuestTitle.trim()) {
+      setAppliedQuests(prev => [...prev, {
+        id: Date.now(),
+        title: newQuestTitle,
+        status: newQuestStatus,
+        deadline: selectedDate.toISOString().split('T')[0]
+      }])
+      setNewQuestTitle('')
+      setNewQuestStatus('진행중')
+      setSelectedDate(undefined)
+      setIsDialogOpen(false)
+    }
+  }
+
+  const getNextDeadline = () => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const futureQuests = appliedQuests.filter(quest => new Date(quest.deadline) >= today)
+        .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
+
+    if (futureQuests.length === 0) return null
+
+    const nextQuest = futureQuests[0]
+    const deadlineDate = new Date(nextQuest.deadline)
+    const daysDiff = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+    return {
+      title: nextQuest.title,
+      days: daysDiff === 0 ? 'D-Day' : `D-${daysDiff}`
+    }
+  }
+
   const saveProfile = async () => {
-    if (!draft || !params.id) return;
+    if (!draft || !profile) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/api/user/${params.id}`, {
+      // 1. 백엔드 API 호출 (주소: /api/user/[username], 메서드: PUT)
+      const response = await fetch(`http://localhost:8000/api/user/${profile.username}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // 백엔드 MemberUpdateDto 필드명에 맞춰서 전송
         body: JSON.stringify({
           nickname: draft.nickname,
-          profileImageUrl: draft.profileImageUrl,
           intro: draft.intro,
+          level: draft.level, // "BRONZE", "SILVER" 등 대문자 문자열
           portfolioUrl: draft.portfolioUrl,
-          level: draft.level,
-          totalCareerYears: Number(draft.totalCareerYears),
-          techStack: draft.techStack
+          totalCareerYears: Number(draft.totalCareerYears), // 반드시 숫자로 변환
+          techStack: draft.techStack // 💡 기술 스택 데이터 추가
         }),
       });
 
-      if (!response.ok) throw new Error("서버 저장 실패");
+      // 2. 응답 결과 확인
+      if (!response.ok) {
+        // 403이나 500 에러가 나면 여기서 걸러집니다.
+        const errorData = await response.text();
+        console.error("서버 응답 에러:", errorData);
+        throw new Error("서버 저장 실패");
+      }
 
-      // UI 갱신
-      await fetchProfile();
+      // 3. 서버 저장 성공 시 프론트엔드 상태(UI) 업데이트
+      setProfile({
+        ...profile,
+        nickname: draft.nickname,
+        profileImageUrl: draft.profileImageUrl,
+        intro: draft.intro,
+        portfolioUrl: draft.portfolioUrl,
+        level: draft.level,
+        totalCareerYears: Number(draft.totalCareerYears),
+        techStack: draft.techStack
+      });
+
       setIsEditing(false);
-      alert("프로필이 성공적으로 저장되었습니다!");
-    } catch (error) {
+      alert("프로필이 성공적으로 저장되었습니다!");    } catch (error) {
+      // 네트워크 장애나 위에서 던진 Error 처리
       console.error("저장 중 에러 발생:", error);
-      alert("저장에 실패했습니다.");
+      alert("저장에 실패했습니다. 서버 로그나 주소를 확인해주세요.");
     }
   };
-
-  // 1. 비밀번호 입력값을 담을 데이터 상자
+  // 비밀번호 변경 모달 상태
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [passwordDraft, setPasswordDraft] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-
-// 2. 비밀번호 변경 버튼 로딩 상태
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
 
-// 3. (추가로) handleInputChange 함수가 없다면 이것도 필요합니다
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setDraft(prev => prev ? { ...prev, [name]: value } : null);
-  };
-  // 6. 비밀번호 수정 로직 (params.id 기반)
   const handlePasswordChange = async () => {
+    // 1. 유효성 검사
     if (passwordDraft.newPassword !== passwordDraft.confirmPassword) {
       alert("새 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
       return;
@@ -248,7 +336,7 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
 
     setIsPasswordLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/user/${params.id}/password`, {
+      const response = await fetch(`http://localhost:8000/api/user/${profile?.username}/password`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -271,10 +359,8 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
       setIsPasswordLoading(false);
     }
   };
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
+<<<<<<< HEAD:QuestWork/frontend/app/profile/[id]/page.tsx
     // 1. 미리보기 기능을 원한다면 (선택 사항)
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -302,6 +388,8 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
     const days = Math.ceil((new Date(upcoming.rawDeadline ?? '').getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     return { title: upcoming.title, days: days === 0 ? 'D-Day' : `D-${days}` };
   };
+=======
+>>>>>>> origin/kyungsu:QuestWork/frontend/app/profile/[username]/page.tsx
 
   if (isLoading) return <div className="flex h-screen items-center justify-center font-bold text-xl">유저 데이터를 가져오는 중입니다...</div>
   if (!profile) return <div className="flex h-screen items-center justify-center font-bold text-red-500">유저 정보를 찾을 수 없습니다.</div>
@@ -312,7 +400,7 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
 
         {/* 💡 상단 프로필 헤더 비주얼 강화 */}
         <section className="relative overflow-hidden bg-white pt-32 pb-8">
-          <div className="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 relative">
+          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 relative">
             <div className="flex flex-row items-center gap-8">
               {/* 이미지 수정 부분 */}
               <div className="relative group">
@@ -374,7 +462,7 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
                                 비밀번호 변경
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px] rounded-2xl">
+                            <DialogContent className="sm:max-w-106.25 rounded-2xl">
                               <div className="grid gap-6 py-6">
                                 <div className="space-y-2">
                                   <Label>현재 비밀번호</Label>
@@ -443,7 +531,7 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
         </section>
 
         {/* 💡 메인 레이아웃 분할 */}
-        <main className="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 py-20">
+        <main className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 py-20">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
 
             {/* 왼쪽 컬럼: 소개 & 스킬 */}
@@ -513,9 +601,13 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
                               setSelectedDate(date)
                             }}
                             modifiers={{
+<<<<<<< HEAD:QuestWork/frontend/app/profile/[id]/page.tsx
                               deadline: quests
                                 .map(q => q.rawDeadline ? new Date(q.rawDeadline) : null)
                                 .filter((date): date is Date => date !== null && !Number.isNaN(date.getTime()))
+=======
+                              deadline: appliedQuests.map(q => new Date(q.deadline))
+>>>>>>> origin/kyungsu:QuestWork/frontend/app/profile/[username]/page.tsx
                             }}
                             modifiersClassNames={{
                               deadline: "bg-purple-200 text-purple-800 font-semibold"
@@ -540,6 +632,7 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
                       ))}
                     </div>
                     <div className="space-y-6 max-h-96 overflow-y-auto">
+<<<<<<< HEAD:QuestWork/frontend/app/profile/[id]/page.tsx
                       {quests.filter(quest => questFilter === '전체' || quest.status === questFilter).length > 0 ? (
                         quests.filter(quest => questFilter === '전체' || quest.status === questFilter).map(quest => {
                           const today = new Date()
@@ -555,6 +648,14 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
                               : daysDiff > 0
                                 ? `D-${daysDiff}`
                                 : `D+${Math.abs(daysDiff)}`
+=======
+                      {appliedQuests.filter(quest => questFilter === '전체' || quest.status === questFilter).map(quest => {
+                        const today = new Date()
+                        today.setHours(0, 0, 0, 0)
+                        const deadlineDate = new Date(quest.deadline)
+                        const daysDiff = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+                        const dDisplay = daysDiff === 0 ? 'D-Day' : daysDiff > 0 ? `D-${daysDiff}` : `D+${Math.abs(daysDiff)}`
+>>>>>>> origin/kyungsu:QuestWork/frontend/app/profile/[username]/page.tsx
 
                           return (
                             <Card key={quest.questId} className="rounded-3xl p-8 hover:shadow-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-shadow duration-200 border-0">
@@ -594,17 +695,17 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
               {/* 통계 카드 그리드 */}
               <section className="space-y-4">
                 <Card className="rounded-3xl bg-white text-[#1e293b] shadow-[0_4px_20px_rgba(0,0,0,0.03)] p-8 flex items-center gap-4 border-0">
-                  <Coins size={48} className="opacity-80 flex-shrink-0 text-purple-600" />
+                  <Coins size={48} className="opacity-80 shrink-0 text-purple-600" />
                   <div>
                     <p className="text-sm font-medium opacity-90">누적 수익</p>
                     <p className="text-5xl font-extrabold tracking-tight">₩{profile.totalReward.toLocaleString()}</p>
                   </div>
                 </Card>
 
-                <Card className="rounded-3xl bg-gradient-to-r from-green-50 to-emerald-50 text-[#1e293b] shadow-[0_4px_20px_rgba(0,0,0,0.03)] p-8 border-0">
+                <Card className="rounded-3xl bg-linear-to-r from-green-50 to-emerald-50 text-[#1e293b] shadow-[0_4px_20px_rgba(0,0,0,0.03)] p-8 border-0">
                   {/* 위: 아이콘 + 텍스트 + 금액 */}
                   <div className="flex items-center gap-6 mb-6">
-                    <Wallet size={48} className="opacity-80 flex-shrink-0 text-green-600" />
+                    <Wallet size={48} className="opacity-80 shrink-0 text-green-600" />
                     <div className="flex-1">
                       <p className="text-sm font-medium opacity-90">내 지갑</p>
                       <p className="text-4xl lg:text-5xl font-extrabold tracking-tight text-green-700">
@@ -621,7 +722,7 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
                         출금 신청
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[520px] rounded-3xl">
+                    <DialogContent className="sm:max-w-130 rounded-3xl">
                       <DialogHeader>
                         <DialogTitle>출금 신청</DialogTitle>
                         <p className="text-sm text-slate-500 mt-2">은행 정보와 출금 금액을 입력하여 안전하게 요청하세요.</p>

@@ -50,9 +50,13 @@ export default function QuestApplyPage() {
 
     const fetchQuest = async () => {
       try {
+<<<<<<< HEAD
         const res = await fetch(`http://localhost:8000/api/quests/${questId}`, {
           signal: controller.signal,
         })
+=======
+        const res = await fetch(`http://localhost:8000/api/quests/${questId}`)
+>>>>>>> origin/kyungsu
         if (!res.ok) throw new Error('퀘스트 정보를 불러올 수 없습니다.')
         const data = await res.json()
         setQuest(data)

@@ -2,7 +2,7 @@ package com.example.QuestWork.domain.payment.service;
 
 
 import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
-import com.example.QuestWork.domain.member.repository.MemberProfileRepository;;
+import com.example.QuestWork.domain.member.repository.MemberProfileRepository;
 import com.example.QuestWork.domain.payment.entity.Payment;
 import com.example.QuestWork.domain.payment.repository.PaymentRepository;
 import com.example.QuestWork.domain.wallet.entity.WalletEntity;

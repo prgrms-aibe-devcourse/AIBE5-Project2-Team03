@@ -40,7 +40,7 @@ function normalizeFormData(formData: ApiQuest["formData"]): ApiQuestFormData {
 }
 
 export function formatQuestReward(amount: number): string {
-  return `원${amount.toLocaleString("ko-KR")}`;
+  return `₩${amount.toLocaleString("ko-KR")}`;
 }
 
 export function formatQuestDeadline(deadline: string): string {

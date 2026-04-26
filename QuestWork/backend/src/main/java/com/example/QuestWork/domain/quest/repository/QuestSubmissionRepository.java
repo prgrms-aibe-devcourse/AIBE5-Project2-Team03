@@ -12,5 +12,7 @@ public interface QuestSubmissionRepository extends JpaRepository<QuestSubmission
     Optional<QuestSubmission> findByQuestAndMember(Quest quest, MemberProfileEntity member);
     List<QuestSubmission> findAllByQuest(Quest quest);
     List<QuestSubmission> findAllByMember(MemberProfileEntity member);
+    long countByQuest(Quest quest);
+    long countByQuestAndStatus(Quest quest, com.example.QuestWork.domain.quest.constant.SubmissionStatus status);
 
 }

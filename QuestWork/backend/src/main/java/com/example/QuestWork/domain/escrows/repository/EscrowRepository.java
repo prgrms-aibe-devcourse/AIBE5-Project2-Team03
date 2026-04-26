@@ -10,8 +10,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface EscrowRepository extends JpaRepository<Escrow, Long> {
+
+    Optional<Escrow> findByQuestId(Long questId);
+
+    boolean existsByQuestId(Long questId);
 
     // 특정 상태(LOCKED 등)인 에스크로 금액의 총합
     @Query("SELECT SUM(e.amount) FROM Escrow e WHERE e.status = :status")
@@ -26,7 +31,16 @@ public interface EscrowRepository extends JpaRepository<Escrow, Long> {
             "FROM Escrow e " +
             "WHERE e.status = 'RELEASED' AND e.releasedAt >= :startDate " +
             "GROUP BY FUNCTION('DATE_FORMAT', e.releasedAt, '%Y-%m-%d') " +
-            // 핵심 수정: ORDER BY도 GROUP BY와 동일한 표현식을 사용해야 합니다.
             "ORDER BY FUNCTION('DATE_FORMAT', e.releasedAt, '%Y-%m-%d') ASC")
     List<DailyRevenueDto> getDailyReleasedAmount(@Param("startDate") LocalDateTime startDate);
+
+    // 최근 12개월간의 월별 지급 완료(RELEASED) 금액 합계 (월간 그래프용)
+    @Query("SELECT new com.example.QuestWork.domain.admin.dto.DailyRevenueDto(" +
+            "  FUNCTION('DATE_FORMAT', e.releasedAt, '%Y-%m'), " +
+            "  SUM(e.amount)) " +
+            "FROM Escrow e " +
+            "WHERE e.status = 'RELEASED' AND e.releasedAt >= :startDate " +
+            "GROUP BY FUNCTION('DATE_FORMAT', e.releasedAt, '%Y-%m') " +
+            "ORDER BY FUNCTION('DATE_FORMAT', e.releasedAt, '%Y-%m') ASC")
+    List<DailyRevenueDto> getMonthlyReleasedAmount(@Param("startDate") LocalDateTime startDate);
 }

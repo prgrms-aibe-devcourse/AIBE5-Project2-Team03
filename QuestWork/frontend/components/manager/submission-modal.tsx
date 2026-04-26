@@ -17,12 +17,14 @@ interface SubmissionModalProps {
   submission: Submission
   onClose: () => void
   onSelect: (id: string) => void
+  isSelecting?: boolean
 }
 
 export function SubmissionModal({
   submission,
   onClose,
   onSelect,
+  isSelecting = false,
 }: SubmissionModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -105,9 +107,10 @@ export function SubmissionModal({
           </Button>
           <Button
             className="bg-primary text-primary-foreground hover:bg-primary-hover"
+            disabled={isSelecting}
             onClick={() => onSelect(submission.id)}
           >
-            이 제출을 수상자로 선택
+            {isSelecting ? '처리 중...' : '이 제출을 수상자로 선택'}
           </Button>
         </div>
       </Card>

@@ -4,18 +4,24 @@ import com.example.QuestWork.domain.member.entity.MemberProfileEntity;
 import com.example.QuestWork.domain.member.repository.MemberProfileRepository;
 import com.example.QuestWork.domain.quest.constant.ApplicationStatus;
 import com.example.QuestWork.domain.quest.dto.QuestApplicationResponseDto;
+import com.example.QuestWork.domain.quest.dto.QuestResponseDto;
+import com.example.QuestWork.domain.quest.dto.QuestStatsResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionRequestDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestUpdateSubmissionRequestDto;
+import com.example.QuestWork.domain.quest.constant.SubmissionStatus;
 import com.example.QuestWork.domain.quest.entity.Quest;
 import com.example.QuestWork.domain.quest.entity.QuestApplication;
 import com.example.QuestWork.domain.quest.entity.QuestSubmission;
 import com.example.QuestWork.domain.quest.repository.QuestApplicationRepository;
 import com.example.QuestWork.domain.quest.repository.QuestRepository;
 import com.example.QuestWork.domain.quest.repository.QuestSubmissionRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,7 @@ public class QuestApplicationService {
     private final MemberProfileRepository memberProfileRepository;
     private final QuestApplicationRepository questApplicationRepository;
     private final QuestSubmissionRepository questSubmissionRepository;
+    private final ObjectMapper objectMapper;
 
 
     //퀘스트 지원 대답
@@ -35,8 +42,16 @@ public class QuestApplicationService {
         Quest quest = getQuest(questId);
         MemberProfileEntity member = getMemberProfile(userId);
 
-        if (questApplicationRepository.existsByQuestAndMemberAndStatus(quest, member, ApplicationStatus.APPLIED)) {
-            throw new IllegalStateException("이미 지원한 퀘스트입니다.");
+        // 기존 레코드 확인 (APPLIED/CANCELED 모두 포함)
+        java.util.Optional<QuestApplication> existing = questApplicationRepository.findByQuestAndMember(quest, member);
+        if (existing.isPresent()) {
+            QuestApplication existingApp = existing.get();
+            if (existingApp.getStatus() == ApplicationStatus.APPLIED) {
+                throw new IllegalStateException("이미 지원한 퀘스트입니다.");
+            }
+            // CANCELED 상태면 재활성화 (DB 유니크 제약 우회)
+            existingApp.reApply();
+            return QuestApplicationResponseDto.from(existingApp);
         }
 
         QuestApplication application = QuestApplication.create(quest, member);
@@ -68,6 +83,25 @@ public class QuestApplicationService {
         );
         QuestSubmission savedSubmission = questSubmissionRepository.save(submission);
         return QuestSubmissionResponseDto.from(savedSubmission);
+    }
+
+    // 내가 지원한 모든 퀘스트 목록 (APPLIED 상태만)
+    public List<QuestResponseDto> getMyAppliedQuests(Long userId) {
+        MemberProfileEntity member = getMemberProfile(userId);
+        return questApplicationRepository.findAllByMember(member)
+                .stream()
+                .filter(app -> app.getStatus() == ApplicationStatus.APPLIED)
+                .map(app -> QuestResponseDto.from(app.getQuest(), objectMapper))
+                .toList();
+    }
+
+    // 내가 제출한 모든 제출물 목록
+    public List<QuestSubmissionResponseDto> getMySubmissions(Long userId) {
+        MemberProfileEntity member = getMemberProfile(userId);
+        return questSubmissionRepository.findAllByMember(member)
+                .stream()
+                .map(QuestSubmissionResponseDto::from)
+                .toList();
     }
 
     //제출한 제출물 수정 대답
@@ -113,6 +147,19 @@ public class QuestApplicationService {
                 .map(QuestApplicationResponseDto::from)
                 .orElse(null);
     }
+    //멤버 본인 제출물 조회
+    public QuestSubmissionResponseDto getMySubmission(Long questId, Long userId) {
+        Quest quest = questRepository.findById(questId)
+                .orElseThrow(() -> new IllegalArgumentException("퀘스트를 찾을 수 없습니다."));
+
+        MemberProfileEntity member = memberProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 프로필을 찾을 수 없습니다."));
+
+        QuestSubmission submission = questSubmissionRepository.findByQuestAndMember(quest, member)
+                .orElseThrow(() -> new IllegalArgumentException("제출 결과가 없습니다."));
+
+        return QuestSubmissionResponseDto.from(submission);
+    }
 
     // 제출물 단건 조회
     public QuestSubmissionResponseDto getSubmission(Long submissionId) {
@@ -121,14 +168,29 @@ public class QuestApplicationService {
         return QuestSubmissionResponseDto.from(submission);
     }
 
+    // 퀘스트 공개 통계 조회
+    public QuestStatsResponseDto getQuestStats(Long questId) {
+        Quest quest = getQuest(questId);
+        long applicantCount = questApplicationRepository.countByQuestAndStatus(quest, ApplicationStatus.APPLIED);
+        long submissionCount = questSubmissionRepository.countByQuest(quest);
+        long selectedCount = questSubmissionRepository.countByQuestAndStatus(quest, SubmissionStatus.WINNER);
+        long reviewingCount = submissionCount - selectedCount;
+        return QuestStatsResponseDto.builder()
+                .applicantCount(applicantCount)
+                .submissionCount(submissionCount)
+                .reviewingCount(reviewingCount < 0 ? 0 : reviewingCount)
+                .selectedCount(selectedCount)
+                .build();
+    }
+
     //퀘스트 퀘스트아이디 받아오기
     private Quest getQuest(Long questId) {
         return questRepository.findById(questId)
                 .orElseThrow(() -> new IllegalArgumentException("퀘스트를 찾을 수 없습니다."));
     }
     //멤버 유저아이디 받아오기
-    private MemberProfileEntity getMemberProfile(Long memberId) {
-        return memberProfileRepository.findById(memberId)
+    private MemberProfileEntity getMemberProfile(Long userId) {
+        return memberProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
     }
     //실제 유저가 가지고 있는 제출물인지 검증

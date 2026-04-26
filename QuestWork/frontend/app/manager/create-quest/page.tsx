@@ -156,7 +156,7 @@ export default function CreateQuestPage() {
     }
 
     if (!Number.isFinite(rewardAmount) || rewardAmount <= 0) {
-      setErrorMessage("보상 금액은 1원 이상 입력해주세요.");
+      setErrorMessage("보상 금액은 ₩1 이상 입력해주세요.");
       return;
     }
 
@@ -325,7 +325,7 @@ export default function CreateQuestPage() {
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
                       <label className="block text-sm font-medium text-foreground">
-                        보상 금액(원)
+                        보상 금액(₩)
                       </label>
                       <Input
                         type="number"

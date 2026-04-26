@@ -1,6 +1,8 @@
 package com.example.QuestWork.domain.quest.controller;
 
 import com.example.QuestWork.domain.quest.dto.QuestApplicationResponseDto;
+import com.example.QuestWork.domain.quest.dto.QuestResponseDto;
+import com.example.QuestWork.domain.quest.dto.QuestStatsResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionRequestDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestUpdateSubmissionRequestDto;
@@ -10,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -80,5 +84,26 @@ public class QuestApplicationController {
     ) {
         questApplicationService.cancelApplication(applicationId, userId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 내가 지원한 퀘스트 목록 조회 (GET /api/quests/applied?userId=X)
+    @GetMapping("/applied")
+    public ResponseEntity<List<QuestResponseDto>> getMyAppliedQuests(@RequestParam Long userId) {
+        List<QuestResponseDto> response = questApplicationService.getMyAppliedQuests(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 내가 제출한 모든 제출물 목록 조회 (GET /api/quests/my-submissions?userId=X)
+    @GetMapping("/my-submissions")
+    public ResponseEntity<List<QuestSubmissionResponseDto>> getMySubmissions(@RequestParam Long userId) {
+        List<QuestSubmissionResponseDto> response = questApplicationService.getMySubmissions(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 퀘스트 공개 통계 조회 (GET /api/quests/{questId}/stats)
+    @GetMapping("/{questId}/stats")
+    public ResponseEntity<QuestStatsResponseDto> getQuestStats(@PathVariable Long questId) {
+        QuestStatsResponseDto response = questApplicationService.getQuestStats(questId);
+        return ResponseEntity.ok(response);
     }
 }

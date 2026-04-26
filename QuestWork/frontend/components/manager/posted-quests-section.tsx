@@ -87,7 +87,7 @@ export function PostedQuestsSection({ quests }: PostedQuestsSectionProps) {
                     <div>
                       <p className="text-xs text-foreground-muted">보상 금액</p>
                       <p className="text-sm font-semibold text-primary">
-                        {quest.rewardAmount?.toLocaleString()} KRW
+                        ₩{quest.rewardAmount?.toLocaleString()}
                       </p>
                     </div>
                     <div>
