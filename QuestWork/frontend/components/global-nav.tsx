@@ -37,9 +37,8 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   const [username, setUsername] = useState<string | null>(null);
   const [nickname, setNickname] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [role, setRole] = useState<"USER" | "MEMBER" | "MANAGER" | "ADMIN">(
-    "USER",
-  );
+  const [role, setRole] = useState<"USER" | "MEMBER" | "MANAGER" | "ADMIN">("USER");
+  const [mounted, setMounted] = useState(false);
 
   const questsCloseRef = useRef<NodeJS.Timeout | null>(null);
   const userMenuCloseRef = useRef<NodeJS.Timeout | null>(null);
@@ -81,6 +80,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
       | null;
 
     setRole(storedRole || "USER");
+    setMounted(true);
   }, []);
 
   const isAuthenticated = isLoggedIn || Boolean(nickname);
@@ -193,7 +193,9 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
         </div>
 
         <div className="flex min-w-0 items-center justify-self-end md:pl-8 lg:pl-12">
-          {isAuthenticated && nickname ? (
+          {!mounted ? (
+            <div className="h-10 w-24 rounded-full bg-border/40 animate-pulse" />
+          ) : isAuthenticated && nickname ? (
             <div
               className="relative"
               onMouseEnter={makeEnter(setIsUserMenuOpen, userMenuCloseRef)}

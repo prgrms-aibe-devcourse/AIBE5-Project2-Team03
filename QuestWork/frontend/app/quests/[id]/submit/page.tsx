@@ -49,6 +49,8 @@ export default function QuestSubmitPage() {
     repoUrl: '',
     fileUrl: '',
   })
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [uploadingFile, setUploadingFile] = useState(false)
 
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -95,19 +97,44 @@ export default function QuestSubmitPage() {
       setError('GitHub 저장소 URL을 입력해주세요.')
       return
     }
-    if (submissionType === 'file' && !formData.fileUrl.trim()) {
-      setError('파일 URL을 입력해주세요.')
+    if (submissionType === 'file' && !formData.fileUrl.trim() && !selectedFile) {
+      setError('파일을 선택하거나 파일 링크를 입력해주세요.')
       return
     }
 
     setSubmitting(true)
     setError(null)
 
+    let resolvedFileUrl = formData.fileUrl
+
+    // 파일이 선택된 경우 먼저 업로드
+    if (submissionType === 'file' && selectedFile) {
+      try {
+        setUploadingFile(true)
+        const fd = new FormData()
+        fd.append('file', selectedFile)
+        const uploadRes = await fetch('http://localhost:8000/api/upload', {
+          method: 'POST',
+          body: fd,
+        })
+        if (!uploadRes.ok) throw new Error('파일 업로드에 실패했습니다.')
+        const uploadData = await uploadRes.json()
+        resolvedFileUrl = `http://localhost:8000${uploadData.fileUrl}`
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '파일 업로드 실패')
+        setSubmitting(false)
+        setUploadingFile(false)
+        return
+      } finally {
+        setUploadingFile(false)
+      }
+    }
+
     const requestBody = {
       SubmissionTitle: formData.submissionTitle,
       SubmissionContent: formData.submissionContent,
       repoUrl: submissionType === 'repo' ? formData.repoUrl : null,
-      fileUrl: submissionType === 'file' ? formData.fileUrl : null,
+      fileUrl: submissionType === 'file' ? resolvedFileUrl : null,
     }
 
     try {
@@ -302,21 +329,56 @@ export default function QuestSubmitPage() {
               </div>
             )}
 
-            {/* File URL */}
+            {/* File */}
             {submissionType === 'file' && (
-              <div className="mt-4 space-y-2">
-                <Label htmlFor="fileUrl">
-                  파일 링크 <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="fileUrl"
-                  name="fileUrl"
-                  type="url"
-                  placeholder="https://drive.google.com/..."
-                  value={formData.fileUrl}
-                  onChange={handleChange}
-                  className="border-border bg-background"
-                />
+              <div className="mt-4 space-y-3">
+                <div className="space-y-2">
+                  <Label>파일 직접 업로드</Label>
+                  <div className="flex items-center gap-3">
+                    <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-surface-raised">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      </svg>
+                      파일 선택
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0] ?? null
+                          setSelectedFile(f)
+                          if (f) setFormData((prev) => ({ ...prev, fileUrl: '' }))
+                        }}
+                      />
+                    </label>
+                    {selectedFile && (
+                      <span className="truncate text-sm text-foreground-muted max-w-xs">
+                        {selectedFile.name}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="text-xs text-foreground-muted">또는</span>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="fileUrl">외부 파일 링크 (Google Drive, Dropbox 등)</Label>
+                  <Input
+                    id="fileUrl"
+                    name="fileUrl"
+                    type="url"
+                    placeholder="https://drive.google.com/..."
+                    value={formData.fileUrl}
+                    onChange={(e) => {
+                      handleChange(e)
+                      if (e.target.value) setSelectedFile(null)
+                    }}
+                    className="border-border bg-background"
+                  />
+                </div>
               </div>
             )}
           </Card>
@@ -332,8 +394,8 @@ export default function QuestSubmitPage() {
             <Button type="button" variant="outline" asChild>
               <Link href={`/quests/${questId}`}>취소</Link>
             </Button>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? '제출 중...' : '결과물 제출하기'}
+            <Button type="submit" disabled={submitting || uploadingFile}>
+              {uploadingFile ? '파일 업로드 중...' : submitting ? '제출 중...' : '결과물 제출하기'}
             </Button>
           </div>
         </form>

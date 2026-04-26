@@ -2,6 +2,7 @@ package com.example.QuestWork.domain.quest.controller;
 
 import com.example.QuestWork.domain.quest.dto.QuestApplicationResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestResponseDto;
+import com.example.QuestWork.domain.quest.dto.QuestStatsResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionRequestDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestUpdateSubmissionRequestDto;
@@ -96,6 +97,13 @@ public class QuestApplicationController {
     @GetMapping("/my-submissions")
     public ResponseEntity<List<QuestSubmissionResponseDto>> getMySubmissions(@RequestParam Long userId) {
         List<QuestSubmissionResponseDto> response = questApplicationService.getMySubmissions(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 퀘스트 공개 통계 조회 (GET /api/quests/{questId}/stats)
+    @GetMapping("/{questId}/stats")
+    public ResponseEntity<QuestStatsResponseDto> getQuestStats(@PathVariable Long questId) {
+        QuestStatsResponseDto response = questApplicationService.getQuestStats(questId);
         return ResponseEntity.ok(response);
     }
 }

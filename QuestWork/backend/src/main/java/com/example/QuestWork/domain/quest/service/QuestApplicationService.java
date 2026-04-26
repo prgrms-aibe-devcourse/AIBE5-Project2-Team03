@@ -5,9 +5,11 @@ import com.example.QuestWork.domain.member.repository.MemberProfileRepository;
 import com.example.QuestWork.domain.quest.constant.ApplicationStatus;
 import com.example.QuestWork.domain.quest.dto.QuestApplicationResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestResponseDto;
+import com.example.QuestWork.domain.quest.dto.QuestStatsResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionRequestDto;
 import com.example.QuestWork.domain.quest.dto.QuestSubmissionResponseDto;
 import com.example.QuestWork.domain.quest.dto.QuestUpdateSubmissionRequestDto;
+import com.example.QuestWork.domain.quest.constant.SubmissionStatus;
 import com.example.QuestWork.domain.quest.entity.Quest;
 import com.example.QuestWork.domain.quest.entity.QuestApplication;
 import com.example.QuestWork.domain.quest.entity.QuestSubmission;
@@ -164,6 +166,21 @@ public class QuestApplicationService {
         QuestSubmission submission = questSubmissionRepository.findById(submissionId)
                 .orElseThrow(() -> new IllegalArgumentException("제출 정보를 찾을 수 없습니다."));
         return QuestSubmissionResponseDto.from(submission);
+    }
+
+    // 퀘스트 공개 통계 조회
+    public QuestStatsResponseDto getQuestStats(Long questId) {
+        Quest quest = getQuest(questId);
+        long applicantCount = questApplicationRepository.countByQuestAndStatus(quest, ApplicationStatus.APPLIED);
+        long submissionCount = questSubmissionRepository.countByQuest(quest);
+        long selectedCount = questSubmissionRepository.countByQuestAndStatus(quest, SubmissionStatus.WINNER);
+        long reviewingCount = submissionCount - selectedCount;
+        return QuestStatsResponseDto.builder()
+                .applicantCount(applicantCount)
+                .submissionCount(submissionCount)
+                .reviewingCount(reviewingCount < 0 ? 0 : reviewingCount)
+                .selectedCount(selectedCount)
+                .build();
     }
 
     //퀘스트 퀘스트아이디 받아오기

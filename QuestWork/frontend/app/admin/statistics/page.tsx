@@ -59,7 +59,7 @@ export default function StatisticsPage() {
   useEffect(() => { fetchStatistics() }, [])
 
   const fmt = (amount: number | null | undefined) =>
-    new Intl.NumberFormat('ko-KR').format(amount ?? 0) + '원'
+    '₩' + new Intl.NumberFormat('ko-KR').format(amount ?? 0)
 
   if (loading) {
     return (
@@ -251,7 +251,7 @@ export default function StatisticsPage() {
                           padding: '12px',
                           fontSize: '12px',
                         }}
-                        formatter={(value: number) => [value.toLocaleString() + '원', '플랫폼 순수익']}
+                        formatter={(value: number) => ['₩' + value.toLocaleString(), '플랫폼 순수익']}
                       />
                       <Area
                         type="monotone"
@@ -338,7 +338,7 @@ export default function StatisticsPage() {
                           padding: '12px',
                           fontSize: '12px',
                         }}
-                        formatter={(value: number) => [value.toLocaleString() + '원', '월간 순수익']}
+                        formatter={(value: number) => ['₩' + value.toLocaleString(), '월간 순수익']}
                         labelFormatter={(label) => {
                           const parts = label.split('-')
                           return parts.length >= 2 ? `${parts[0]}년 ${parts[1]}월` : label

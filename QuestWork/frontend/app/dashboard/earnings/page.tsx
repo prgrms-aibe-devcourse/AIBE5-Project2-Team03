@@ -1,43 +1,74 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { GlobalNav } from '@/components/global-nav'
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { StatCard } from '@/components/dashboard/stat-card'
 import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
-const MONTHLY_EARNINGS = [
-  { month: '1월', amount: 180000 },
-  { month: '2월', amount: 270000 },
-  { month: '3월', amount: 300000 },
-  { month: '4월', amount: 500000 },
-]
+interface Transaction {
+  id: number
+  amount: number
+  type: string
+  status: string
+  description: string
+  createdAt: string
+}
 
-const PAYMENTS = [
-  {
-    id: '1',
-    title: 'React Admin Dashboard',
-    date: '2024-04-12',
-    amount: '₩500,000',
-    status: '지급 완료',
-  },
-  {
-    id: '2',
-    title: 'Mobile Task Flow',
-    date: '2024-04-09',
-    amount: '₩300,000',
-    status: '정산 대기',
-  },
-  {
-    id: '3',
-    title: 'Spring Boot REST Service',
-    date: '2024-03-28',
-    amount: '₩220,000',
-    status: '지급 완료',
-  },
-]
+const TYPE_LABEL: Record<string, string> = {
+  SETTLEMENT: '퀘스트 보상',
+  WITHDRAW: '출금',
+  BONUS: '보너스',
+}
+
+const TYPE_COLOR: Record<string, string> = {
+  SETTLEMENT: 'bg-green-100 text-green-700',
+  WITHDRAW: 'bg-slate-100 text-slate-700',
+  BONUS: 'bg-primary-light text-primary',
+}
 
 export default function EarningsPage() {
-  const maxAmount = Math.max(...MONTHLY_EARNINGS.map((item) => item.amount))
+  const router = useRouter()
+  const [balance, setBalance] = useState<number | null>(null)
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId')
+    if (!userId) { router.push('/login'); return }
+
+    const fetchData = async () => {
+      try {
+        const [walletRes, txRes] = await Promise.all([
+          fetch(`http://localhost:8000/api/settlement/wallet/${userId}`),
+          fetch(`http://localhost:8000/api/settlement/transactions/${userId}`),
+        ])
+        if (walletRes.ok) {
+          const w = await walletRes.json()
+          setBalance(w.balance ?? 0)
+        }
+        if (txRes.ok) {
+          const txs: Transaction[] = await txRes.json()
+          setTransactions(txs)
+        }
+      } catch (e) {
+        console.error(e)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [router])
+
+  const totalIncome = transactions
+    .filter((t) => t.amount > 0)
+    .reduce((s, t) => s + t.amount, 0)
+
+  const totalWithdraw = transactions
+    .filter((t) => t.amount < 0)
+    .reduce((s, t) => s + Math.abs(t.amount), 0)
 
   return (
     <div className="min-h-screen bg-background">
@@ -50,86 +81,67 @@ export default function EarningsPage() {
             수익 내역을 확인해보세요
           </h1>
           <p className="mt-2 text-foreground-muted">
-            퀘스트 보상 지급 현황과 월별 수익 흐름을 확인할 수 있습니다.
+            퀘스트 보상 지급 현황과 지갑 잔액을 확인할 수 있습니다.
           </p>
         </div>
 
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
-          <StatCard
-            label="총 수익"
-            value="₩1,250,000"
-            subtext="누적 지급 금액"
-            accent
-          />
-          <StatCard
-            label="지급 완료"
-            value="₩950,000"
-            subtext="완료된 정산 금액"
-          />
-          <StatCard
-            label="정산 대기"
-            value="₩300,000"
-            subtext="현재 검토 또는 지급 대기 금액"
-          />
-        </div>
+        {loading ? (
+          <p className="text-sm text-foreground-muted">불러오는 중...</p>
+        ) : (
+          <>
+            <div className="mb-6 grid gap-4 md:grid-cols-3">
+              <StatCard
+                label="지갑 잔액"
+                value={`₩${(balance ?? 0).toLocaleString()}`}
+                subtext="현재 출금 가능 잔액"
+                accent
+              />
+              <StatCard
+                label="총 수익"
+                value={`₩${totalIncome.toLocaleString()}`}
+                subtext="누적 입금 금액"
+              />
+              <StatCard
+                label="총 출금"
+                value={`₩${totalWithdraw.toLocaleString()}`}
+                subtext="누적 출금 금액"
+              />
+            </div>
 
-        <div className="grid gap-6 xl:grid-cols-[1fr_1.2fr]">
-          <Card className="border border-border">
-            <div className="p-6">
-              <h2 className="text-lg font-semibold text-foreground">
-                월별 수익
-              </h2>
-
-              <div className="mt-6 space-y-4">
-                {MONTHLY_EARNINGS.map((item) => (
-                  <div key={item.month} className="flex items-center gap-3">
-                    <span className="w-10 text-sm font-medium text-foreground-muted">
-                      {item.month}
-                    </span>
-                    <div className="h-10 flex-1 overflow-hidden rounded-lg bg-surface-raised">
+            <Card className="border border-border">
+              <div className="p-6">
+                <h2 className="text-lg font-semibold text-foreground">거래 내역</h2>
+                {transactions.length === 0 ? (
+                  <p className="mt-4 text-sm text-foreground-muted">아직 거래 내역이 없습니다.</p>
+                ) : (
+                  <div className="mt-4 divide-y divide-border">
+                    {transactions.map((tx) => (
                       <div
-                        className="h-full rounded-lg bg-primary"
-                        style={{ width: `${(item.amount / maxAmount) * 100}%` }}
-                      />
-                    </div>
-                    <span className="w-24 text-right text-sm font-semibold text-foreground">
-                      ₩{item.amount.toLocaleString()}
-                    </span>
+                        key={tx.id}
+                        className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Badge className={TYPE_COLOR[tx.type] ?? 'bg-slate-100 text-slate-700'}>
+                            {TYPE_LABEL[tx.type] ?? tx.type}
+                          </Badge>
+                          <div>
+                            <p className="text-sm font-medium text-foreground">{tx.description || '-'}</p>
+                            <p className="mt-0.5 text-xs text-foreground-muted">
+                              {new Date(tx.createdAt).toLocaleString('ko-KR')}
+                            </p>
+                          </div>
+                        </div>
+                        <p className={`shrink-0 font-bold ${tx.amount >= 0 ? 'text-primary' : 'text-red-500'}`}>
+                          {tx.amount >= 0 ? '+' : ''}₩{Math.abs(tx.amount).toLocaleString()}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            </div>
-          </Card>
-
-          <Card className="border border-border">
-            <div className="p-6">
-              <h2 className="text-lg font-semibold text-foreground">
-                최근 지급 내역
-              </h2>
-
-              <div className="mt-4 divide-y divide-border">
-                {PAYMENTS.map((payment) => (
-                  <div
-                    key={payment.id}
-                    className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0"
-                  >
-                    <div>
-                      <p className="font-medium text-foreground">
-                        {payment.title}
-                      </p>
-                      <p className="mt-1 text-xs text-foreground-muted">
-                        {payment.date} · {payment.status}
-                      </p>
-                    </div>
-                    <p className="shrink-0 font-bold text-primary">
-                      {payment.amount}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
-        </div>
+            </Card>
+          </>
+        )}
       </DashboardShell>
     </div>
   )

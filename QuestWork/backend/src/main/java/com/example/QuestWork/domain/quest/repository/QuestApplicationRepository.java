@@ -18,5 +18,7 @@ public interface QuestApplicationRepository extends JpaRepository<QuestApplicati
     List<QuestApplication> findByMember(MemberProfileEntity member);
     List<QuestApplication> findAllByQuest(Quest quest);
     List<QuestApplication> findAllByMember(MemberProfileEntity member);
+    long countByQuest(Quest quest);
+    long countByQuestAndStatus(Quest quest, ApplicationStatus status);
 
 }

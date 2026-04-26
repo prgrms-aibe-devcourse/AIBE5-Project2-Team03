@@ -8,6 +8,7 @@ import com.example.QuestWork.domain.quest.dto.*;
 import com.example.QuestWork.domain.quest.entity.Quest;
 import com.example.QuestWork.domain.quest.entity.QuestSubmission;
 import com.example.QuestWork.domain.quest.entity.QuestWinner;
+import com.example.QuestWork.domain.quest.constant.QuestStatus;
 import com.example.QuestWork.domain.quest.repository.QuestApplicationRepository;
 import com.example.QuestWork.domain.quest.repository.QuestRepository;
 import com.example.QuestWork.domain.quest.repository.QuestSubmissionRepository;
@@ -81,6 +82,10 @@ public class ManagerQuestService {
         // 제출물 상태를 WINNER로 변경
         submission.markAsWinner();
         questSubmissionRepository.save(submission);
+
+        // 퀘스트 상태를 PICKED(우승자 선정 완료)로 변경
+        quest.updateStatus(QuestStatus.PICKED);
+        questRepository.save(quest);
 
         // 에스크로 생성 (아직 없는 경우만)
         if (!escrowRepository.existsByQuestId(questId)) {
