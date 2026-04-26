@@ -7,6 +7,13 @@ import { GlobalNav } from "@/components/global-nav";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
+  addStoredAppliedQuest,
+  createStoredAppliedQuest,
+  getStoredAppliedQuests,
+  removeStoredAppliedQuest,
+} from "@/lib/applied-quests";
+import { getStoredSubmissions } from "@/lib/quest-submissions";
+import {
   Trophy,
   Calendar,
   Clock,
@@ -39,6 +46,10 @@ interface ManagerProfile {
   companyName: string;
   managerType: string;
   approved: boolean;
+}
+
+interface MySubmissionResponse {
+  questId?: number | string;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -98,6 +109,14 @@ export default function QuestDetailPage() {
     setCurrentUserId(userId);
     if (!userId || role === "MANAGER") return;
 
+    const storedApplication = getStoredAppliedQuests(userId).find(
+      (item) => item.questId === questId,
+    );
+    if (storedApplication) {
+      setApplied(true);
+      setApplicationId(storedApplication.applicationId ?? null);
+    }
+
     const checkApplication = async () => {
       try {
         const res = await fetch(
@@ -107,13 +126,50 @@ export default function QuestDetailPage() {
           const data = await res.json();
           setApplicationId(data.applicationId);
           setApplied(true);
+          if (quest) {
+            addStoredAppliedQuest(
+              createStoredAppliedQuest(quest, userId, data.applicationId),
+            );
+          }
         }
       } catch {
         // ignore
       }
     };
     checkApplication();
-  }, [questId]);
+  }, [questId, quest]);
+
+  useEffect(() => {
+    if (!currentUserId || userRole === "MANAGER") {
+      setHasSubmission(false);
+      return;
+    }
+
+    const hasLocalSubmission = getStoredSubmissions(currentUserId).some(
+      (submission) => submission.questId === questId,
+    );
+    setHasSubmission(hasLocalSubmission);
+
+    const checkMySubmissions = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8000/api/quests/my-submissions?userId=${currentUserId}`,
+        );
+        if (!res.ok) return;
+
+        const data: MySubmissionResponse[] = await res.json();
+        if (!Array.isArray(data)) return;
+
+        setHasSubmission(
+          data.some((submission) => String(submission.questId) === questId),
+        );
+      } catch {
+        // localStorage fallback is enough for the current frontend flow.
+      }
+    };
+
+    checkMySubmissions();
+  }, [questId, currentUserId, userRole]);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -213,14 +269,36 @@ export default function QuestDetailPage() {
         const data = await res.json();
         setApplicationId(data.applicationId);
         setApplied(true);
+        if (quest) {
+          addStoredAppliedQuest(
+            createStoredAppliedQuest(quest, userId, data.applicationId),
+          );
+        }
         // 통계 즉시 갱신
         const sRes = await fetch(
           `http://localhost:8000/api/quests/${questId}/stats`,
         ).catch(() => null);
         if (sRes?.ok) setStats(await sRes.json());
       } else {
-        const data = await res.json().catch(() => ({}));
-        setApplyError(data.message || "지원에 실패했습니다.");
+        const errorText = await res.text();
+        let message = errorText;
+        try {
+          const parsed = JSON.parse(errorText);
+          message = parsed.message || message;
+        } catch {
+          // plain text response
+        }
+
+        if (message.includes("이미 지원")) {
+          setApplied(true);
+          if (quest) {
+            addStoredAppliedQuest(createStoredAppliedQuest(quest, userId));
+          }
+          setApplyError(null);
+          return;
+        }
+
+        setApplyError(message || "지원에 실패했습니다.");
       }
     } catch {
       setApplyError("서버 연결에 실패했습니다.");
@@ -242,6 +320,7 @@ export default function QuestDetailPage() {
       if (res.ok) {
         setApplied(false);
         setApplicationId(null);
+        removeStoredAppliedQuest(questId, userId);
         // 통계 즉시 갱신
         const sRes = await fetch(
           `http://localhost:8000/api/quests/${questId}/stats`,
@@ -310,8 +389,7 @@ export default function QuestDetailPage() {
   const statusColor =
     STATUS_COLORS[quest.status] ?? "bg-gray-100 text-gray-600";
   const difficultyLabel = DIFFICULTY_LABELS[difficulty] ?? difficulty;
-  const hasSubmittedResult =
-    hasSubmission || (applied && stats.submissionCount > 0);
+  const hasSubmittedResult = hasSubmission;
 
   const managerDisplayName =
     manager?.companyName || manager?.nickname || `매니저 #${quest.managerId}`;

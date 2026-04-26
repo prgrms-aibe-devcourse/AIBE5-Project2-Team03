@@ -19,6 +19,40 @@ interface QuestLike {
 }
 
 const STORAGE_KEY = 'questwork-applied-quests'
+const USER_STORAGE_KEY_PREFIX = 'questwork-applied-quests:'
+
+function getUserStorageKey(userId: string) {
+  return `${USER_STORAGE_KEY_PREFIX}${userId}`
+}
+
+function parseStoredQuests(raw: string | null): StoredAppliedQuest[] {
+  if (!raw) {
+    return []
+  }
+
+  try {
+    const parsed = JSON.parse(raw)
+    const quests = Array.isArray(parsed) ? parsed : []
+
+    return quests.filter((quest): quest is StoredAppliedQuest => {
+      return (
+        quest &&
+        typeof quest.questId === 'string' &&
+        typeof quest.userId === 'string' &&
+        typeof quest.title === 'string'
+      )
+    })
+  } catch {
+    return []
+  }
+}
+
+function sortAppliedQuests(quests: StoredAppliedQuest[]) {
+  return quests.sort(
+    (a, b) =>
+      new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime(),
+  )
+}
 
 export function formatAppliedQuestReward(amount?: number): string {
   if (typeof amount !== 'number') {
@@ -53,32 +87,42 @@ export function getStoredAppliedQuests(userId?: string | null): StoredAppliedQue
     return []
   }
 
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    if (!raw) {
-      return []
+  if (userId) {
+    const userQuests = parseStoredQuests(
+      window.localStorage.getItem(getUserStorageKey(userId)),
+    )
+    const legacyQuests = parseStoredQuests(window.localStorage.getItem(STORAGE_KEY))
+      .filter((quest) => quest.userId === userId)
+
+    const merged = new Map<string, StoredAppliedQuest>()
+    const questsForUser = [...legacyQuests, ...userQuests]
+    questsForUser.forEach((quest) => {
+      merged.set(quest.questId, quest)
+    })
+
+    const next = sortAppliedQuests(Array.from(merged.values()))
+    if (next.length > 0) {
+      window.localStorage.setItem(getUserStorageKey(userId), JSON.stringify(next))
     }
 
-    const parsed = JSON.parse(raw)
-    const quests = Array.isArray(parsed) ? parsed : []
-
-    return quests
-      .filter((quest): quest is StoredAppliedQuest => {
-        return (
-          quest &&
-          typeof quest.questId === 'string' &&
-          typeof quest.userId === 'string' &&
-          typeof quest.title === 'string'
-        )
-      })
-      .filter((quest) => !userId || quest.userId === userId)
-      .sort(
-        (a, b) =>
-          new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime(),
-      )
-  } catch {
-    return []
+    return next
   }
+
+  const allQuests = new Map<string, StoredAppliedQuest>()
+  parseStoredQuests(window.localStorage.getItem(STORAGE_KEY)).forEach((quest) => {
+    allQuests.set(`${quest.userId}:${quest.questId}`, quest)
+  })
+
+  for (let index = 0; index < window.localStorage.length; index += 1) {
+    const key = window.localStorage.key(index)
+    if (!key?.startsWith(USER_STORAGE_KEY_PREFIX)) continue
+
+    parseStoredQuests(window.localStorage.getItem(key)).forEach((quest) => {
+      allQuests.set(`${quest.userId}:${quest.questId}`, quest)
+    })
+  }
+
+  return sortAppliedQuests(Array.from(allQuests.values()))
 }
 
 export function addStoredAppliedQuest(quest: StoredAppliedQuest) {
@@ -86,7 +130,7 @@ export function addStoredAppliedQuest(quest: StoredAppliedQuest) {
     return
   }
 
-  const current = getStoredAppliedQuests()
+  const current = getStoredAppliedQuests(quest.userId)
   const next = [
     quest,
     ...current.filter(
@@ -95,7 +139,10 @@ export function addStoredAppliedQuest(quest: StoredAppliedQuest) {
     ),
   ]
 
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+  window.localStorage.setItem(
+    getUserStorageKey(quest.userId),
+    JSON.stringify(next),
+  )
 }
 
 export function removeStoredAppliedQuest(questId: string, userId: string) {
@@ -103,10 +150,10 @@ export function removeStoredAppliedQuest(questId: string, userId: string) {
     return
   }
 
-  const next = getStoredAppliedQuests().filter(
+  const next = getStoredAppliedQuests(userId).filter(
     (quest) => !(quest.questId === questId && quest.userId === userId),
   )
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+  window.localStorage.setItem(getUserStorageKey(userId), JSON.stringify(next))
 }
 
 export function completeStoredAppliedQuest(
@@ -118,7 +165,7 @@ export function completeStoredAppliedQuest(
     return
   }
 
-  const current = getStoredAppliedQuests()
+  const current = getStoredAppliedQuests(userId)
   const existing = current.find(
     (quest) => quest.questId === questId && quest.userId === userId,
   )
@@ -142,7 +189,7 @@ export function completeStoredAppliedQuest(
     ),
   ]
 
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+  window.localStorage.setItem(getUserStorageKey(userId), JSON.stringify(next))
 }
 
 export function createStoredAppliedQuest(

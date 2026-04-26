@@ -16,18 +16,40 @@ const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1522202176988-4ea95f317b13?w=1600&h=900&fit=crop",
 ];
 
+const HERO_VIDEO_SRC = "/videos/questwork-hero.mp4";
+const HERO_VIDEO_POSTER = HERO_IMAGES[0];
+
 type Audience = "freelancer" | "manager";
 
 export function HeroSection() {
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [audience, setAudience] = useState<Audience>("freelancer");
   const [role, setRole] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] =
     useState<QuestCategorySlug>("web-development");
   const [searchQuery, setSearchQuery] = useState("");
   const autoSlideRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotionPreference = () => {
+      setPrefersReducedMotion(mediaQuery.matches);
+      if (mediaQuery.matches) {
+        setIsVideoReady(false);
+      }
+    };
+
+    updateMotionPreference();
+    mediaQuery.addEventListener("change", updateMotionPreference);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateMotionPreference);
+    };
+  }, []);
 
   useEffect(() => {
     if (isHovered) {
@@ -92,9 +114,29 @@ export function HeroSection() {
             />
           ))}
 
-          <div className="absolute inset-0 bg-black/35" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/25" />
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent" />
+          {!prefersReducedMotion && (
+            <video
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
+                isVideoReady ? "opacity-100" : "opacity-0"
+              }`}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              poster={HERO_VIDEO_POSTER}
+              onCanPlay={() => setIsVideoReady(true)}
+              onError={() => setIsVideoReady(false)}
+              aria-hidden="true"
+            >
+              <source src={HERO_VIDEO_SRC} type="video/mp4" />
+            </video>
+          )}
+
+          <div className="absolute inset-0 bg-[#14072E]/35" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0616]/85 via-[#2A145A]/62 to-[#6D28D9]/18" />
+          <div className="absolute inset-0 bg-white/[0.03] backdrop-blur-[0.5px]" />
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0B0616]/75 to-transparent" />
         </div>
 
         <div className="relative z-10 flex h-full items-center px-6 py-12 sm:px-10 md:pl-20 md:pr-14 lg:px-16 lg:pl-24">
@@ -212,60 +254,64 @@ export function HeroSection() {
           </div>
         </div>
 
-        <button
-          onClick={prevSlide}
-          className="absolute left-5 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-white/20 bg-black/25 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A78BFA] md:inline-flex lg:left-6"
-          aria-label="Previous slide"
-        >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-
-        <button
-          onClick={nextSlide}
-          className="absolute right-4 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-white/20 bg-black/25 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A78BFA] md:inline-flex"
-          aria-label="Next slide"
-        >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
-
-        <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2">
-          {HERO_IMAGES.map((_, idx) => (
+        {!isVideoReady && (
+          <>
             <button
-              key={idx}
-              onClick={() => goToSlide(idx)}
-              className={`h-2 rounded-full transition-all ${
-                idx === currentSlide
-                  ? "w-8 bg-white"
-                  : "w-2 bg-white/40 hover:bg-white/70"
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
-          ))}
-        </div>
+              onClick={prevSlide}
+              className="absolute left-5 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-white/20 bg-black/25 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A78BFA] md:inline-flex lg:left-6"
+              aria-label="Previous slide"
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+
+            <button
+              onClick={nextSlide}
+              className="absolute right-4 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-white/20 bg-black/25 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A78BFA] md:inline-flex"
+              aria-label="Next slide"
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+
+            <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+              {HERO_IMAGES.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => goToSlide(idx)}
+                  className={`h-2 rounded-full transition-all ${
+                    idx === currentSlide
+                      ? "w-8 bg-white"
+                      : "w-2 bg-white/40 hover:bg-white/70"
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
