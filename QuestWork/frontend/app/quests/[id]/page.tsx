@@ -6,6 +6,13 @@ import { GlobalNav } from '@/components/global-nav'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
+import {
+  addStoredAppliedQuest,
+  createStoredAppliedQuest,
+  getStoredAppliedQuests,
+  removeStoredAppliedQuest,
+} from '@/lib/applied-quests'
+import { getStoredSubmissions } from '@/lib/quest-submissions'
 
 interface QuestApiResponse {
   id: number
@@ -31,12 +38,17 @@ export default function QuestDetailPage() {
   const [applicationId, setApplicationId] = useState<number | null>(null)
   const [cancelling, setCancelling] = useState(false)
   const [userRole, setUserRole] = useState<string | null>(null)
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const [hasSubmission, setHasSubmission] = useState(false)
+  const [participantCount, setParticipantCount] = useState(0)
+  const [submissionCount, setSubmissionCount] = useState(0)
 
   useEffect(() => {
     const role = localStorage.getItem('role')
     setUserRole(role)
 
     const userId = localStorage.getItem('userId')
+    setCurrentUserId(userId)
     if (!userId || role === 'MANAGER') return
 
     // 기존 지원 여부 조회
@@ -56,6 +68,30 @@ export default function QuestDetailPage() {
     }
     checkApplication()
   }, [questId])
+
+  useEffect(() => {
+    const submissions = getStoredSubmissions()
+    const appliedQuests = getStoredAppliedQuests()
+    const questSubmissions = submissions.filter(
+      (submission) => submission.questId === questId,
+    )
+
+    setHasSubmission(questSubmissions.length > 0)
+    setSubmissionCount(questSubmissions.length)
+    setParticipantCount(
+      appliedQuests.filter((appliedQuest) => appliedQuest.questId === questId)
+        .length,
+    )
+  }, [questId])
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId')
+    if (!userId || !applied || !quest) return
+
+    addStoredAppliedQuest(
+      createStoredAppliedQuest(quest, userId, applicationId),
+    )
+  }, [applied, applicationId, quest])
 
   useEffect(() => {
     const fetchQuest = async () => {
@@ -101,6 +137,11 @@ export default function QuestDetailPage() {
         const data = await res.json()
         setApplicationId(data.applicationId)
         setApplied(true)
+        if (quest) {
+          addStoredAppliedQuest(
+            createStoredAppliedQuest(quest, userId, data.applicationId),
+          )
+        }
       } else {
         const data = await res.json().catch(() => ({}))
         setApplyError(data.message || '지원에 실패했습니다.')
@@ -125,6 +166,7 @@ export default function QuestDetailPage() {
       if (res.ok) {
         setApplied(false)
         setApplicationId(null)
+        removeStoredAppliedQuest(questId, userId)
       } else {
         const data = await res.json().catch(() => ({}))
         setApplyError(data.message || '취소에 실패했습니다.')
@@ -168,6 +210,8 @@ export default function QuestDetailPage() {
   const techStack: string[] = Array.isArray(formData?.techStack)
     ? (formData.techStack as string[])
     : []
+  const isOwnManagerQuest =
+    userRole === 'MANAGER' && currentUserId === String(quest.managerId)
 
   return (
       <div className="min-h-screen bg-background">
@@ -249,9 +293,41 @@ export default function QuestDetailPage() {
           <div>
             <div className="sticky top-24 space-y-3 rounded-xl border border-border bg-surface p-6 shadow-sm">
               <h3 className="text-center font-semibold text-foreground">
-                이 퀘스트에 참여하시겠어요?
+                {userRole === 'MANAGER' ? '퀘스트 관리' : '이 퀘스트에 참여하시겠어요?'}
               </h3>
-              {userRole !== 'MANAGER' && (
+              {userRole === 'MANAGER' ? (
+                isOwnManagerQuest ? (
+                  <Link href="/dashboard/my-quests" className="block">
+                    <Button variant="outline" className="w-full">
+                      {hasSubmission ? '제출 결과 확인' : '지원자 보기'}
+                    </Button>
+                  </Link>
+                ) : (
+                  <div className="space-y-4 pt-1">
+                    <p className="text-center text-sm font-medium text-foreground-muted">
+                      현재 제출 현황
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-xl bg-primary-light/80 px-4 py-5 text-center shadow-sm shadow-primary/5">
+                        <p className="text-xs font-medium text-foreground-muted">
+                          참여자
+                        </p>
+                        <p className="mt-2 text-2xl font-bold text-primary">
+                          {participantCount}명
+                        </p>
+                      </div>
+                      <div className="rounded-xl bg-white px-4 py-5 text-center shadow-sm shadow-primary/10 ring-1 ring-primary/15">
+                        <p className="text-xs font-medium text-foreground-muted">
+                          제출 완료
+                        </p>
+                        <p className="mt-2 text-2xl font-bold text-foreground">
+                          {submissionCount}건
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )
+              ) : (
                 <>
                   {applied ? (
                     <>
@@ -282,13 +358,13 @@ export default function QuestDetailPage() {
                   {applyError && (
                     <p className="text-center text-sm text-red-500">{applyError}</p>
                   )}
+                  <Link href={`/quests/${questId}/submit`} className="block">
+                    <Button variant="outline" className="w-full">
+                      결과 제출하기
+                    </Button>
+                  </Link>
                 </>
               )}
-              <Link href={`/quests/${questId}/submit`} className="block">
-                <Button variant="outline" className="w-full">
-                  결과 제출하기
-                </Button>
-              </Link>
             </div>
           </div>
         </div>

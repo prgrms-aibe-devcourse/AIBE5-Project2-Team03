@@ -7,6 +7,10 @@ import { GlobalNav } from '@/components/global-nav'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import {
+  addStoredAppliedQuest,
+  createStoredAppliedQuest,
+} from '@/lib/applied-quests'
 
 interface QuestData {
   id: number
@@ -42,22 +46,31 @@ export default function QuestApplyPage() {
   const [success, setSuccess] = useState(false)
 
   useEffect(() => {
+    const controller = new AbortController()
+
     const fetchQuest = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/quests/detail/${questId}`)
+        const res = await fetch(`http://localhost:8000/api/quests/${questId}`, {
+          signal: controller.signal,
+        })
         if (!res.ok) throw new Error('퀘스트 정보를 불러올 수 없습니다.')
         const data = await res.json()
         setQuest(data)
       } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') return
         setError(e instanceof Error ? e.message : '오류가 발생했습니다.')
       } finally {
         setLoading(false)
       }
     }
     fetchQuest()
+
+    return () => controller.abort()
   }, [questId])
 
   const handleApply = async () => {
+    if (applying || success) return
+
     const userId = localStorage.getItem('userId')
     if (!userId) {
       alert('로그인이 필요합니다.')
@@ -75,6 +88,12 @@ export default function QuestApplyPage() {
       )
 
       if (res.ok) {
+        const data = await res.json().catch(() => ({}))
+        if (quest) {
+          addStoredAppliedQuest(
+            createStoredAppliedQuest(quest, userId, data.applicationId),
+          )
+        }
         setSuccess(true)
       } else {
         const data = await res.json().catch(() => ({}))

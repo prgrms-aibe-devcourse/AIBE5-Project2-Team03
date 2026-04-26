@@ -28,11 +28,10 @@ export function TrustedCompaniesSection() {
             TRUSTED BY COMPANIES
           </p>
           <h2 className="mt-4 text-balance text-3xl font-bold text-foreground sm:text-4xl">
-            Trusted by teams building real products
+            실제 서비스를 만드는 팀들이 선택한 QuestWork
           </h2>
           <p className="mt-3 text-sm leading-6 text-foreground-muted sm:text-base">
-            QuestWork helps companies discover proven developers and launch
-            project-based collaboration with more confidence.
+            검증된 개발자와 연결되어 프로젝트를 더 자신 있게 시작하세요.
           </p>
         </div>
 
@@ -59,7 +58,7 @@ export function TrustedCompaniesSection() {
                           alt={`${logo.name} logo`}
                           width={logo.width}
                           height={logo.height}
-                          className="h-auto max-h-8 w-auto max-w-full opacity-60 grayscale transition-all duration-300 group-hover/logo:opacity-95 group-hover/logo:grayscale-0 sm:max-h-9"
+                          className="h-auto max-h-8 w-auto max-w-full opacity-90 transition-all duration-300 group-hover/logo:opacity-100 sm:max-h-9"
                         />
                       </div>
                     ))}

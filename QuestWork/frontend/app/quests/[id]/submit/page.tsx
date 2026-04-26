@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { GlobalNav } from '@/components/global-nav'
@@ -8,17 +8,8 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-
-interface QuestData {
-  id: number
-  title: string
-  rewardAmount: number
-  deadline: string
-  formData: {
-    description?: string
-    submissionFormats?: string[]
-  }
-}
+import { completeStoredAppliedQuest, getStoredAppliedQuests } from '@/lib/applied-quests'
+import { addStoredSubmission, formatSubmissionStatus } from '@/lib/quest-submissions'
 
 interface SubmissionResponseDto {
   submissionId: number
@@ -39,9 +30,6 @@ export default function QuestSubmitPage() {
   const router = useRouter()
   const questId = params.id as string
 
-  const [quest, setQuest] = useState<QuestData | null>(null)
-  const [questLoading, setQuestLoading] = useState(true)
-
   const [submissionType, setSubmissionType] = useState<'repo' | 'file'>('repo')
   const [formData, setFormData] = useState({
     submissionTitle: '',
@@ -53,22 +41,6 @@ export default function QuestSubmitPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<SubmissionResponseDto | null>(null)
-
-  useEffect(() => {
-    const fetchQuest = async () => {
-      try {
-        const res = await fetch(`http://localhost:8000/api/quests/detail/${questId}`)
-        if (!res.ok) throw new Error('퀘스트 정보를 불러올 수 없습니다.')
-        const data = await res.json()
-        setQuest(data)
-      } catch {
-        // 퀘스트 정보 불러오기 실패해도 폼은 표시
-      } finally {
-        setQuestLoading(false)
-      }
-    }
-    fetchQuest()
-  }, [questId])
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -122,6 +94,36 @@ export default function QuestSubmitPage() {
 
       if (res.ok) {
         const data: SubmissionResponseDto = await res.json()
+        const appliedQuest = getStoredAppliedQuests(userId).find(
+          (quest) => quest.questId === questId,
+        )
+        const submittedAt = data.submittedAt || new Date().toISOString()
+        const storedSubmission = {
+          id: String(data.submissionId),
+          questId: String(data.questId ?? questId),
+          userId,
+          questTitle: appliedQuest?.title ?? `퀘스트 #${questId}`,
+          reward: appliedQuest?.reward ?? '-',
+          title: data.submissionTitle || formData.submissionTitle,
+          summary: data.submissionContent || formData.submissionContent,
+          submissionType: submissionType === 'repo' ? 'github' : 'file',
+          githubUrl: data.repoUrl ?? undefined,
+          fileName: data.fileUrl ?? undefined,
+          status: formatSubmissionStatus(data.status),
+          submittedAt,
+          freelancerName:
+            localStorage.getItem('nickname') ||
+            localStorage.getItem('username') ||
+            'QuestWork 사용자',
+        } as const
+
+        addStoredSubmission(storedSubmission)
+        completeStoredAppliedQuest(questId, userId, {
+          title: storedSubmission.questTitle,
+          reward: storedSubmission.reward,
+          deadline: appliedQuest?.deadline,
+          rawDeadline: appliedQuest?.rawDeadline,
+        })
         setResult(data)
       } else {
         const data = await res.json().catch(() => ({}))
@@ -182,7 +184,7 @@ export default function QuestSubmitPage() {
           <Link href="/quests" className="hover:text-foreground">퀘스트</Link>
           <span>/</span>
           <Link href={`/quests/${questId}`} className="hover:text-foreground">
-            {questLoading ? '...' : (quest?.title ?? `퀘스트 #${questId}`)}
+            퀘스트 #{questId}
           </Link>
           <span>/</span>
           <span className="text-foreground">결과 제출</span>
@@ -191,11 +193,6 @@ export default function QuestSubmitPage() {
         <div className="mb-6">
           <p className="text-sm font-semibold text-primary">Quest Submission</p>
           <h1 className="mt-1 text-3xl font-bold text-foreground">결과물 제출</h1>
-          {quest && (
-            <p className="mt-1 text-sm font-medium text-foreground-muted">
-              {quest.title}
-            </p>
-          )}
           <p className="mt-2 text-foreground-muted">
             완성된 결과물을 제출하세요. 제출 후 매니저가 검토합니다.
           </p>

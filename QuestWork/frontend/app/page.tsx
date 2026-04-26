@@ -4,6 +4,7 @@ import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { BenefitsSection } from "@/components/landing/benefits-section";
 import { Footer } from "@/components/landing/footer";
 import { PlatformStatsSection } from "@/components/landing/platform-stats-section";
+import { PromoBanner } from "@/components/landing/promo-banner";
 import { TrustedCompaniesSection } from "@/components/landing/trusted-companies-section";
 import { QuestCard, type Quest } from "@/components/quest-card";
 
@@ -61,6 +62,7 @@ export default async function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       <GlobalNav />
+      <PromoBanner />
       <HeroSection />
       <TrustedCompaniesSection />
       <PlatformStatsSection />

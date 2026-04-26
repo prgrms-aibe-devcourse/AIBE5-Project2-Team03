@@ -1,41 +1,17 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { GlobalNav } from '@/components/global-nav'
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-
-const SUBMISSIONS = [
-  {
-    id: '1',
-    questId: '1',
-    questTitle: 'React Admin Dashboard Performance Optimization',
-    submittedAt: '2024-04-10',
-    status: '선정 완료',
-    rewardStatus: '지급 완료',
-    reward: '₩500,000',
-  },
-  {
-    id: '2',
-    questId: '2',
-    questTitle: 'Mobile App for Task Management',
-    submittedAt: '2024-04-08',
-    status: '검토 중',
-    rewardStatus: '정산 대기',
-    reward: '₩300,000',
-  },
-  {
-    id: '3',
-    questId: '3',
-    questTitle: 'REST API for Microservices Architecture',
-    submittedAt: '2024-04-09',
-    status: '제출 완료',
-    rewardStatus: '-',
-    reward: '₩250,000',
-  },
-]
+import {
+  formatSubmissionStatus,
+  getStoredSubmissions,
+  type StoredSubmission,
+} from '@/lib/quest-submissions'
 
 const STATUS_CLASS: Record<string, string> = {
   '선정 완료': 'bg-green-100 text-green-700',
@@ -44,6 +20,13 @@ const STATUS_CLASS: Record<string, string> = {
 }
 
 export default function MySubmissionsPage() {
+  const [submissions, setSubmissions] = useState<StoredSubmission[]>([])
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId')
+    setSubmissions(getStoredSubmissions(userId))
+  }, [])
+
   return (
     <div className="min-h-screen bg-background">
       <GlobalNav />
@@ -82,39 +65,53 @@ export default function MySubmissionsPage() {
                 </tr>
               </thead>
               <tbody>
-                {SUBMISSIONS.map((submission) => (
-                  <tr
-                    key={submission.id}
-                    className="border-b border-border transition-colors last:border-b-0 hover:bg-surface"
-                  >
-                    <td className="px-4 py-4">
-                      <p className="font-medium text-foreground">
-                        {submission.questTitle}
+                {submissions.length > 0 ? (
+                  submissions.map((submission) => {
+                    const status = formatSubmissionStatus(submission.status)
+
+                    return (
+                      <tr
+                        key={submission.id}
+                        className="border-b border-border transition-colors last:border-b-0 hover:bg-surface"
+                      >
+                        <td className="px-4 py-4">
+                          <p className="font-medium text-foreground">
+                            {submission.questTitle}
+                          </p>
+                          <p className="mt-1 text-xs text-foreground-muted">
+                            예상 보상 {submission.reward}
+                          </p>
+                        </td>
+                        <td className="px-4 py-4 text-foreground-muted">
+                          {new Date(submission.submittedAt).toLocaleDateString('ko-KR')}
+                        </td>
+                        <td className="px-4 py-4">
+                          <Badge className={STATUS_CLASS[status] ?? STATUS_CLASS['제출 완료']}>
+                            {status}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-4 text-foreground-muted">
+                          -
+                        </td>
+                        <td className="px-4 py-4 text-right">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/quests/${submission.questId}`}>
+                              보기
+                            </Link>
+                          </Button>
+                        </td>
+                      </tr>
+                    )
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-10 text-center">
+                      <p className="text-sm text-foreground-muted">
+                        아직 제출한 퀘스트가 없습니다.
                       </p>
-                      <p className="mt-1 text-xs text-foreground-muted">
-                        예상 보상 {submission.reward}
-                      </p>
-                    </td>
-                    <td className="px-4 py-4 text-foreground-muted">
-                      {submission.submittedAt}
-                    </td>
-                    <td className="px-4 py-4">
-                      <Badge className={STATUS_CLASS[submission.status]}>
-                        {submission.status}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-4 text-foreground-muted">
-                      {submission.rewardStatus}
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/quests/${submission.questId}`}>
-                          보기
-                        </Link>
-                      </Button>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
               </table>
             </div>

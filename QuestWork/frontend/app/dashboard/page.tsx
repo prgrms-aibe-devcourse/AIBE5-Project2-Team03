@@ -1,11 +1,21 @@
 'use client'
 
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { GlobalNav } from '@/components/global-nav'
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { StatCard } from '@/components/dashboard/stat-card'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import {
+  getStoredAppliedQuests,
+  type StoredAppliedQuest,
+} from '@/lib/applied-quests'
+import {
+  formatSubmissionStatus,
+  getStoredSubmissions,
+  type StoredSubmission,
+} from '@/lib/quest-submissions'
 
 const OVERVIEW_STATS = [
   {
@@ -36,38 +46,6 @@ const OVERVIEW_STATS = [
   },
 ]
 
-const RECENT_SUBMISSIONS = [
-  {
-    id: '1',
-    title: 'React Admin Dashboard Performance Optimization',
-    date: '2024-04-10',
-    status: '검토 중',
-    href: '/dashboard/my-submissions',
-  },
-  {
-    id: '2',
-    title: 'Next.js E-commerce Platform',
-    date: '2024-04-08',
-    status: '선정 완료',
-    href: '/dashboard/my-submissions',
-  },
-]
-
-const RECENT_QUESTS = [
-  {
-    id: '1',
-    title: 'REST API for Microservices Architecture',
-    meta: '진행률 45%',
-    href: '/dashboard/my-quests',
-  },
-  {
-    id: '2',
-    title: 'Spring Boot REST Service',
-    meta: '완료됨',
-    href: '/dashboard/my-quests',
-  },
-]
-
 const RECENT_EARNINGS = [
   {
     id: '1',
@@ -84,6 +62,56 @@ const RECENT_EARNINGS = [
 ]
 
 export default function DashboardPage() {
+  const [appliedQuests, setAppliedQuests] = useState<StoredAppliedQuest[]>([])
+  const [submissions, setSubmissions] = useState<StoredSubmission[]>([])
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId')
+    setAppliedQuests(getStoredAppliedQuests(userId))
+    setSubmissions(getStoredSubmissions(userId))
+  }, [])
+
+  const activeAppliedQuests = appliedQuests.filter(
+    (quest) => quest.status !== '완료',
+  )
+
+  const overviewStats = useMemo(
+    () =>
+      OVERVIEW_STATS.map((stat) =>
+        stat.label === '진행 중인 퀘스트'
+          ? {
+              ...stat,
+              value: `${activeAppliedQuests.length}개`,
+              subtext:
+                activeAppliedQuests.length > 0
+                  ? '참여 신청한 퀘스트'
+              : '아직 참여중인 퀘스트가 없습니다.',
+            }
+          : stat.label === '완료한 퀘스트'
+            ? {
+                ...stat,
+                value: `${submissions.length}개`,
+                subtext:
+                  submissions.length > 0
+                    ? '제출 완료한 퀘스트'
+                    : '아직 제출한 퀘스트가 없습니다.',
+              }
+            : stat.label === '제출한 결과물'
+              ? {
+                  ...stat,
+                  value: `${submissions.length}건`,
+                  subtext:
+                    submissions.length > 0
+                      ? '제출 완료'
+                      : '아직 제출한 퀘스트가 없습니다.',
+                }
+          : stat,
+      ),
+    [activeAppliedQuests.length, submissions.length],
+  )
+  const recentAppliedQuests = activeAppliedQuests.slice(0, 3)
+  const recentSubmissions = submissions.slice(0, 3)
+
   return (
     <div className="min-h-screen bg-background">
       <GlobalNav />
@@ -104,7 +132,7 @@ export default function DashboardPage() {
             className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5"
             aria-label="대시보드 요약"
           >
-            {OVERVIEW_STATS.map((stat) => (
+            {overviewStats.map((stat) => (
               <StatCard
                 key={stat.label}
                 label={stat.label}
@@ -131,23 +159,35 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {RECENT_SUBMISSIONS.map((item) => (
-                    <Link key={item.id} href={item.href}>
-                      <div className="rounded-lg border border-border p-4 transition-colors hover:bg-surface">
-                        <div className="flex items-start justify-between gap-3">
-                          <h3 className="line-clamp-2 text-sm font-semibold text-foreground">
-                            {item.title}
-                          </h3>
-                          <Badge className="shrink-0 bg-primary-light text-primary">
-                            {item.status}
-                          </Badge>
-                        </div>
-                        <p className="mt-2 text-xs text-foreground-muted">
-                          제출일 {item.date}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
+                  {recentSubmissions.length > 0 ? (
+                    recentSubmissions.map((item) => {
+                      const status = formatSubmissionStatus(item.status)
+
+                      return (
+                        <Link key={item.id} href="/dashboard/my-submissions">
+                          <div className="rounded-lg border border-border p-4 transition-colors hover:bg-surface">
+                            <div className="flex items-start justify-between gap-3">
+                              <h3 className="line-clamp-2 text-sm font-semibold text-foreground">
+                                {item.questTitle}
+                              </h3>
+                              <Badge className="shrink-0 bg-primary-light text-primary">
+                                {status}
+                              </Badge>
+                            </div>
+                            <p className="mt-2 text-xs text-foreground-muted">
+                              제출일 {new Date(item.submittedAt).toLocaleDateString('ko-KR')}
+                            </p>
+                          </div>
+                        </Link>
+                      )
+                    })
+                  ) : (
+                    <div className="rounded-lg border border-dashed border-border p-4">
+                      <p className="text-sm text-foreground-muted">
+                        아직 제출한 퀘스트가 없습니다.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
@@ -167,18 +207,31 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {RECENT_QUESTS.map((item) => (
-                    <Link key={item.id} href={item.href}>
-                      <div className="rounded-lg border border-border p-4 transition-colors hover:bg-surface">
-                        <h3 className="line-clamp-2 text-sm font-semibold text-foreground">
-                          {item.title}
-                        </h3>
-                        <p className="mt-2 text-xs text-foreground-muted">
-                          {item.meta}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
+                  {recentAppliedQuests.length > 0 ? (
+                    recentAppliedQuests.map((quest) => (
+                      <Link key={quest.questId} href={`/quests/${quest.questId}`}>
+                        <div className="rounded-lg border border-border p-4 transition-colors hover:bg-surface">
+                          <div className="flex items-start justify-between gap-3">
+                            <h3 className="line-clamp-2 text-sm font-semibold text-foreground">
+                              {quest.title}
+                            </h3>
+                            <Badge className="shrink-0 bg-primary-light text-primary">
+                              {quest.status}
+                            </Badge>
+                          </div>
+                          <p className="mt-2 text-xs text-foreground-muted">
+                            {quest.reward} · {quest.deadline}
+                          </p>
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="rounded-lg border border-dashed border-border p-4">
+                      <p className="text-sm text-foreground-muted">
+                        아직 참여중인 퀘스트가 없습니다.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>

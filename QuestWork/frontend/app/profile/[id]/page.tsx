@@ -12,6 +12,10 @@ import { Separator } from '@/components/ui/separator'
 import { Calendar } from '@/components/ui/calendar'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  getStoredAppliedQuests,
+  type StoredAppliedQuest,
+} from '@/lib/applied-quests'
 
 // Lucide 아이콘 (필요시 pnpm install lucide-react 필요, 없다면 텍스트로 대체 가능)
 import { User, Briefcase, DollarSign, Award, Settings, Save, X, Link2, Lock, Calendar as CalendarIcon, Bell, Wallet, Coins } from 'lucide-react'
@@ -56,24 +60,14 @@ const TECH_STACK_OPTIONS = [
   'HTML', 'CSS', 'Tailwind CSS', 'GraphQL', 'REST API', 'Git', 'Linux', 'Firebase', 'Supabase'
 ]
 
-// 찜한/진행 중 퀘스트 모의 데이터
-const MOCK_QUESTS = [
-  { id: 1, title: 'React 기반 관리자 대시보드 개발', status: '진행중', deadline: '2024-05-15' },
-  { id: 2, title: 'Next.js 이커머스 플랫폼 구축', status: '찜', deadline: '2024-05-20' },
-  { id: 3, title: 'Spring Boot API 서버 개발', status: '진행중', deadline: '2024-05-10' },
-]
-
 export default function ProfilePage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);
   const [profile, setProfile] = useState<FreelancerProfile | null>(null)
   const [draft, setDraft] = useState<ProfileDraft | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [questFilter, setQuestFilter] = useState<'전체' | '진행중' | '찜'>('전체')
+  const [questFilter, setQuestFilter] = useState<'전체' | '진행 중' | '완료'>('전체')
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [newQuestTitle, setNewQuestTitle] = useState('')
-  const [newQuestStatus, setNewQuestStatus] = useState<'진행중' | '찜'>('진행중')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [walletBalance, setWalletBalance] = useState<number | null>(null)
   const [walletLoading, setWalletLoading] = useState(true)
@@ -85,7 +79,7 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
   const [withdrawError, setWithdrawError] = useState('')
   const [withdrawSubmitting, setWithdrawSubmitting] = useState(false)
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [quests, setQuests] = useState(MOCK_QUESTS) //
+  const [quests, setQuests] = useState<StoredAppliedQuest[]>([])
 
 
 
@@ -143,6 +137,11 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
       fetchProfile();
     }
   }, [params.id]);
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId')
+    setQuests(getStoredAppliedQuests(userId))
+  }, [])
 
   // 4. ⭐ 출금 핸들러 (요청하신 대로 유지 및 보완)
   const handleWithdrawSubmit = async () => {
@@ -297,27 +296,11 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const upcoming = quests
-      .filter(q => new Date(q.deadline) >= today)
-      .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())[0];
+      .filter(q => q.rawDeadline && new Date(q.rawDeadline).getTime() >= today.getTime())
+      .sort((a, b) => new Date(a.rawDeadline ?? '').getTime() - new Date(b.rawDeadline ?? '').getTime())[0];
     if (!upcoming) return null;
-    const days = Math.ceil((new Date(upcoming.deadline) - today) / (1000 * 60 * 60 * 24));
+    const days = Math.ceil((new Date(upcoming.rawDeadline ?? '').getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     return { title: upcoming.title, days: days === 0 ? 'D-Day' : `D-${days}` };
-  };
-
-  // addQuest 함수 추가
-  const addQuest = () => {
-    if (!newQuestTitle.trim() || !selectedDate) return;
-    const newQuest = {
-      id: quests.length + 1,
-      title: newQuestTitle,
-      status: newQuestStatus,
-      deadline: selectedDate.toISOString().split('T')[0], // YYYY-MM-DD
-    };
-    setQuests([...quests, newQuest]);
-    setNewQuestTitle('');
-    setNewQuestStatus('진행중');
-    setSelectedDate(undefined);
-    setIsDialogOpen(false);
   };
 
   if (isLoading) return <div className="flex h-screen items-center justify-center font-bold text-xl">유저 데이터를 가져오는 중입니다...</div>
@@ -420,7 +403,7 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
                                 </div>
                               </div>
                               <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl">취소</Button>
+                                <Button variant="outline" onClick={() => setIsPasswordModalOpen(false)} className="rounded-xl">취소</Button>
                                 <Button onClick={handlePasswordChange} disabled={isPasswordLoading} className="bg-red-600 hover:bg-red-700 text-white rounded-xl">
                                   {isPasswordLoading ? "변경 중..." : "비밀번호 수정 완료"}
                                 </Button>
@@ -528,10 +511,11 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
                             selected={selectedDate}
                             onSelect={(date) => {
                               setSelectedDate(date)
-                              setIsDialogOpen(true)
                             }}
                             modifiers={{
-                              deadline: quests.map(q => new Date(q.deadline))
+                              deadline: quests
+                                .map(q => q.rawDeadline ? new Date(q.rawDeadline) : null)
+                                .filter((date): date is Date => date !== null && !Number.isNaN(date.getTime()))
                             }}
                             modifiersClassNames={{
                               deadline: "bg-purple-200 text-purple-800 font-semibold"
@@ -543,7 +527,7 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
                   </div>
                   <div className="lg:col-span-1">
                     <div className="mb-4 flex gap-3">
-                      {(['전체', '진행중', '찜'] as const).map((filter) => (
+                      {(['전체', '진행 중', '완료'] as const).map((filter) => (
                           <Button
                               key={filter}
                               variant="outline"
@@ -556,15 +540,24 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
                       ))}
                     </div>
                     <div className="space-y-6 max-h-96 overflow-y-auto">
-                      {quests.filter(quest => questFilter === '전체' || quest.status === questFilter).map(quest => {
-                        const today = new Date()
-                        today.setHours(0, 0, 0, 0)
-                        const deadlineDate = new Date(quest.deadline)
-                        const daysDiff = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24))
-                        const dDisplay = daysDiff === 0 ? 'D-Day' : daysDiff > 0 ? `D-${daysDiff}` : `D+${Math.abs(daysDiff)}`
+                      {quests.filter(quest => questFilter === '전체' || quest.status === questFilter).length > 0 ? (
+                        quests.filter(quest => questFilter === '전체' || quest.status === questFilter).map(quest => {
+                          const today = new Date()
+                          today.setHours(0, 0, 0, 0)
+                          const deadlineDate = quest.rawDeadline ? new Date(quest.rawDeadline) : null
+                          const daysDiff = deadlineDate && !Number.isNaN(deadlineDate.getTime())
+                            ? Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+                            : null
+                          const dDisplay = daysDiff === null
+                            ? quest.deadline
+                            : daysDiff === 0
+                              ? 'D-Day'
+                              : daysDiff > 0
+                                ? `D-${daysDiff}`
+                                : `D+${Math.abs(daysDiff)}`
 
-                        return (
-                            <Card key={quest.id} className="rounded-3xl p-8 hover:shadow-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-shadow duration-200 border-0">
+                          return (
+                            <Card key={quest.questId} className="rounded-3xl p-8 hover:shadow-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-shadow duration-200 border-0">
                               <div className="flex items-center justify-between">
                                 <div className="flex-1">
                                   <p className="font-semibold text-sm text-[#1e293b]">{quest.title}</p>
@@ -573,58 +566,25 @@ export default function ProfilePage({ params: paramsPromise }: { params: Promise
                                     {quest.deadline} ({dDisplay})
                                   </p>
                                 </div>
-                                <Badge variant={quest.status === '진행중' ? 'default' : 'secondary'} className="ml-4 px-3 py-1 rounded-full bg-purple-100 text-purple-800 border-0">
+                                <Badge variant={quest.status === '진행 중' ? 'default' : 'secondary'} className="ml-4 px-3 py-1 rounded-full bg-purple-100 text-purple-800 border-0">
                                   {quest.status}
                                 </Badge>
                               </div>
                             </Card>
-                        )
-                      })}
+                          )
+                        })
+                      ) : (
+                        <Card className="rounded-3xl border-0 bg-gray-50 p-8 text-center shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+                          <p className="text-sm text-slate-500">
+                            {questFilter === '완료'
+                              ? '아직 제출한 퀘스트가 없습니다.'
+                              : '아직 참여중인 퀘스트가 없습니다.'}
+                          </p>
+                        </Card>
+                      )}
                     </div>
                   </div>
                 </div>
-
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogContent className="rounded-3xl">
-                    <DialogHeader>
-                      <DialogTitle>새로운 퀘스트 추가</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="quest-title">퀘스트 제목</Label>
-                        <Input
-                            id="quest-title"
-                            value={newQuestTitle}
-                            onChange={(e) => setNewQuestTitle(e.target.value)}
-                            placeholder="퀘스트 제목을 입력하세요"
-                            className="rounded-xl"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="quest-status">상태</Label>
-                        <Select value={newQuestStatus} onValueChange={(value: '진행중' | '찜') => setNewQuestStatus(value)}>
-                          <SelectTrigger className="rounded-xl">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="진행중">진행중</SelectItem>
-                            <SelectItem value="찜">찜</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label>데드라인</Label>
-                        <p className="text-sm text-slate-500 mt-1">
-                          {selectedDate ? selectedDate.toLocaleDateString() : '날짜를 선택하세요'}
-                        </p>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl">취소</Button>
-                      <Button onClick={addQuest} disabled={!newQuestTitle.trim()} className="rounded-xl">추가</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
               </section>
             </div>
 
