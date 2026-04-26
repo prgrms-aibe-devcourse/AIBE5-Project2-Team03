@@ -10,11 +10,8 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
-    Optional<User> findByEmail(String email);
 
-    // UserRepository.java
-    Optional<User> findByUsername(String username); // n을 소문자로!
-    // UserRepository.java
+    Optional<User> findByEmail(String email);
 
     // 1. 기존 권한 삭제
     @Modifying
