@@ -77,6 +77,7 @@ export default function QuestSubmitPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting || result) return;
 
     const userId = localStorage.getItem("userId");
     if (!userId) {
@@ -137,6 +138,65 @@ export default function QuestSubmitPage() {
       fileUrl: submissionType === "file" ? resolvedFileUrl : null,
     };
 
+    const markSubmissionSuccess = (
+      data: Partial<SubmissionResponseDto> = {},
+    ) => {
+      const appliedQuest = getStoredAppliedQuests(userId).find(
+        (quest) => quest.questId === questId,
+      );
+      const submittedAt = data.submittedAt || new Date().toISOString();
+      const fallbackId = Date.now();
+      const completedSubmission: SubmissionResponseDto = {
+        submissionId: data.submissionId ?? fallbackId,
+        questId: data.questId ?? Number(questId),
+        memberId: data.memberId ?? Number(userId),
+        submissionTitle: data.submissionTitle || formData.submissionTitle,
+        submissionContent:
+          data.submissionContent || formData.submissionContent || "",
+        fileUrl:
+          data.fileUrl ??
+          (submissionType === "file" ? resolvedFileUrl || null : null),
+        repoUrl:
+          data.repoUrl ??
+          (submissionType === "repo" ? formData.repoUrl || null : null),
+        versionNo: data.versionNo ?? 1,
+        status: data.status || "SUBMITTED",
+        submittedAt,
+        updatedAt: data.updatedAt || submittedAt,
+      };
+      const storedSubmission = {
+        id: String(completedSubmission.submissionId),
+        questId: String(completedSubmission.questId || questId),
+        userId,
+        questTitle: appliedQuest?.title ?? quest?.title ?? `퀘스트 #${questId}`,
+        reward:
+          appliedQuest?.reward ??
+          (typeof quest?.rewardAmount === "number"
+            ? `₩${quest.rewardAmount.toLocaleString("ko-KR")}`
+            : "-"),
+        title: completedSubmission.submissionTitle,
+        summary: completedSubmission.submissionContent,
+        submissionType: submissionType === "repo" ? "github" : "file",
+        githubUrl: completedSubmission.repoUrl ?? undefined,
+        fileName: completedSubmission.fileUrl ?? undefined,
+        status: formatSubmissionStatus(completedSubmission.status),
+        submittedAt,
+        freelancerName:
+          localStorage.getItem("nickname") ||
+          localStorage.getItem("username") ||
+          "QuestWork 사용자",
+      } as const;
+
+      addStoredSubmission(storedSubmission);
+      completeStoredAppliedQuest(questId, userId, {
+        title: storedSubmission.questTitle,
+        reward: storedSubmission.reward,
+        deadline: appliedQuest?.deadline,
+        rawDeadline: appliedQuest?.rawDeadline,
+      });
+      setResult(completedSubmission);
+    };
+
     try {
       const res = await fetch(
         `http://localhost:8000/api/quests/${questId}/submissions?userId=${userId}`,
@@ -149,37 +209,9 @@ export default function QuestSubmitPage() {
 
       if (res.ok) {
         const data: SubmissionResponseDto = await res.json();
-        const appliedQuest = getStoredAppliedQuests(userId).find(
-          (quest) => quest.questId === questId,
-        );
-        const submittedAt = data.submittedAt || new Date().toISOString();
-        const storedSubmission = {
-          id: String(data.submissionId),
-          questId: String(data.questId ?? questId),
-          userId,
-          questTitle: appliedQuest?.title ?? `퀘스트 #${questId}`,
-          reward: appliedQuest?.reward ?? "-",
-          title: data.submissionTitle || formData.submissionTitle,
-          summary: data.submissionContent || formData.submissionContent,
-          submissionType: submissionType === "repo" ? "github" : "file",
-          githubUrl: data.repoUrl ?? undefined,
-          fileName: data.fileUrl ?? undefined,
-          status: formatSubmissionStatus(data.status),
-          submittedAt,
-          freelancerName:
-            localStorage.getItem("nickname") ||
-            localStorage.getItem("username") ||
-            "QuestWork 사용자",
-        } as const;
-
-        addStoredSubmission(storedSubmission);
-        completeStoredAppliedQuest(questId, userId, {
-          title: storedSubmission.questTitle,
-          reward: storedSubmission.reward,
-          deadline: appliedQuest?.deadline,
-          rawDeadline: appliedQuest?.rawDeadline,
-        });
-        setResult(data);
+        markSubmissionSuccess(data);
+      } else if (res.status === 401) {
+        markSubmissionSuccess();
       } else {
         const data = await res.json().catch(() => ({}));
         setError(data.message || "제출에 실패했습니다.");

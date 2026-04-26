@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 export default function ProfileSettingsPage() {
   const [accountEmail, setAccountEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [userId, setUserId] = useState("");
   const [passwordDraft, setPasswordDraft] = useState({
     currentPassword: "",
     newPassword: "",
@@ -25,16 +26,17 @@ export default function ProfileSettingsPage() {
   useEffect(() => {
     setAccountEmail(localStorage.getItem("email") || "");
     setUsername(localStorage.getItem("username") || "");
+    setUserId(localStorage.getItem("userId") || "");
   }, []);
 
   const handlePasswordChange = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setPasswordMessage(null);
 
-    if (!username) {
+    if (!userId) {
       setPasswordMessage({
         type: "error",
-        text: "로그인 사용자 정보를 찾을 수 없습니다.",
+        text: "로그인 사용자 ID를 찾을 수 없습니다. 다시 로그인한 뒤 시도해주세요.",
       });
       return;
     }
@@ -62,7 +64,7 @@ export default function ProfileSettingsPage() {
     setIsPasswordLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:8000/api/user/${encodeURIComponent(username)}/password`,
+        `http://localhost:8000/api/user/${encodeURIComponent(userId)}/password`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -75,6 +77,23 @@ export default function ProfileSettingsPage() {
 
       if (!response.ok) {
         const errorMsg = await response.text();
+
+        if (response.status === 400) {
+          throw new Error(errorMsg || "현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(
+            "비밀번호 변경 권한을 확인하지 못했습니다. 다시 로그인한 뒤 시도해주세요.",
+          );
+        }
+
+        if (response.status === 404) {
+          throw new Error(
+            "비밀번호를 변경할 사용자 정보를 찾지 못했습니다. 다시 로그인한 뒤 시도해주세요.",
+          );
+        }
+
         throw new Error(errorMsg || "비밀번호 수정 실패");
       }
 
