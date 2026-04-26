@@ -110,83 +110,101 @@ export function MemberTable({
 
   return (
       <>
-        <Card className="border-border overflow-hidden">
+        <Card className="border-border overflow-hidden bg-card shadow-sm">
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead>회원 정보</TableHead>
-                <TableHead>권한</TableHead>
-                <TableHead>상태</TableHead>
-                <TableHead>가입일</TableHead>
-                <TableHead>최근 접속</TableHead>
-                <TableHead className="text-right">관리</TableHead>
+              <TableRow className="bg-muted/40 border-b border-border">
+                {/* 넓이를 재조정했습니다 */}
+                <TableHead className="w-[350px] py-3 pl-6 font-semibold">회원 정보</TableHead>
+                <TableHead className="w-[120px] text-center font-semibold">권한</TableHead>
+                <TableHead className="w-[120px] text-center font-semibold">상태</TableHead>
+                <TableHead className="w-[180px] text-center font-semibold">가입일</TableHead>
+                {/* 최근 접속 컬럼 삭제 */}
+                <TableHead className="w-[80px] pr-6 text-right font-semibold">관리</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {members.map((member) => (
-                  <TableRow key={member.id} className="hover:bg-muted/30">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                          <span className="text-sm font-semibold text-primary">{member.name.charAt(0)}</span>
+                  <TableRow key={member.id} className="hover:bg-muted/20 transition-colors border-b border-border last:border-0">
+                    <TableCell className="py-3 pl-6">
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 shadow-sm">
+                          <span className="text-sm font-bold text-primary">{member.name.charAt(0)}</span>
                         </div>
-                        <div>
-                          <p className="font-medium">{member.name}</p>
-                          <p className="text-sm text-muted-foreground">{member.email}</p>
+                        <div className="min-w-0">
+                          <p className="font-semibold text-foreground truncate">{member.name}</p>
+                          <p className="text-xs text-muted-foreground truncate">{member.email}</p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={getRoleBadgeStyle(member.role)}>
+                    <TableCell className="py-3 text-center">
+                      <Badge variant="outline" className={`px-2.5 py-0.5 font-medium ${getRoleBadgeStyle(member.role)}`}>
                         {getRoleLabel(member.role)}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={getStatusBadgeStyle(member.status)}>
+                    <TableCell className="py-3 text-center">
+                      <Badge variant="outline" className={`px-2.5 py-0.5 font-medium ${getStatusBadgeStyle(member.status)}`}>
                         {member.status === "ACTIVE" ? "활성화" : "비활성화"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">{member.joinDate}</TableCell>
-                    <TableCell className="text-muted-foreground">{member.lastLogin}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="py-3 text-center text-sm text-muted-foreground">{member.joinDate}</TableCell>
+
+                    <TableCell className="py-3 pr-6 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-muted">
+                            <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
+                          </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuLabel>회원 관리</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
+                        {/* 포털을 제거하거나 구조를 단순화하여 이벤트 오류 방지 */}
+                        <DropdownMenuContent align="end" className="w-56 bg-white border border-border shadow-lg p-1.5 z-[60]">
+                          <DropdownMenuLabel className="px-3 py-2 text-xs font-bold text-muted-foreground uppercase tracking-wider">회원 관리</DropdownMenuLabel>
+                          <DropdownMenuSeparator className="my-1" />
 
-                          {/* 권한 변경 서브 메뉴 */}
+                          {/* 권한 변경: onClick이 확실히 작동하도록 MenuItem 구조 확인 */}
                           <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                              <Shield className="mr-2 h-4 w-4" /> 권한 변경
+                            <DropdownMenuSubTrigger className="cursor-pointer px-3 py-2.5 rounded-md focus:bg-primary focus:text-primary-foreground">
+                              <Shield className="mr-3 h-4 w-4" />
+                              <span className="font-medium">권한 변경</span>
                             </DropdownMenuSubTrigger>
                             <DropdownMenuPortal>
-                              <DropdownMenuSubContent>
-                                <DropdownMenuItem onClick={() => onRoleChange(member.id, "ADMIN")}>관리자</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onRoleChange(member.id, "MANAGER")}>매니저</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onRoleChange(member.id, "MEMBER")}>일반 회원</DropdownMenuItem>
+                              <DropdownMenuSubContent className="bg-white border border-border shadow-md min-w-[140px] p-1.5">
+                                {["ADMIN", "MANAGER", "MEMBER"].map((role) => (
+                                    <DropdownMenuItem
+                                        key={role}
+                                        className="cursor-pointer px-3 py-2 rounded-md focus:bg-primary focus:text-primary-foreground font-medium"
+                                        onClick={(e) => {
+                                          e.stopPropagation(); // 이벤트 전파 방지 추가
+                                          onRoleChange(member.id, role as Role);
+                                        }}
+                                    >
+                                      {getRoleLabel(role as Role)}
+                                    </DropdownMenuItem>
+                                ))}
                               </DropdownMenuSubContent>
                             </DropdownMenuPortal>
                           </DropdownMenuSub>
 
-                          {/* 상태 변경 서브 메뉴 */}
                           <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                              <CheckCircle className="mr-2 h-4 w-4" /> 상태 변경
+                            <DropdownMenuSubTrigger className="cursor-pointer px-3 py-2.5 rounded-md focus:bg-primary focus:text-primary-foreground">
+                              <CheckCircle className="mr-3 h-4 w-4" />
+                              <span className="font-medium">상태 변경</span>
                             </DropdownMenuSubTrigger>
                             <DropdownMenuPortal>
-                              <DropdownMenuSubContent>
-                                <DropdownMenuItem onClick={() => onStatusChange(member.id, "ACTIVE")}>활성화</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onStatusChange(member.id, "INACTIVE")}>비활성화</DropdownMenuItem>
+                              <DropdownMenuSubContent className="bg-white border border-border shadow-md min-w-[140px] p-1.5">
+                                <DropdownMenuItem className="cursor-pointer px-3 py-2 rounded-md focus:bg-primary focus:text-primary-foreground" onClick={() => onStatusChange(member.id, "ACTIVE")}>활성화</DropdownMenuItem>
+                                <DropdownMenuItem className="cursor-pointer px-3 py-2 rounded-md focus:bg-primary focus:text-primary-foreground" onClick={() => onStatusChange(member.id, "INACTIVE")}>비활성화</DropdownMenuItem>
                               </DropdownMenuSubContent>
                             </DropdownMenuPortal>
                           </DropdownMenuSub>
 
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleDeleteClick(member)} className="text-destructive">
-                            <Trash2 className="mr-2 h-4 w-4" /> 회원 삭제
+                          <DropdownMenuSeparator className="my-1" />
+                          <DropdownMenuItem
+                              onClick={() => handleDeleteClick(member)}
+                              className="text-destructive cursor-pointer px-3 py-2.5 rounded-md focus:bg-destructive focus:text-destructive-foreground font-medium"
+                          >
+                            <Trash2 className="mr-3 h-4 w-4" />
+                            <span>회원 삭제</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -196,7 +214,6 @@ export function MemberTable({
             </TableBody>
           </Table>
         </Card>
-
         {/* 삭제 확인 모달 */}
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>

@@ -156,7 +156,7 @@ public class QuestService {
         wallet.setBalance(currentBalance.add(reward));
 
         // 4. 프로필 누적 수익 업데이트
-        MemberProfileEntity profile = memberProfileRepository.findByUserId(winnerId)
+        MemberProfileEntity profile = memberProfileRepository.findById(winnerId)
                 .orElseThrow(() -> new IllegalArgumentException("프로필 정보가 없습니다."));
 
         BigDecimal currentTotal = profile.getTotalReward() != null ? profile.getTotalReward() : BigDecimal.ZERO;

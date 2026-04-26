@@ -69,17 +69,17 @@ export function MemberStats({ stats }: StatsProps) {
   ]
 
   return (
-    <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+    <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
       {statItems.map((item) => (
-        <Card key={item.label} className="border-border">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${item.bgColor}`}>
-                <item.icon className={`h-5 w-5 ${item.color}`} />
+        <Card key={item.label} className="border-border bg-card shadow-sm transition-all hover:shadow-md">
+          <CardContent className="p-3">
+            <div className="flex flex-col items-center text-center space-y-1">
+              <div className={`rounded-full p-2 ${item.bgColor} shadow-inner`}>
+                <item.icon className={`h-4 w-4 ${item.color}`} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">{item.value}</p>
-                <p className="text-sm text-muted-foreground">{item.label}</p>
+                <p className="text-xs font-medium text-muted-foreground">{item.label}</p>
+                <p className="text-xl font-bold tracking-tight text-foreground">{item.value}</p>
               </div>
             </div>
           </CardContent>

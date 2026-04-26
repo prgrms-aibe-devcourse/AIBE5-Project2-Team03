@@ -10,6 +10,8 @@ import com.example.QuestWork.domain.user.dto.UserRequestDto;
 import com.example.QuestWork.domain.user.dto.UserResponseDto;
 import com.example.QuestWork.domain.user.entity.User;
 import com.example.QuestWork.domain.user.repository.UserRepository;
+import com.example.QuestWork.domain.wallet.entity.WalletEntity;
+import com.example.QuestWork.domain.wallet.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class UserService {
     // 💡 아래 레포지토리들이 반드시 추가되어야 합니다.
     private final MemberProfileRepository memberProfileRepository;
     private final ManagerProfileRepository managerProfileRepository;
+    private final WalletRepository walletRepository;
 
     @Transactional(readOnly=true)
     public UserResponseDto login(UserLoginRequestDto dto) {
@@ -46,15 +49,22 @@ public class UserService {
         String roleType = dto.getRoleType();
         System.out.println("전달된 roleType: [" + roleType + "]");
 
-        // 1. [공통] 어떤 역할이든 '기본 멤버 프로필'은 생성합니다.
-        // (매니저도 활동을 하려면 기본 프로필 정보가 필요하니까요!)
+        // 1. [수정] 결과를 'savedProfile'이라는 변수에 담아줍니다.
         MemberProfileEntity memberProfile = MemberProfileEntity.builder()
                 .user(user)
                 .level(MemberLevel.BRONZE)
                 .badgeCount(0)
                 .totalReward(BigDecimal.ZERO)
                 .build();
-        memberProfileRepository.save(memberProfile);
+        MemberProfileEntity savedProfile = memberProfileRepository.save(memberProfile);
+
+        // 2. [수정] WalletEntity의 필드명(memberId)에 맞춰서 값을 넣습니다.
+        WalletEntity wallet = WalletEntity.builder()
+                .userId(savedProfile.getId()) // 💡 .memberProfile이 아니라 .memberId입니다!
+                .balance(BigDecimal.ZERO)
+                .build();
+        walletRepository.save(wallet);
+
 
         // 2. 역할에 따른 권한 부여 및 추가 프로필 생성
         if (roleType != null && roleType.trim().equalsIgnoreCase("MANAGER")) {
@@ -74,11 +84,13 @@ public class UserService {
                     .build();
             managerProfileRepository.save(managerProfile);
 
+
             System.out.println("매니저 및 기본 멤버 프로필 생성 완료");
         } else {
             // 일반 멤버 권한 부여
             userRepository.insertUserRoleNative(user.getId(), "MEMBER");
             System.out.println("일반 멤버 프로필 생성 완료");
         }
-    }
+
+     }
     }

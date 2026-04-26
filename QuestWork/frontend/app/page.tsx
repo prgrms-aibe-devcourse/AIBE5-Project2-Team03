@@ -6,11 +6,53 @@ import { Footer } from "@/components/landing/footer";
 import { PlatformStatsSection } from "@/components/landing/platform-stats-section";
 import { TrustedCompaniesSection } from "@/components/landing/trusted-companies-section";
 import { QuestCard, type Quest } from "@/components/quest-card";
-import { fetchQuestCardList } from "@/lib/quests";
+
+interface ApiQuest {
+  id: number;
+  title: string;
+  formData: {
+    description: string;
+    techStack: string[];
+    difficulty: string;
+    submissionFormats: string[];
+  };
+  rewardAmount: number;
+  deadline: string;
+  status: string;
+}
+
+function formatReward(amount: number): string {
+  return "원" + amount.toLocaleString("ko-KR");
+}
+
+function formatDeadline(deadline: string): string {
+  const deadlineDate = new Date(deadline.replace(" ", "T"));
+  const now = new Date();
+  const diffMs = deadlineDate.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays <= 0) return "마감";
+  return `${diffDays}일 남음`;
+}
 
 async function fetchFeaturedQuests(): Promise<Quest[]> {
-  const quests = await fetchQuestCardList();
-  return quests.slice(0, 6);
+  try {
+    const res = await fetch("http://localhost:8000/api/quests", {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return [];
+    const data: ApiQuest[] = await res.json();
+    return data.slice(0, 6).map((q) => ({
+      id: String(q.id),
+      title: q.title,
+      description: q.formData?.description ?? "",
+      techStack: q.formData?.techStack ?? [],
+      reward: formatReward(q.rewardAmount),
+      deadline: formatDeadline(q.deadline),
+      participants: 0,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export default async function LandingPage() {

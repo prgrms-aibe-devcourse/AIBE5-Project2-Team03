@@ -1,5 +1,6 @@
 package com.example.QuestWork.domain.withdraw.entity;
 
+import com.example.QuestWork.domain.withdraw.constant.WithdrawStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,8 +37,9 @@ public class WithdrawRequest {
 
     // 빌더 사용 시에도 "REQUESTED"가 기본값으로 들어가도록 설정
     @Builder.Default
-    @Column(length = 30, nullable = false)
-    private String status = "REQUESTED";
+    @Enumerated(EnumType.STRING) // ⭐ DB에 문자열(REQUESTED)로 저장되게 합니다.
+    @Column(nullable = false)
+    private WithdrawStatus status = WithdrawStatus.REQUESTED; // 기본값 설정
 
     @Column(name = "requested_at", nullable = false, updatable = false)
     private LocalDateTime requestedAt;
@@ -51,5 +53,9 @@ public class WithdrawRequest {
         if (this.requestedAt == null) {
             this.requestedAt = LocalDateTime.now();
         }
+    }
+
+    public void setStatus(WithdrawStatus withdrawStatus) {
+        this.status = withdrawStatus;
     }
 }
