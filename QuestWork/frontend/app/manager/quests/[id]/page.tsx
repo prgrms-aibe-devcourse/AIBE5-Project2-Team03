@@ -178,6 +178,8 @@ export default function ManagerQuestDetailPage() {
       }
       setPayoutDone(true)
       setPayoutSubmission(null)
+      // 퀘스트 상태를 FINISHED로 로컬 업데이트
+      setQuest(prev => prev ? { ...prev, status: 'FINISHED' } : prev)
     } catch (e) {
       setPayoutError(e instanceof Error ? e.message : '오류가 발생했습니다.')
     } finally {
@@ -481,11 +483,11 @@ export default function ManagerQuestDetailPage() {
                                 {s.status === 'WINNER' ? (
                                   <Button
                                     size="sm"
-                                    disabled={payoutDone}
+                                    disabled={quest?.status === 'FINISHED' || payoutDone}
                                     className="bg-green-600 text-white hover:bg-green-700 disabled:opacity-40"
                                     onClick={() => setPayoutSubmission(s)}
                                   >
-                                    {payoutDone ? '지급 완료' : '지급 승인'}
+                                    {(quest?.status === 'FINISHED' || payoutDone) ? '지급 완료' : '지급 승인'}
                                   </Button>
                                 ) : (
                                   <Button

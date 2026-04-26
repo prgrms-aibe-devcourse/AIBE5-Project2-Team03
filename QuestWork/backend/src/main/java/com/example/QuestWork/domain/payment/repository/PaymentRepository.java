@@ -28,12 +28,12 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             nativeQuery = true)
     BigDecimal sumAllFees();
 
-    // [수정] 이번 달 수익: 4월에 결제(paid_at)되었고, 현재 RELEASED 상태인 모든 수수료
+    // [수정] 이번 달 수익: 현재 달에 결제되었고, RELEASED 상태인 모든 수수료
     @Query(value = "SELECT SUM(p.fee) " +
             "FROM payments p " +
             "JOIN escrows e ON p.quest_id = e.quest_id " +
             "WHERE e.status = 'RELEASED' " +
-            "  AND DATE_FORMAT(p.paid_at, '%Y-%m') = '2026-04'", // 날짜 기준을 paid_at으로!
+            "  AND DATE_FORMAT(p.paid_at, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')",
             nativeQuery = true)
     BigDecimal calculateMonthFee();
 

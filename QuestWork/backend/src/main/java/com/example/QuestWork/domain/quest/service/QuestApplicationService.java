@@ -189,8 +189,8 @@ public class QuestApplicationService {
                 .orElseThrow(() -> new IllegalArgumentException("퀘스트를 찾을 수 없습니다."));
     }
     //멤버 유저아이디 받아오기
-    private MemberProfileEntity getMemberProfile(Long memberId) {
-        return memberProfileRepository.findById(memberId)
+    private MemberProfileEntity getMemberProfile(Long userId) {
+        return memberProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
     }
     //실제 유저가 가지고 있는 제출물인지 검증
