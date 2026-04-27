@@ -79,9 +79,9 @@ export function MemberTable({
 
   const getStatusBadgeStyle = (status: Status) => {
     switch (status.toUpperCase()) {
-      case "ACTIVE": return "bg-emerald-50 text-emerald-700 border-emerald-200"
-      case "INACTIVE": return "bg-rose-50 text-rose-700 border-rose-200"
-      case "DELETED": return "bg-slate-50 text-slate-700 border-slate-200"
+      case "ACTIVE": return "bg-emerald-50 text-emerald-700 border-emerald-200" // 활성화
+      case "INACTIVE": return "bg-slate-50 text-slate-700 border-slate-200"      // 비활성화
+      case "DELETED": return "bg-rose-50 text-rose-700 border-rose-200"         // ✅ 삭제됨 (빨간색 계열)
       default: return "bg-slate-50 text-slate-700 border-slate-200"
     }
   }
@@ -144,7 +144,9 @@ export function MemberTable({
                     </TableCell>
                     <TableCell className="py-3 text-center">
                       <Badge variant="outline" className={`px-2.5 py-0.5 font-medium ${getStatusBadgeStyle(member.status)}`}>
-                        {member.status === "ACTIVE" ? "활성화" : "비활성화"}
+                        {member.status === "ACTIVE" && "활성화"}
+                        {member.status === "INACTIVE" && "비활성화"}
+                        {member.status === "DELETED" && "삭제됨"}
                       </Badge>
                     </TableCell>
                     <TableCell className="py-3 text-center text-sm text-muted-foreground">{member.joinDate}</TableCell>
