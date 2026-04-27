@@ -46,34 +46,80 @@ const OVERVIEW_STATS = [
   },
 ]
 
-const RECENT_EARNINGS = [
-  {
-    id: '1',
-    title: 'React Admin Dashboard',
-    amount: '₩500,000',
-    date: '2024-04-12',
-  },
-  {
-    id: '2',
-    title: 'Mobile App Task Flow',
-    amount: '₩300,000',
-    date: '2024-04-09',
-  },
-]
+interface Transaction {
+  id: number
+  amount: number
+  type: string
+  status: string
+  description: string
+  createdAt: string
+}
+
+const getRecentEarningTitle = (transaction: Transaction) => {
+  const questId =
+    transaction.description.match(/퀘스트\s*(\d+)\s*번/)?.[1] ??
+    transaction.description.match(/quest\s*#?\s*(\d+)/i)?.[1] ??
+    transaction.description.match(/퀘스트\s*ID[:\s]*(\d+)/i)?.[1]
+
+  return questId
+    ? `퀘스트 ${questId}번 보상 지급`
+    : '퀘스트 보상 지급 완료'
+}
 
 export default function DashboardPage() {
   const [appliedQuests, setAppliedQuests] = useState<StoredAppliedQuest[]>([])
   const [submissions, setSubmissions] = useState<StoredSubmission[]>([])
+  const [transactions, setTransactions] = useState<Transaction[]>([])
 
   useEffect(() => {
     const userId = localStorage.getItem('userId')
     setAppliedQuests(getStoredAppliedQuests(userId))
     setSubmissions(getStoredSubmissions(userId))
+
+    if (!userId) return
+
+    const fetchTransactions = async () => {
+      try {
+        const txRes = await fetch(
+          `http://localhost:8000/api/settlement/transactions/${userId}`,
+        )
+
+        if (txRes.ok) {
+          const txs: Transaction[] = await txRes.json()
+          setTransactions(txs)
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchTransactions()
   }, [])
 
   const activeAppliedQuests = appliedQuests.filter(
     (quest) => quest.status !== '완료',
   )
+
+  const incomeTransactions = useMemo(
+    () =>
+      transactions
+        .filter((transaction) => transaction.amount > 0)
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() -
+            new Date(a.createdAt).getTime(),
+        ),
+    [transactions],
+  )
+  const totalIncome = useMemo(
+    () =>
+      incomeTransactions.reduce(
+        (sum, transaction) => sum + transaction.amount,
+        0,
+      ),
+    [incomeTransactions],
+  )
+  const recentEarnings = incomeTransactions.slice(0, 3)
 
   const overviewStats = useMemo(
     () =>
@@ -105,9 +151,23 @@ export default function DashboardPage() {
                       ? '제출 완료'
                       : '아직 제출한 퀘스트가 없습니다.',
                 }
-          : stat,
+          : stat.accent
+            ? {
+                ...stat,
+                value: `₩${totalIncome.toLocaleString('ko-KR')}`,
+                subtext:
+                  recentEarnings.length > 0
+                    ? '실제 지급 완료 수익'
+                    : '아직 지급된 수익이 없습니다.',
+              }
+            : stat,
       ),
-    [activeAppliedQuests.length, submissions.length],
+    [
+      activeAppliedQuests.length,
+      recentEarnings.length,
+      submissions.length,
+      totalIncome,
+    ],
   )
   const recentAppliedQuests = activeAppliedQuests.slice(0, 3)
   const recentSubmissions = submissions.slice(0, 3)
@@ -251,24 +311,33 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {RECENT_EARNINGS.map((item) => (
-                    <div
-                      key={item.id}
-                      className="rounded-lg border border-border p-4"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <h3 className="line-clamp-2 text-sm font-semibold text-foreground">
-                          {item.title}
-                        </h3>
-                        <span className="shrink-0 text-sm font-bold text-primary">
-                          {item.amount}
-                        </span>
+                  {recentEarnings.length > 0 ? (
+                    recentEarnings.map((item) => (
+                      <div
+                        key={item.id}
+                        className="rounded-lg border border-border p-4"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <h3 className="text-sm font-semibold text-foreground">
+                            {getRecentEarningTitle(item)}
+                          </h3>
+                          <span className="shrink-0 text-sm font-bold text-primary">
+                            +₩{Math.abs(item.amount).toLocaleString('ko-KR')}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-xs text-foreground-muted">
+                          지급일{' '}
+                          {new Date(item.createdAt).toLocaleDateString('ko-KR')}
+                        </p>
                       </div>
-                      <p className="mt-2 text-xs text-foreground-muted">
-                        지급일 {item.date}
+                    ))
+                  ) : (
+                    <div className="rounded-lg border border-dashed border-border p-4">
+                      <p className="text-sm text-foreground-muted">
+                        아직 지급된 수익이 없습니다.
                       </p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </Card>

@@ -13,12 +13,23 @@ export interface ManagerSubmission {
   submittedAt: string
   status: 'reviewing' | 'winner' | 'rejected'
   githubUrl: string
+  rewardConfirmed: boolean
 }
 
 function mapSubmissionStatus(apiStatus: string): 'reviewing' | 'winner' | 'rejected' {
   if (apiStatus === 'WINNER') return 'winner'
   if (apiStatus === 'REJECTED') return 'rejected'
   return 'reviewing'
+}
+
+function isRewardConfirmed(sub: any) {
+  if (Boolean(sub.rewardConfirmed ?? sub.isPaid ?? sub.paidAt)) return true
+
+  return [sub.paymentStatus, sub.rewardStatus, sub.payoutStatus].some((status) =>
+    ['PAID', 'COMPLETED', 'COMPLETE', 'RELEASED', 'CONFIRMED'].includes(
+      String(status ?? '').toUpperCase(),
+    ),
+  )
 }
 
 export function useManagerDashboardData() {
@@ -78,6 +89,7 @@ export function useManagerDashboardData() {
                 submittedAt: sub.submittedAt?.split('T')[0] ?? '',
                 status: mapSubmissionStatus(sub.status),
                 githubUrl: sub.repoUrl || sub.fileUrl || '',
+                rewardConfirmed: isRewardConfirmed(sub),
               })),
             ),
         )

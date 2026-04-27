@@ -14,11 +14,31 @@ import { Button, buttonVariants } from '@/components/ui/button'
 interface Quest {
   id: string
   title: string
-  description: string
-  rewardAmount: number
-  deadline: string
-  status: 'active' | 'completed' | 'draft'
-  createdAt: string
+  description?: string
+  rewardAmount?: number
+  deadline?: string
+  endDate?: string
+  dueDate?: string
+  status?: string
+  createdAt?: string
+}
+
+function getQuestDeadlineDate(quest: Quest) {
+  const deadlineValue = quest.deadline ?? quest.endDate ?? quest.dueDate
+  if (!deadlineValue) return null
+
+  const date = new Date(deadlineValue)
+  if (Number.isNaN(date.getTime())) return null
+
+  return date
+}
+
+function isSameCalendarDate(a: Date, b: Date) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  )
 }
 
 function Calendar({
@@ -202,10 +222,11 @@ function CalendarDayButton({
 
   // 해당 날짜의 퀘스트 필터링
   const dayQuests = quests.filter(quest => {
-    const questDate = new Date(quest.deadline)
-    const currentDate = new Date(day.date)
-    return questDate.toDateString() === currentDate.toDateString()
+    const questDate = getQuestDeadlineDate(quest)
+    if (!questDate) return false
+    return isSameCalendarDate(questDate, day.date)
   })
+  const hasDeadline = dayQuests.length > 0
 
   return (
     <Button
@@ -225,13 +246,16 @@ function CalendarDayButton({
       className={cn(
         'data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70',
         defaultClassNames.day,
+        hasDeadline &&
+          !modifiers.selected &&
+          'rounded-full bg-purple-50/60 text-purple-800 shadow-[inset_0_0_0_1px_rgba(168,85,247,0.12)] hover:bg-purple-50',
         className,
       )}
       {...props}
     >
       <span>{day.date.getDate()}</span>
-      {dayQuests.length > 0 && (
-        <div className="flex flex-col gap-0.5 w-full mt-0.5">
+      {false && dayQuests.length > 0 && (
+        <div className="hidden">
           {dayQuests.slice(0, 2).map((quest) => (
             <div
               key={quest.id}
@@ -252,6 +276,18 @@ function CalendarDayButton({
             </div>
           )}
         </div>
+      )}
+      {hasDeadline && (
+        <span
+          className={cn(
+            'mt-0.5 flex h-1.5 min-w-1.5 items-center justify-center rounded-full bg-primary/80 text-[9px] font-bold leading-none text-primary-foreground opacity-100',
+            dayQuests.length > 1 && 'h-4 min-w-4 px-1',
+            modifiers.selected && 'bg-primary-foreground text-primary',
+          )}
+          title={dayQuests.map((quest) => quest.title).join(', ')}
+        >
+          {dayQuests.length > 1 ? dayQuests.length : ''}
+        </span>
       )}
     </Button>
   )

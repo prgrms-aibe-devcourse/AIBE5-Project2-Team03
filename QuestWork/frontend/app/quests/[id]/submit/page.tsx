@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  completeStoredAppliedQuest,
   getStoredAppliedQuests,
+  submitStoredAppliedQuest,
 } from "@/lib/applied-quests";
 import {
   addStoredSubmission,
@@ -188,7 +188,7 @@ export default function QuestSubmitPage() {
       } as const;
 
       addStoredSubmission(storedSubmission);
-      completeStoredAppliedQuest(questId, userId, {
+      submitStoredAppliedQuest(questId, userId, {
         title: storedSubmission.questTitle,
         reward: storedSubmission.reward,
         deadline: appliedQuest?.deadline,

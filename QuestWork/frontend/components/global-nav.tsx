@@ -8,7 +8,6 @@ import {
   BookOpen,
   BriefcaseBusiness,
   Building2,
-  ChevronDown,
   Headphones,
   Menu,
   MonitorSmartphone,
@@ -140,6 +139,51 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   const enterpriseCloseRef = useRef<NodeJS.Timeout | null>(null);
   const userMenuCloseRef = useRef<NodeJS.Timeout | null>(null);
 
+  const clearDesktopDropdownTimers = () => {
+    [questsCloseRef, whyCloseRef, enterpriseCloseRef].forEach((timerRef) => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    });
+  };
+
+  const closeDesktopDropdowns = () => {
+    clearDesktopDropdownTimers();
+    setIsQuestsOpen(false);
+    setIsWhyOpen(false);
+    setIsEnterpriseOpen(false);
+  };
+
+  const openDesktopDropdown = (target: "quests" | "why" | "enterprise") => {
+    clearDesktopDropdownTimers();
+    setIsQuestsOpen(target === "quests");
+    setIsWhyOpen(target === "why");
+    setIsEnterpriseOpen(target === "enterprise");
+  };
+
+  const toggleDesktopDropdown = (target: "quests" | "why" | "enterprise") => {
+    clearDesktopDropdownTimers();
+
+    if (target === "quests") {
+      setIsQuestsOpen((open) => !open);
+      setIsWhyOpen(false);
+      setIsEnterpriseOpen(false);
+      return;
+    }
+
+    if (target === "why") {
+      setIsQuestsOpen(false);
+      setIsWhyOpen((open) => !open);
+      setIsEnterpriseOpen(false);
+      return;
+    }
+
+    setIsQuestsOpen(false);
+    setIsWhyOpen(false);
+    setIsEnterpriseOpen((open) => !open);
+  };
+
   const makeEnter =
     (
       setter: (v: boolean) => void,
@@ -263,22 +307,22 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
         </div>
 
         <div className="hidden min-w-0 items-center justify-self-center lg:flex">
-          <div className="flex items-center gap-1 rounded-full border border-border/70 bg-white/70 px-2 py-1.5 shadow-sm shadow-black/5 backdrop-blur-sm xl:px-3">
+          <div className="flex items-center gap-7 xl:gap-9">
             <div
               className="relative"
-              onMouseEnter={makeEnter(setIsQuestsOpen, questsCloseRef)}
-              onMouseLeave={makeLeave(setIsQuestsOpen, questsCloseRef)}
+              onMouseEnter={() => openDesktopDropdown("quests")}
+              onMouseLeave={closeDesktopDropdowns}
             >
               <button
                 type="button"
-                onClick={() => setIsQuestsOpen((open) => !open)}
-                className="rounded-full px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                onClick={() => toggleDesktopDropdown("quests")}
+                className="px-0 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
               >
                 퀘스트
               </button>
 
               {isQuestsOpen && (
-                <div className="absolute left-1/2 top-full z-30 w-[28rem] -translate-x-1/2 pt-4">
+                <div className="absolute left-1/2 top-full z-30 w-[28rem] -translate-x-1/2 pt-4 duration-100 animate-in fade-in-0 slide-in-from-top-1">
                   <div className="overflow-hidden rounded-2xl border border-border bg-background shadow-xl shadow-primary/10">
                     <div className="border-b border-border bg-gradient-to-r from-primary-light/55 to-white px-5 py-4">
                       <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
@@ -321,27 +365,26 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 
             <Link
               href={dashboardHref}
-              className="rounded-full px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
+              className="px-0 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
             >
               대시보드
             </Link>
 
             <div
               className="relative"
-              onMouseEnter={makeEnter(setIsWhyOpen, whyCloseRef)}
-              onMouseLeave={makeLeave(setIsWhyOpen, whyCloseRef)}
+              onMouseEnter={() => openDesktopDropdown("why")}
+              onMouseLeave={closeDesktopDropdowns}
             >
               <button
                 type="button"
-                onClick={() => setIsWhyOpen((open) => !open)}
-                className="inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                onClick={() => toggleDesktopDropdown("why")}
+                className="px-0 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
               >
                 Why QuestWork
-                <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
 
               {isWhyOpen && (
-                <div className="absolute left-1/2 top-full z-30 w-[30rem] -translate-x-1/2 pt-4">
+                <div className="absolute left-1/2 top-full z-30 w-[30rem] -translate-x-1/2 pt-4 duration-100 animate-in fade-in-0 slide-in-from-top-1">
                   <div className="overflow-hidden rounded-2xl border border-border bg-background shadow-xl shadow-primary/10">
                     <div className="border-b border-border bg-gradient-to-r from-primary-light/55 to-white px-5 py-4">
                       <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
@@ -384,20 +427,19 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 
             <div
               className="relative"
-              onMouseEnter={makeEnter(setIsEnterpriseOpen, enterpriseCloseRef)}
-              onMouseLeave={makeLeave(setIsEnterpriseOpen, enterpriseCloseRef)}
+              onMouseEnter={() => openDesktopDropdown("enterprise")}
+              onMouseLeave={closeDesktopDropdowns}
             >
               <button
                 type="button"
-                onClick={() => setIsEnterpriseOpen((open) => !open)}
-                className="inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                onClick={() => toggleDesktopDropdown("enterprise")}
+                className="px-0 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
               >
                 기업 서비스
-                <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
 
               {isEnterpriseOpen && (
-                <div className="absolute left-1/2 top-full z-30 w-[31rem] -translate-x-1/2 pt-4">
+                <div className="absolute left-1/2 top-full z-30 w-[31rem] -translate-x-1/2 pt-4 duration-100 animate-in fade-in-0 slide-in-from-top-1">
                   <div className="overflow-hidden rounded-2xl border border-border bg-background shadow-xl shadow-primary/10">
                     <div className="grid gap-4 bg-gradient-to-r from-[#F1E8FF] to-white p-5">
                       <div className="flex items-start justify-between gap-4">
@@ -456,7 +498,7 @@ export function GlobalNav({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 
             <Link
               href="/blog"
-              className="rounded-full px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
+              className="px-0 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
             >
               Blog
             </Link>

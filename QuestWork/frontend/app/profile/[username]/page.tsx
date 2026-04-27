@@ -12,6 +12,7 @@ import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -45,6 +46,7 @@ import {
   Bell,
   Wallet,
   Coins,
+  CheckCircle2,
 } from "lucide-react";
 
 // 인터페이스 정의 (기존과 동일)
@@ -211,6 +213,12 @@ export default function ProfilePage({
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawError, setWithdrawError] = useState("");
   const [withdrawSubmitting, setWithdrawSubmitting] = useState(false);
+  const [isWithdrawSuccessOpen, setIsWithdrawSuccessOpen] = useState(false);
+  const [profileFeedback, setProfileFeedback] = useState<{
+    type: "success" | "error";
+    title: string;
+    description: string;
+  } | null>(null);
   const [appliedQuests, setAppliedQuests] = useState<ProfileQuest[]>([]);
 
   const fetchAppliedQuests = async (userId: number) => {
@@ -365,7 +373,7 @@ export default function ProfilePage({
         throw new Error(errorText || "출금 요청을 처리하지 못했습니다.");
       }
 
-      alert("출금 신청이 완료되었습니다.");
+      setIsWithdrawSuccessOpen(true);
 
       // 모달 및 입력값 초기화
       setIsWithdrawOpen(false);
@@ -503,10 +511,18 @@ export default function ProfilePage({
       });
 
       setIsEditing(false);
-      alert("프로필이 성공적으로 저장되었습니다!");
+      setProfileFeedback({
+        type: "success",
+        title: "프로필이 저장되었습니다",
+        description: "변경한 마이페이지 정보가 성공적으로 반영되었습니다.",
+      });
     } catch (error: any) {
       console.error("저장 중 에러 발생:", error);
-      alert(error.message || "프로필 저장 중 오류가 발생했습니다.");
+      setProfileFeedback({
+        type: "error",
+        title: "프로필 저장에 실패했습니다",
+        description: error.message || "프로필 저장 중 오류가 발생했습니다.",
+      });
     }
   };
   if (isLoading)
@@ -995,6 +1011,87 @@ export default function ProfilePage({
                         {withdrawSubmitting ? "신청 중..." : "출금 신청"}
                       </Button>
                     </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog
+                  open={isWithdrawSuccessOpen}
+                  onOpenChange={setIsWithdrawSuccessOpen}
+                >
+                  <DialogContent className="max-w-md rounded-[28px] border border-[#A78BFA]/25 bg-white p-0 shadow-[0_30px_80px_-36px_rgba(109,40,217,0.35)]">
+                    <div className="px-8 pb-8 pt-9">
+                      <DialogHeader className="items-center text-center">
+                        <div className="mb-5 flex h-[72px] w-[72px] items-center justify-center rounded-full bg-[#6D28D9]/8 ring-8 ring-[#A78BFA]/10">
+                          <CheckCircle2
+                            className="h-10 w-10 text-[#6D28D9]"
+                            strokeWidth={2.2}
+                          />
+                        </div>
+                        <DialogTitle className="text-center text-[26px] font-bold tracking-[-0.03em] text-foreground">
+                          출금 신청이 완료되었습니다
+                        </DialogTitle>
+                        <DialogDescription className="max-w-[300px] pt-2 text-center text-sm leading-6 text-foreground-muted">
+                          관리자 확인 후 등록된 계좌로 순차적으로 입금됩니다.
+                        </DialogDescription>
+                      </DialogHeader>
+
+                      <DialogFooter className="mt-8 sm:justify-center">
+                        <Button
+                          type="button"
+                          onClick={() => setIsWithdrawSuccessOpen(false)}
+                          className="min-w-28 rounded-xl bg-[#6D28D9] px-6 text-white shadow-[0_14px_30px_-14px_rgba(109,40,217,0.65)] hover:bg-[#5B21B6]"
+                        >
+                          확인
+                        </Button>
+                      </DialogFooter>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog
+                  open={Boolean(profileFeedback)}
+                  onOpenChange={(open) => !open && setProfileFeedback(null)}
+                >
+                  <DialogContent className="max-w-md rounded-[28px] border border-[#A78BFA]/25 bg-white p-0 shadow-[0_30px_80px_-36px_rgba(109,40,217,0.35)]">
+                    <div className="px-8 pb-8 pt-9">
+                      <DialogHeader className="items-center text-center">
+                        <div
+                          className={`mb-5 flex h-[72px] w-[72px] items-center justify-center rounded-full ring-8 ${
+                            profileFeedback?.type === "error"
+                              ? "bg-red-50 ring-red-100"
+                              : "bg-[#6D28D9]/8 ring-[#A78BFA]/10"
+                          }`}
+                        >
+                          {profileFeedback?.type === "error" ? (
+                            <X
+                              className="h-9 w-9 text-red-500"
+                              strokeWidth={2.2}
+                            />
+                          ) : (
+                            <CheckCircle2
+                              className="h-10 w-10 text-[#6D28D9]"
+                              strokeWidth={2.2}
+                            />
+                          )}
+                        </div>
+                        <DialogTitle className="text-center text-[26px] font-bold tracking-[-0.03em] text-foreground">
+                          {profileFeedback?.title}
+                        </DialogTitle>
+                        <DialogDescription className="max-w-[300px] pt-2 text-center text-sm leading-6 text-foreground-muted">
+                          {profileFeedback?.description}
+                        </DialogDescription>
+                      </DialogHeader>
+
+                      <DialogFooter className="mt-8 sm:justify-center">
+                        <Button
+                          type="button"
+                          onClick={() => setProfileFeedback(null)}
+                          className="min-w-28 rounded-xl bg-[#6D28D9] px-6 text-white shadow-[0_14px_30px_-14px_rgba(109,40,217,0.65)] hover:bg-[#5B21B6]"
+                        >
+                          확인
+                        </Button>
+                      </DialogFooter>
+                    </div>
                   </DialogContent>
                 </Dialog>
               </Card>

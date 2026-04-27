@@ -133,10 +133,9 @@ export function HeroSection() {
             </video>
           )}
 
-          <div className="absolute inset-0 bg-[#14072E]/35" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0616]/85 via-[#2A145A]/62 to-[#6D28D9]/18" />
-          <div className="absolute inset-0 bg-white/[0.03] backdrop-blur-[0.5px]" />
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0B0616]/75 to-transparent" />
+          <div className="absolute inset-0 bg-[#14072E]/18" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0616]/72 via-[#2A145A]/38 to-[#6D28D9]/6" />
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0B0616]/58 to-transparent" />
         </div>
 
         <div className="relative z-10 flex h-full items-center px-6 py-12 sm:px-10 md:pl-20 md:pr-14 lg:px-16 lg:pl-24">
