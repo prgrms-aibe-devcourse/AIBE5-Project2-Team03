@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
+import Link from "next/link";
 
 export function Footer() {
   return (
@@ -89,10 +89,10 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="mt-12 border-t border-border pt-8 flex flex-col items-center justify-between gap-4 text-sm text-foreground-muted md:flex-row">
-          <p>&copy; 2024 QuestWork. All rights reserved.</p>
+          <p>&copy; 2026 QuestWork. All rights reserved.</p>
           <p>Made with passion for developers and companies</p>
         </div>
       </div>
     </footer>
-  )
+  );
 }

@@ -4,6 +4,14 @@ import { ManagerWorkspaceShell } from '@/components/manager/manager-workspace-sh
 import { RewardSection, type QuestRewardItem } from '@/components/manager/reward-section'
 import { useManagerDashboardData } from '@/components/manager/use-manager-dashboard-data'
 
+function isQuestRewardPaid(quest: any, rewardConfirmed: boolean) {
+  if (rewardConfirmed) return true
+
+  return ['FINISHED', 'COMPLETED', 'PAID', 'RELEASED'].includes(
+    String(quest.status ?? '').toUpperCase(),
+  )
+}
+
 export default function ManagerRewardManagementPage() {
   const { isAuthorized, userId, dbQuests, allSubmissions } = useManagerDashboardData()
 
@@ -24,7 +32,7 @@ export default function ManagerRewardManagementPage() {
         submissionId: winner.submissionId,
         submissionTitle: winner.freelancerName,
         githubUrl: winner.githubUrl,
-        rewardConfirmed: quest.status === 'FINISHED',
+        rewardConfirmed: isQuestRewardPaid(quest, winner.rewardConfirmed),
       } satisfies QuestRewardItem
     })
     .filter((item): item is QuestRewardItem => item !== null)

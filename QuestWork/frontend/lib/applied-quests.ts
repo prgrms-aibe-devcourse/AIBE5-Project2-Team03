@@ -192,6 +192,42 @@ export function completeStoredAppliedQuest(
   window.localStorage.setItem(getUserStorageKey(userId), JSON.stringify(next))
 }
 
+export function submitStoredAppliedQuest(
+  questId: string,
+  userId: string,
+  fallback?: Partial<StoredAppliedQuest>,
+) {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  const current = getStoredAppliedQuests(userId)
+  const existing = current.find(
+    (quest) => quest.questId === questId && quest.userId === userId,
+  )
+
+  const submitted: StoredAppliedQuest = {
+    questId,
+    userId,
+    title: existing?.title ?? fallback?.title ?? `퀘스트 #${questId}`,
+    reward: existing?.reward ?? fallback?.reward ?? '-',
+    deadline: existing?.deadline ?? fallback?.deadline ?? '-',
+    rawDeadline: existing?.rawDeadline ?? fallback?.rawDeadline,
+    status: '제출 완료',
+    appliedAt: existing?.appliedAt ?? fallback?.appliedAt ?? new Date().toISOString(),
+    applicationId: existing?.applicationId ?? fallback?.applicationId ?? null,
+  }
+
+  const next = [
+    submitted,
+    ...current.filter(
+      (quest) => !(quest.questId === questId && quest.userId === userId),
+    ),
+  ]
+
+  window.localStorage.setItem(getUserStorageKey(userId), JSON.stringify(next))
+}
+
 export function createStoredAppliedQuest(
   quest: QuestLike,
   userId: string,

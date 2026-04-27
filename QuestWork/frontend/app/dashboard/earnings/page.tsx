@@ -29,6 +29,53 @@ const TYPE_COLOR: Record<string, string> = {
   BONUS: 'bg-primary-light text-primary',
 }
 
+const formatWon = (amount: number) =>
+  `₩${Math.round(Math.abs(amount)).toLocaleString('ko-KR')}`
+
+const parseAmountFromDescription = (description: string, label: string) => {
+  const match = description.match(
+    new RegExp(`${label}\\s*[:：]\\s*([0-9,.]+)`),
+  )
+
+  if (!match) return null
+
+  const amount = Number.parseFloat(match[1].replace(/,/g, ''))
+  return Number.isFinite(amount) ? amount : null
+}
+
+const getQuestIdFromDescription = (description: string) =>
+  description.match(/퀘스트\s*#?\s*(\d+)\s*번/)?.[1] ??
+  description.match(/퀘스트\s*ID[:\s]*(\d+)/i)?.[1] ??
+  description.match(/quest\s*#?\s*(\d+)/i)?.[1]
+
+const getDisplayDescription = (transaction: Transaction) => {
+  const questId = getQuestIdFromDescription(transaction.description)
+  const principal = parseAmountFromDescription(transaction.description, '원금')
+  const fee = parseAmountFromDescription(transaction.description, '수수료')
+  const fallbackTitle =
+    transaction.description
+      .replace(/\([^)]*\)/g, '')
+      .replace(/원금\s*[:：].*$/g, '')
+      .trim() || (TYPE_LABEL[transaction.type] ?? transaction.type)
+
+  const title =
+    transaction.type === 'SETTLEMENT'
+      ? questId
+        ? `퀘스트 #${questId} 보상 지급 완료`
+        : '퀘스트 보상 지급 완료'
+      : fallbackTitle
+
+  const details = [
+    principal !== null ? `원금 ${formatWon(principal)}` : null,
+    fee !== null ? `수수료 ${formatWon(fee)}` : null,
+  ].filter(Boolean)
+
+  return {
+    title,
+    details: details.length > 0 ? details.join(' · ') : null,
+  }
+}
+
 export default function EarningsPage() {
   const router = useRouter()
   const [balance, setBalance] = useState<number | null>(null)
@@ -115,27 +162,38 @@ export default function EarningsPage() {
                   <p className="mt-4 text-sm text-foreground-muted">아직 거래 내역이 없습니다.</p>
                 ) : (
                   <div className="mt-4 divide-y divide-border">
-                    {transactions.map((tx) => (
-                      <div
-                        key={tx.id}
-                        className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Badge className={TYPE_COLOR[tx.type] ?? 'bg-slate-100 text-slate-700'}>
-                            {TYPE_LABEL[tx.type] ?? tx.type}
-                          </Badge>
-                          <div>
-                            <p className="text-sm font-medium text-foreground">{tx.description || '-'}</p>
-                            <p className="mt-0.5 text-xs text-foreground-muted">
-                              {new Date(tx.createdAt).toLocaleString('ko-KR')}
-                            </p>
+                    {transactions.map((tx) => {
+                      const display = getDisplayDescription(tx)
+
+                      return (
+                        <div
+                          key={tx.id}
+                          className="flex items-start justify-between gap-5 py-4 first:pt-0 last:pb-0"
+                        >
+                          <div className="flex min-w-0 items-start gap-4">
+                            <Badge className={TYPE_COLOR[tx.type] ?? 'bg-slate-100 text-slate-700'}>
+                              {TYPE_LABEL[tx.type] ?? tx.type}
+                            </Badge>
+                            <div className="min-w-0">
+                              <p className="text-base font-semibold text-foreground">
+                                {display.title}
+                              </p>
+                              {display.details ? (
+                                <p className="mt-1.5 text-sm text-foreground-muted">
+                                  {display.details}
+                                </p>
+                              ) : null}
+                              <p className="mt-1 text-sm text-foreground-muted">
+                                {new Date(tx.createdAt).toLocaleString('ko-KR')}
+                              </p>
+                            </div>
                           </div>
+                          <p className={`shrink-0 text-lg font-bold ${tx.amount >= 0 ? 'text-primary' : 'text-red-500'}`}>
+                            {tx.amount >= 0 ? '+' : ''}{formatWon(tx.amount)}
+                          </p>
                         </div>
-                        <p className={`shrink-0 font-bold ${tx.amount >= 0 ? 'text-primary' : 'text-red-500'}`}>
-                          {tx.amount >= 0 ? '+' : ''}₩{Math.abs(tx.amount).toLocaleString()}
-                        </p>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
               </div>

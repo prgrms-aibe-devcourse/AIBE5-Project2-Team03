@@ -45,7 +45,6 @@ export function LoginForm() {
 
         let targetPath = "/";
         if (userRole === "ADMIN") targetPath = "/admin";
-        else if (userRole === "MANAGER") targetPath = "/manager";
 
         console.log(`확정 권한: ${userRole} | 이동 경로: ${targetPath}`);
         window.location.href = targetPath;
