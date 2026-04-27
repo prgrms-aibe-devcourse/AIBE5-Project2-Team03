@@ -2,8 +2,10 @@ package com.example.QuestWork.domain.admin.controller;
 
 
 
+import com.example.QuestWork.domain.admin.dto.AdminQuestResponseDto;
 import com.example.QuestWork.domain.admin.dto.AdminUserResponseDto;
 import com.example.QuestWork.domain.admin.service.AdminService;
+import com.example.QuestWork.domain.quest.constant.QuestStatus;
 import com.example.QuestWork.domain.user.constant.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -56,5 +60,30 @@ public class AdminController {
         adminService.updateUserRole(userId, roleName.toUpperCase());
 
         return ResponseEntity.ok("유저[" + userId + "]의 권한이 " + roleName + "(으)로 변경되었습니다.");
+    }
+
+    // ===== 퀘스트 관리 =====
+
+    /** 전체 퀘스트 목록 (매니저 기준 정렬) */
+    @GetMapping("/quests")
+    public ResponseEntity<List<AdminQuestResponseDto>> getAllQuests() {
+        return ResponseEntity.ok(adminService.getAllQuestsForAdmin());
+    }
+
+    /** 퀘스트 상태 변경 (비활성화 등) */
+    @PatchMapping("/quests/{questId}/status")
+    public ResponseEntity<String> updateQuestStatus(
+            @PathVariable("questId") Long questId,
+            @RequestBody String statusStr) {
+        QuestStatus status = QuestStatus.valueOf(statusStr.replace("\"", "").trim());
+        adminService.updateQuestStatus(questId, status);
+        return ResponseEntity.ok("퀘스트 " + questId + " 상태가 " + status + "로 변경되었습니다.");
+    }
+
+    /** 퀘스트 삭제 */
+    @DeleteMapping("/quests/{questId}")
+    public ResponseEntity<String> deleteQuest(@PathVariable("questId") Long questId) {
+        adminService.deleteQuest(questId);
+        return ResponseEntity.ok("퀘스트 " + questId + "이(가) 삭제되었습니다.");
     }
 }

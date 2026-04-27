@@ -49,7 +49,7 @@ export default function StatisticsPage() {
     return (
         <div className="flex min-h-screen flex-col bg-background">
             {/* 1. 헤더 (최상단 고정) */}
-            <AdminHeader />
+            <AdminHeader activeTab="statistics" />
 
             {/* 2. 메인 컨텐츠 영역 */}
             <main className="flex-1 max-w-7xl mx-auto px-4 py-8 space-y-10 w-full">

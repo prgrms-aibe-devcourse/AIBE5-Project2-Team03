@@ -161,7 +161,7 @@ export default function SettlementManagementPage() {
 
   return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-        <AdminHeader />
+        <AdminHeader activeTab="settlement-management" />
         <main className="mx-auto max-w-[1200px] px-6 pt-28 pb-12 space-y-10">
           <div className="text-center space-y-4 mb-8">
             <h1 className="text-4xl font-bold text-slate-900 tracking-tight">정산 관리</h1>

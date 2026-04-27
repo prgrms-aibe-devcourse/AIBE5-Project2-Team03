@@ -35,7 +35,9 @@ public class AdminStatsService {
         System.out.println("======= ADMIN DASHBOARD LOG START =======");
 
         // 1. 오늘 수익
-        BigDecimal todayFee = paymentRepository.calculateTodayFee();
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
+        BigDecimal todayFee = paymentRepository.calculateTodayFee(startOfDay, endOfDay);
         // 2. 이번 달 수익
         BigDecimal monthFee = paymentRepository.calculateMonthFee();
         // 3. 인출 가능 잔액 (누적 수익)

@@ -17,4 +17,6 @@ public interface QuestRepository extends JpaRepository<Quest, Long> {
 
     @Query("SELECT COUNT(q) FROM Quest q WHERE q.status IN ('OPEN', 'IN_PROGRESS')")
     long countActiveQuests();
+
+    List<Quest> findAllByOrderByManagerId_IdAsc();
 }

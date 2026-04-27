@@ -3,6 +3,9 @@ package com.example.QuestWork.domain.admin.service;
 
 
 import com.example.QuestWork.domain.admin.dto.AdminUserResponseDto;
+import com.example.QuestWork.domain.admin.dto.AdminQuestResponseDto;
+import com.example.QuestWork.domain.quest.constant.QuestStatus;
+import com.example.QuestWork.domain.quest.repository.QuestRepository;
 import com.example.QuestWork.domain.user.constant.UserStatus;
 import com.example.QuestWork.domain.user.entity.User;
 import com.example.QuestWork.domain.user.repository.UserRepository;
@@ -13,11 +16,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class AdminService {
     private final UserRepository userRepository;
+    private final QuestRepository questRepository;
 
 
     @Transactional(readOnly = true)
@@ -55,6 +62,30 @@ public class AdminService {
 
         // 2. 새로운 권한(예: ADMIN)으로 다시 연결!
         userRepository.insertUserRoleNative(userId, roleName);
+    }
+
+    // 퀘스트 전체 목록 조회 (매니저 기준 정렬)
+    @Transactional(readOnly = true)
+    public List<AdminQuestResponseDto> getAllQuestsForAdmin() {
+        return questRepository.findAllByOrderByManagerId_IdAsc()
+                .stream()
+                .map(AdminQuestResponseDto::from)
+                .collect(Collectors.toList());
+    }
+
+    // 퀘스트 상태 변경 (비활성화 = CANCELED)
+    public void updateQuestStatus(Long questId, QuestStatus status) {
+        var quest = questRepository.findById(questId)
+                .orElseThrow(() -> new RuntimeException("퀘스트를 찾을 수 없습니다: " + questId));
+        quest.updateStatus(status);
+    }
+
+    // 퀘스트 삭제 (하드 삭제)
+    public void deleteQuest(Long questId) {
+        if (!questRepository.existsById(questId)) {
+            throw new RuntimeException("퀘스트를 찾을 수 없습니다: " + questId);
+        }
+        questRepository.deleteById(questId);
     }
 
 }

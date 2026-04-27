@@ -17,8 +17,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     Optional<Payment> findByQuestIdAndMemberId(Long questId, Long memberId);
 
-    @Query("SELECT SUM(p.fee) FROM Payment p WHERE DATE(p.paidAt) = CURRENT_DATE")
-    BigDecimal calculateTodayFee();
+    @Query("SELECT SUM(p.fee) FROM Payment p WHERE p.paidAt BETWEEN :start AND :end")
+    BigDecimal calculateTodayFee(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     // 전체 누적 수익: 상태가 RELEASED인 모든 수수료 합계
     @Query(value = "SELECT SUM(p.fee) " +
