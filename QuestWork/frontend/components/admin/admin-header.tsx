@@ -9,7 +9,7 @@ export function AdminHeader() {
       // 만약 다크모드라면 bg-slate-950 같은 어두운 색을 써보세요.
       <header className="sticky top-0 z-50 w-full border-b border-border bg-white shadow-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link href="/admin" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <span className="text-sm font-bold text-primary-foreground">Q</span>
             </div>
