@@ -43,6 +43,14 @@ export default function StatisticsPage() {
 
     useEffect(() => { fetchStatistics() }, [])
 
+    // 30초마다 자동 갱신 (오늘 수익 실시간 반영)
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchStatistics()
+        }, 30000)
+        return () => clearInterval(interval)
+    }, [])
+
     if (loading) return <div className="flex min-h-screen items-center justify-center bg-background text-slate-500 font-bold">데이터를 불러오는 중...</div>;
     if (error) return <div className="flex min-h-screen items-center justify-center text-red-500">{error}</div>;
 
@@ -63,6 +71,7 @@ export default function StatisticsPage() {
                     <div className="flex items-center gap-3 text-slate-400 bg-slate-100/50 px-4 py-2 rounded-full border border-slate-200 w-fit">
                         <Clock className="w-4 h-4 text-slate-500" />
                         <span className="text-xs font-bold uppercase tracking-widest">실시간 동기화 완료: {lastUpdated}</span>
+                        <span className="text-xs text-slate-400">(30초 자동갱신)</span>
                     </div>
                 </div>
 

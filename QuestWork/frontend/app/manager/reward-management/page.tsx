@@ -23,6 +23,7 @@ export default function ManagerRewardManagementPage() {
         submissionId: winner.submissionId,
         submissionTitle: winner.freelancerName, // submissionTitle은 훅에서 추가 필요 시 확장
         githubUrl: winner.githubUrl,
+        rewardConfirmed: quest.status === 'FINISHED',
       } satisfies QuestRewardItem
     })
     .filter((item): item is QuestRewardItem => item !== null)

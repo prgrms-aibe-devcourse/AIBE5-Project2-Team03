@@ -148,6 +148,10 @@ export default function ManagerQuestDetailPage() {
         setQuest(questData)
         setApplicants(applicantsData)
         setSubmissions(submissionsData)
+        // 이미 지급 완료된 경우(FINISHED) payoutDone 반영
+        if (questData.status === 'FINISHED') {
+          setPayoutDone(true)
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : '오류가 발생했습니다.')
       } finally {
@@ -166,6 +170,7 @@ export default function ManagerQuestDetailPage() {
       const res = await fetch('http://localhost:8000/api/settlement/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           freelancerId: submission.userId,
           questId: quest.id,

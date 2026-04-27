@@ -17,15 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-const TECH_STACK_OPTIONS = [
-  "React",
-  "Next.js",
-  "Java",
-  "Spring",
-  "Node.js",
-  "Python",
-];
+import { SKILL_TAG_GROUPS } from "@/lib/skill-tags";
 
 const DIFFICULTY_OPTIONS = ["Beginner", "Intermediate", "Advanced"];
 
@@ -299,22 +291,45 @@ export default function CreateQuestPage() {
                     기술 스택 요구사항
                   </h2>
 
-                  <div className="flex flex-wrap gap-2">
-                    {TECH_STACK_OPTIONS.map((tech) => (
-                      <button
-                        key={tech}
-                        type="button"
-                        onClick={() => handleTechStackChange(tech)}
-                        className={`rounded-md px-3 py-2 text-sm font-medium transition-all ${
-                          formData.techStack.includes(tech)
-                            ? "bg-primary text-primary-foreground"
-                            : "border border-border bg-surface text-foreground hover:border-primary hover:text-primary"
-                        }`}
-                      >
-                        {tech}
-                      </button>
+                  <div className="space-y-4">
+                    {SKILL_TAG_GROUPS.map((group) => (
+                      <div key={group.category}>
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground-muted">
+                          {group.category}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {group.skills.map((tech) => (
+                            <button
+                              key={tech}
+                              type="button"
+                              onClick={() => handleTechStackChange(tech)}
+                              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+                                formData.techStack.includes(tech)
+                                  ? "bg-primary text-primary-foreground"
+                                  : "border border-border bg-surface text-foreground hover:border-primary hover:text-primary"
+                              }`}
+                            >
+                              {tech}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     ))}
                   </div>
+
+                  {formData.techStack.length > 0 && (
+                    <div className="mt-4 flex flex-wrap gap-1.5">
+                      <span className="text-xs text-foreground-muted">선택됨:</span>
+                      {formData.techStack.map((tech) => (
+                        <span
+                          key={tech}
+                          className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </Card>
 
                 <Card className="border border-border p-6">
