@@ -25,7 +25,6 @@ export function HeroSection() {
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const [isVideoReady, setIsVideoReady] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [audience, setAudience] = useState<Audience>("freelancer");
   const [role, setRole] = useState<string | null>(null);
@@ -38,9 +37,6 @@ export function HeroSection() {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const updateMotionPreference = () => {
       setPrefersReducedMotion(mediaQuery.matches);
-      if (mediaQuery.matches) {
-        setIsVideoReady(false);
-      }
     };
 
     updateMotionPreference();
@@ -95,7 +91,7 @@ export function HeroSection() {
   return (
     <section className="flex justify-center bg-background px-4 py-10 sm:px-6 lg:px-8">
       <div
-        className="relative aspect-[1280/628] min-h-[616px] w-full max-w-[1408px] overflow-hidden rounded-3xl shadow-2xl shadow-black/20 lg:min-h-0"
+        className="relative aspect-1280/628 min-h-154 w-full max-w-352 overflow-hidden rounded-3xl shadow-2xl shadow-black/20 lg:min-h-0"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -116,26 +112,21 @@ export function HeroSection() {
 
           {!prefersReducedMotion && (
             <video
-              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
-                isVideoReady ? "opacity-100" : "opacity-0"
-              }`}
+              className="absolute inset-0 h-full w-full object-cover"
               autoPlay
               muted
               loop
               playsInline
-              preload="metadata"
+              preload="auto"
               poster={HERO_VIDEO_POSTER}
-              onCanPlay={() => setIsVideoReady(true)}
-              onError={() => setIsVideoReady(false)}
               aria-hidden="true"
-            >
-              <source src={HERO_VIDEO_SRC} type="video/mp4" />
-            </video>
+              src={HERO_VIDEO_SRC}
+            />
           )}
 
           <div className="absolute inset-0 bg-[#14072E]/18" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0616]/72 via-[#2A145A]/38 to-[#6D28D9]/6" />
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0B0616]/58 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-r from-[#0B0616]/72 via-[#2A145A]/38 to-[#6D28D9]/6" />
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-[#0B0616]/58 to-transparent" />
         </div>
 
         <div className="relative z-10 flex h-full items-center px-6 py-12 sm:px-10 md:pl-20 md:pr-14 lg:px-16 lg:pl-24">
@@ -195,7 +186,7 @@ export function HeroSection() {
               {audience === "freelancer" ? (
                 <form
                   onSubmit={handleSearch}
-                  className="flex w-full max-w-2xl flex-col gap-3 rounded-[2rem] border border-white/20 bg-white/95 p-2 shadow-2xl shadow-black/25 sm:flex-row"
+                  className="flex w-full max-w-2xl flex-col gap-3 rounded-4xl border border-white/20 bg-white/95 p-2 shadow-2xl shadow-black/25 sm:flex-row"
                 >
                   <label className="sr-only" htmlFor="quest-search">
                     퀘스트 검색
@@ -253,8 +244,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        {!isVideoReady && (
-          <>
+        <>
             <button
               onClick={prevSlide}
               className="absolute left-5 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-white/20 bg-black/25 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A78BFA] md:inline-flex lg:left-6"
@@ -310,7 +300,6 @@ export function HeroSection() {
               ))}
             </div>
           </>
-        )}
       </div>
     </section>
   );

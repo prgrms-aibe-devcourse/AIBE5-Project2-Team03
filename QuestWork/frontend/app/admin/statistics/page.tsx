@@ -78,7 +78,7 @@ export default function StatisticsPage() {
                 {/* 상단 카드 섹션 (메인 수익 카드 + 요약 카드들) */}
                 <div className="flex flex-col lg:flex-row gap-6">
                     <div className="lg:w-1/3">
-                        <Card className="h-full border-0 shadow-2xl bg-[#1e293b] text-white rounded-[32px] overflow-hidden relative group min-h-[240px]">
+                        <Card className="h-full border-0 shadow-2xl bg-[#1e293b] text-white rounded-4xl overflow-hidden relative group min-h-60">
                             <div className="absolute -right-4 -top-4 w-48 h-48 bg-blue-500/20 blur-[60px] group-hover:bg-blue-500/30 transition-all duration-700" />
                             <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-emerald-500/10 blur-[50px]" />
 
@@ -137,7 +137,7 @@ export default function StatisticsPage() {
                     </CardHeader>
 
                     <CardContent className="p-8">
-                        <div className="h-[400px] w-full">
+                        <div className="h-100 w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart
                                     data={chartMode === 'weekly' ? data?.dailyRevenues : data?.monthlyRevenues}
@@ -207,7 +207,7 @@ export default function StatisticsPage() {
 
 function SmallStatsCard({ title, value, unit = "원", icon }: any) {
     return (
-        <Card className="border-0 shadow-sm rounded-[24px] bg-white hover:shadow-xl hover:shadow-slate-100/50 transition-all duration-300 group">
+        <Card className="border-0 shadow-sm rounded-3xl bg-white hover:shadow-xl hover:shadow-slate-100/50 transition-all duration-300 group">
             <CardContent className="p-6">
                 <div className="flex items-center gap-5">
                     <div className="w-11 h-11 rounded-xl bg-slate-50 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 border border-slate-100/50">

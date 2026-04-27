@@ -19,8 +19,8 @@ const MARQUEE_GROUPS = [COMPANY_LOGOS, COMPANY_LOGOS];
 
 export function TrustedCompaniesSection() {
   return (
-    <section className="relative overflow-hidden border-t border-border bg-[linear-gradient(180deg,rgba(109,40,217,0.04),rgba(255,255,255,0)_36%),linear-gradient(90deg,rgba(167,139,250,0.08),rgba(255,255,255,0)_18%,rgba(255,255,255,0)_82%,rgba(167,139,250,0.08))] px-4 py-16 sm:px-6 sm:py-[4.5rem] lg:px-8">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#A78BFA]/40 to-transparent" />
+    <section className="relative overflow-hidden border-t border-border bg-[linear-gradient(180deg,rgba(109,40,217,0.04),rgba(255,255,255,0)_36%),linear-gradient(90deg,rgba(167,139,250,0.08),rgba(255,255,255,0)_18%,rgba(255,255,255,0)_82%,rgba(167,139,250,0.08))] px-4 py-16 sm:px-6 sm:py-18 lg:px-8">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#A78BFA]/40 to-transparent" />
 
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
@@ -36,11 +36,11 @@ export function TrustedCompaniesSection() {
         </div>
 
         <div className="relative mt-10">
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background via-background/92 to-transparent sm:w-24" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background via-background/92 to-transparent sm:w-24" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-linear-to-r from-background via-background/92 to-transparent sm:w-24" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-linear-to-l from-background via-background/92 to-transparent sm:w-24" />
 
-          <div className="rounded-[2rem] border border-white/60 bg-white/72 px-3 py-5 shadow-[0_24px_80px_-48px_rgba(109,40,217,0.35)] backdrop-blur-sm sm:px-4">
-            <div className="trusted-marquee overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+          <div className="rounded-4xl border border-white/60 bg-white/72 px-3 py-5 shadow-[0_24px_80px_-48px_rgba(109,40,217,0.35)] backdrop-blur-sm sm:px-4">
+            <div className="trusted-marquee overflow-hidden mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
               <div className="trusted-marquee__track flex min-w-max shrink-0 items-center">
                 {MARQUEE_GROUPS.map((group, groupIndex) => (
                   <div
@@ -51,7 +51,7 @@ export function TrustedCompaniesSection() {
                     {group.map((logo) => (
                       <div
                         key={`${groupIndex}-${logo.name}`}
-                        className="group/logo flex h-16 w-[136px] items-center justify-center px-3 transition-colors duration-300 hover:bg-[#6D28D9]/4 sm:h-[4.5rem] sm:w-[156px] sm:px-4"
+                        className="group/logo flex h-16 w-34 items-center justify-center px-3 transition-colors duration-300 hover:bg-[#6D28D9]/4 sm:h-18 sm:w-39 sm:px-4"
                       >
                         <Image
                           src={logo.src}

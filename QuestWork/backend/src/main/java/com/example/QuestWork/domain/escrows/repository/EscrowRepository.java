@@ -27,6 +27,7 @@ public interface EscrowRepository extends JpaRepository<Escrow, Long> {
     // dto 뒤에 실제 클래스명(예: DailyRevenueDto)까지 꼭 붙여줘야 해요!
     @Query("SELECT new com.example.QuestWork.domain.admin.dto.DailyRevenueDto(" +
             "  FUNCTION('DATE_FORMAT', e.releasedAt, '%Y-%m-%d'), " +
+            "  SUM(e.amount), " +
             "  SUM(e.amount)) " +
             "FROM Escrow e " +
             "WHERE e.status = 'RELEASED' AND e.releasedAt >= :startDate " +
@@ -37,6 +38,7 @@ public interface EscrowRepository extends JpaRepository<Escrow, Long> {
     // 최근 12개월간의 월별 지급 완료(RELEASED) 금액 합계 (월간 그래프용)
     @Query("SELECT new com.example.QuestWork.domain.admin.dto.DailyRevenueDto(" +
             "  FUNCTION('DATE_FORMAT', e.releasedAt, '%Y-%m'), " +
+            "  SUM(e.amount), " +
             "  SUM(e.amount)) " +
             "FROM Escrow e " +
             "WHERE e.status = 'RELEASED' AND e.releasedAt >= :startDate " +
